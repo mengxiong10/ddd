@@ -1,0 +1,80 @@
+# 项目总纲（CONSTITUTION）
+
+## 最高原则
+单人开发；可维护性第一；文件与抽象最少；低改动放大；不提前抽象（YAGNI）。
+
+## 项目目标
+一款纯前端、单机、回合制策略游戏：以三国为背景，玩家通过**经营**（获取金钱与兵力）与**战斗**（回合制战棋）逐步占领州郡，**统一全国即胜利**。
+
+## 技术栈
+- 语言：TypeScript（严格模式）
+- 框架/构建：React + Vite
+- 样式/组件：Tailwind CSS + shadcn/ui
+- 状态管理：Zustand
+- 持久化：localStorage（本地存档）
+- 测试：Vitest（核心逻辑单测）
+
+## 架构原则（"引擎"即分层，而非游戏引擎）
+明确不使用 Phaser / PixiJS 等游戏引擎。回合制 UI/面板/地图驱动的特性下，分层架构更易维护、可测：
+
+- **游戏核心 `src/core/`**：纯 TypeScript，**禁止 import React / Zustand / 任何 UI**。
+  - 不可变状态推进：`apply(state, action) -> newState`，纯函数、确定性、可单测。
+  - 所有规则归此层：经营产出、兵力增长、战斗结算、AI 决策、胜负判定。
+  - 随机性通过可注入的 seed/RNG，保证可复现、可测。
+- **状态层 `src/store/`**：Zustand store 持有 core 状态、派发 action、对接 localStorage 存档。**不写游戏规则**。Zustand store 即"应用服务层"，不再额外引入应用层。
+- **渲染层 `src/ui/`**：React + shadcn/ui，只读状态、画界面、发 action。**不写游戏规则**。
+
+依赖方向严格单向：`ui → store → core`，core 不反向依赖任何上层。
+
+## core 内部组织：DDD-lite（函数式）
+为防止 `economy.ts` / `ai.ts` 等单文件膨胀成"上帝文件"，`core` 内部按 **限界上下文（bounded context）** 划分，但只取轻量 DDD：
+
+- 采用：**限界上下文分模块 + 聚合 + 值对象 + 领域服务 + 统一语言（沉淀到 `CONTEXT.md`）**。
+- **不采用**：仓储（Repository）、应用/基础设施分层、领域事件总线、ORM、贫血/充血实体类。出现真实需求（如第二个事件消费者）前不提前引入，遵循 YAGNI。
+- **聚合用函数式实现**：聚合 = 数据类型 + 一组对其操作的纯函数（含不变量校验），契合不可变状态总纲；不使用 class 实体。
+- 跨上下文协调保持薄：`game.ts` 的 `apply` 作为总入口，委派给各上下文的命令处理函数。
+
+## 代码与目录约定
+```
+src/
+  core/                  # 纯 TS 游戏核心（无 UI 依赖），按限界上下文组织
+    shared/              # 跨上下文值对象/基础类型：Resources、Position、Id、rng
+    world/               # 上下文：地图/归属/城池
+      city.ts            #   聚合 City + 不变量
+      officer.ts         #   聚合 Officer（君主即 Officer，归属用 lordId）
+      adjacency.ts       #   州郡邻接图（值对象）
+    economy/             # 上下文：经营（金钱/兵力产出、征兵——领域服务）
+    military/            # 上下文：部队/战棋战斗
+      army.ts            #   聚合 Army / Unit
+      battlefield.ts     #   战棋棋盘（值对象）
+      battle.ts          #   战斗结算（领域服务）
+      movement.ts
+    turn/                # 上下文：回合调度
+    ai/                  # AI 决策（经营 + 战斗）
+    game-state.ts        # 根状态 GameState（聚合各上下文状态）
+    game.ts              # apply(state, action) 总入口，编排各上下文
+    *.test.ts            # 与被测文件同级
+  store/                 # Zustand store + 存档
+  ui/
+    components/ui/        # shadcn 生成的基础组件
+    ...                  # 业务组件（地图、城池面板、战棋界面等）
+  App.tsx
+  main.tsx
+```
+- 命名：类型 PascalCase；函数/变量 camelCase；文件 kebab-case 或与导出主体一致。
+- 模块组织：deep modules——小接口、深实现；每个上下文自带类型与规则，就近放置，不设全局 `types.ts` 巨石，不堆空泛 utils。
+
+## 数据建模原则（经验）
+- **单一真相源、禁止冗余状态**：同一事实只存一处。能由其它字段派生的，就用派生函数（selector）求得，不另存一份。
+  - 反例（已踩坑）：`City.officerIds` 与 `Officer.cityId` 同时存归属——双向冗余，易不一致。已删除 `officerIds`，统一用 `officersInCity`（基于 `Officer.cityId`）反推。
+  - 规则：新增字段前先问"它能否从已有状态推出？"能则不存，写成 selector。双向引用（A 存 B 列表且 B 存 A 引用）默认禁止，只保留其一。
+
+## 测试与质量线
+- 默认 TDD：**是，但仅限游戏核心** `src/core/`（经营产出、战斗结算、AI、胜负判定）；UI 不强制测试。
+- 测什么：核心规则的关键行为与边界，少而精，不追覆盖率。
+- core 必须保持可在无浏览器环境下运行与测试（纯函数 + 可注入 RNG）。
+
+## 范围边界（第一版 MVP）
+- 做：6–9 个州的节点地图；1 个 AI 对手；经营（征兵/产金等）+ 回合制战棋 + 占领；占领全部州即胜利；localStorage 存档。
+- 战棋规模约束：**小棋盘（如 ≤ 8×6）、双方单位数少（如 ≤ 6/方）**，控制复杂度。
+- 不做（第一版）：多 AI 势力、外交、科技树、武将养成、动画/音效、联机、复杂剧情。
