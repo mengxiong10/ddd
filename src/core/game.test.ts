@@ -63,6 +63,36 @@ describe('征兵 / 分配 端到端', () => {
   })
 })
 
+describe('掠夺 / 侦察 端到端', () => {
+  it('掠夺占人、效果延到月末（破坏+收益）后回城、队列清空', () => {
+    let s = apply(createInitialState(1), { type: 'plunder', cityId: 'chengdu', officerId: 'zhugeliang' })
+    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(s.cities.chengdu!.agriculture).toBe(300) // 下令当下不破坏
+    expect(s.pendingCommands).toHaveLength(1)
+    s = apply(s, { type: 'endMonth' })
+    expect(s.cities.chengdu!.agriculture).toBe(150) // 月末破坏
+    expect(s.cities.chengdu!.food).toBe(400 + 750)
+    expect(s.cities.chengdu!.gold).toBe(500 + 300)
+    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(s.pendingCommands).toEqual([])
+  })
+
+  it('侦察占人、即时扣金扣体力，月末回城', () => {
+    let s = apply(createInitialState(1), { type: 'scout', cityId: 'chengdu', officerId: 'zhugeliang', targetCityId: 'xuchang' })
+    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(s.cities.chengdu!.gold).toBe(500 - 20)
+    s = apply(s, { type: 'endMonth' })
+    expect(s.officers.zhugeliang!.busy).toBe(false)
+  })
+
+  it('canApply 反映 canPlunder / canScout 校验', () => {
+    const s = createInitialState(1)
+    expect(canApply(s, { type: 'plunder', cityId: 'chengdu', officerId: 'zhugeliang' }).ok).toBe(true)
+    expect(canApply(s, { type: 'scout', cityId: 'chengdu', officerId: 'zhugeliang', targetCityId: 'jiangling' }).ok).toBe(false)
+    expect(canApply(s, { type: 'scout', cityId: 'chengdu', officerId: 'zhugeliang', targetCityId: 'xuchang' }).ok).toBe(true)
+  })
+})
+
 describe('端到端确定性', () => {
   it('相同 seed + 相同动作序列 -> 完全一致', () => {
     const actions: Action[] = [

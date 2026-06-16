@@ -104,5 +104,6 @@ export function createInitialState(seed: number): GameState {
     cities,
     officers,
     rng: createRng(seed),
+    pendingCommands: [],
   }
 }

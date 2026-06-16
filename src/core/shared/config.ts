@@ -16,6 +16,12 @@ export interface GameConfig {
   readonly staminaRecoveryPerMonth: number
   /** 征兵消耗的执行人体力（扁平成本，可调）。 */
   readonly recruitStaminaCost: number
+  /** 掠夺消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly plunderStaminaCost: number
+  /** 侦察消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly scoutStaminaCost: number
+  /** 侦察消耗的本城金（扁平成本，门槛同值）。 */
+  readonly scoutGoldCost: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
@@ -24,4 +30,7 @@ export const DEFAULT_CONFIG: GameConfig = {
   commandStaminaCost: 8,
   staminaRecoveryPerMonth: 4,
   recruitStaminaCost: 12,
+  plunderStaminaCost: 12,
+  scoutStaminaCost: 10,
+  scoutGoldCost: 20,
 }

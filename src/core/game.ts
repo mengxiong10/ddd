@@ -6,6 +6,8 @@ import { DEFAULT_CONFIG } from './shared/config'
 import { canDevelop, develop } from './economy/develop'
 import { canRecruit, recruit } from './economy/recruit'
 import { canAllocate, allocate } from './economy/allocate'
+import { canPlunder, plunder } from './economy/plunder'
+import { canScout, scout } from './economy/scout'
 import { endMonth } from './turn/end-month'
 
 /**
@@ -17,6 +19,8 @@ export type Action =
   | { type: 'commerce'; cityId: CityId; officerId: OfficerId } // 招商 -> commerce
   | { type: 'recruit'; cityId: CityId; officerId: OfficerId; amount: number } // 征兵（占人）
   | { type: 'allocate'; cityId: CityId; officerId: OfficerId; amount: number } // 分配（不占人）
+  | { type: 'plunder'; cityId: CityId; officerId: OfficerId } // 掠夺（占人，效果延到月末）
+  | { type: 'scout'; cityId: CityId; officerId: OfficerId; targetCityId: CityId } // 侦察（占人，即时）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -30,6 +34,10 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canRecruit(state, action.cityId, action.officerId, action.amount, config)
     case 'allocate':
       return canAllocate(state, action.cityId, action.officerId, action.amount)
+    case 'plunder':
+      return canPlunder(state, action.cityId, action.officerId, config)
+    case 'scout':
+      return canScout(state, action.cityId, action.officerId, action.targetCityId, config)
     case 'endMonth':
       return { ok: true }
   }
@@ -46,6 +54,10 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return recruit(state, action.cityId, action.officerId, action.amount, config)
     case 'allocate':
       return allocate(state, action.cityId, action.officerId, action.amount)
+    case 'plunder':
+      return plunder(state, action.cityId, action.officerId, config)
+    case 'scout':
+      return scout(state, action.cityId, action.officerId, action.targetCityId, config)
     case 'endMonth':
       return endMonth(state, config)
   }

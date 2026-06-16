@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { City } from './city'
-import { attributeCap, raiseAttribute, spendGold, addFood, addGold, addReserveTroops } from './city'
+import { attributeCap, raiseAttribute, spendGold, addFood, addGold, addReserveTroops, ravage } from './city'
 
 const base: City = {
   id: 'c1', name: '成都', lordId: 'o1',
@@ -38,5 +38,18 @@ describe('city 聚合', () => {
   it('addReserveTroops 增减后备兵，不低于 0', () => {
     expect(addReserveTroops(base, 50).reserveTroops).toBe(50)
     expect(addReserveTroops({ ...base, reserveTroops: 30 }, -50).reserveTroops).toBe(0)
+  })
+
+  it('ravage 农业/商业/民忠各 floor(÷2)，不碰粮/金', () => {
+    const r = ravage({ ...base, agriculture: 301, commerce: 200, loyalty: 51 })
+    expect(r.agriculture).toBe(150)
+    expect(r.commerce).toBe(100)
+    expect(r.loyalty).toBe(25)
+    expect(r.food).toBe(base.food)
+    expect(r.gold).toBe(base.gold)
+  })
+
+  it('ravage 连续两次再减半（基于上次结果）', () => {
+    expect(ravage(ravage(base)).agriculture).toBe(75)
   })
 })

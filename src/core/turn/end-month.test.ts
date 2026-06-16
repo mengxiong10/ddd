@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import { develop } from '../economy/develop'
+import { plunder } from '../economy/plunder'
 import { endMonth } from './end-month'
 
 const cfg = DEFAULT_CONFIG
@@ -39,5 +40,19 @@ describe('endMonth 月末编排', () => {
     expect(next.cities.chengdu!.food).toBe(400 + 75)
     expect(next.cities.chengdu!.gold).toBe(500 + 100)
     expect(next.month).toBe(7)
+  })
+
+  it('掠夺先于收粮/收税：收粮月按减半后的农业/商业结算，队列清空、执行人回城', () => {
+    // 6 月（收粮+收税）：先掠夺成都（农 300->150、商 200->100），收益粮+750/金+300，再按减半后收粮 floor(150/4)=37、收税 floor(100/2)=50
+    const queued = plunder({ ...createInitialState(1), month: 6 }, 'chengdu', 'zhugeliang', cfg)
+    const next = endMonth(queued, cfg)
+    const c = next.cities.chengdu!
+    expect(c.agriculture).toBe(150)
+    expect(c.commerce).toBe(100)
+    expect(c.loyalty).toBe(25)
+    expect(c.food).toBe(400 + 750 + 37)
+    expect(c.gold).toBe(500 + 300 + 50)
+    expect(next.pendingCommands).toEqual([])
+    expect(next.officers.zhugeliang!.busy).toBe(false)
   })
 })

@@ -55,3 +55,17 @@ export function addGold(c: City, amount: number): City {
 export function addReserveTroops(c: City, delta: number): City {
   return { ...c, reserveTroops: Math.max(0, c.reserveTroops + delta) }
 }
+
+/**
+ * 掠夺破坏：城被掠夺后的降级转移——农业/商业/民忠各 floor(÷2)。
+ * RAVAGE_DIVISOR 为内联规则身份；floor 于非负值即保证 ≥0，且不超原上限，不碰粮/金。
+ */
+const RAVAGE_DIVISOR = 2
+export function ravage(c: City): City {
+  return {
+    ...c,
+    agriculture: Math.floor(c.agriculture / RAVAGE_DIVISOR),
+    commerce: Math.floor(c.commerce / RAVAGE_DIVISOR),
+    loyalty: Math.floor(c.loyalty / RAVAGE_DIVISOR),
+  }
+}

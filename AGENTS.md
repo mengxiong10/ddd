@@ -11,6 +11,7 @@
 - 不引入仓储/应用层/事件总线/实体 class；YAGNI，出现真实需求前不提前抽象。
 - 跨上下文协调只走 `core/game.ts` 的 `apply` 总入口委派；上下文之间不互相深耦合。
 - 指令分「校验/变更」两段：`canX` 返回统一的 `CommandCheck`（`shared/command.ts`，`{ok, reason}`），`X` 执行变更且非法即 no-op；`game.canApply/apply` 按 Action 分派委派给各领域服务。
+- 占人统一用 `Officer.busy`（横切所有占人指令，月末回城）。**效果延到月末执行**的指令进 `GameState.pendingCommands`（带 `type` 的判别式并集），由 `turn` 层按 `type` 分派执行（与 `game.apply` 同构）；效果即时的指令不入队。月末顺序固定：`pendingCommands → settle（收粮/收税）→ 回城+体力恢复 → 月份+1`。
 
 ## 流程
 spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ spec-build（实现）→ spec-refactor（重构）
@@ -21,5 +22,6 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 |------|-----|---------|------|
 | 经营循环 economy-loop | specs/01-economy-loop/prd.md | specs/01-economy-loop/dev.md | done |
 | 兵力系统 troops | specs/02-troops/prd.md | specs/02-troops/dev.md | done |
+| 掠夺/侦察 plunder-scout | specs/03-plunder-scout/prd.md | specs/03-plunder-scout/dev.md | done |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）
