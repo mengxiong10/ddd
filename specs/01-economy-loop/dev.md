@@ -16,20 +16,19 @@
 ```ts
 export type DevelopKind = 'agriculture' | 'commerce'
 
+// config 只放「扁平成本 + 恢复速率」（平衡旋钮）；公式/除数/日历/量纲上限属规则身份，内联到领域模块（见 CONSTITUTION「配置 vs 内联常量」）。
 export interface GameConfig {
   commandGoldCost: number         // 50
   commandStaminaCost: number      // 8
-  staminaMax: number              // 100
   staminaRecoveryPerMonth: number // 4
-  developIntelDivisor: number     // 5  -> floor(智力 / 5)
-  developRandMax: number          // 30 -> RandInt(0, 30)
-  harvestDivisor: number          // 4  -> floor(农业 / 4)
-  taxDivisor: number              // 2  -> floor(商业 / 2)
-  harvestMonths: readonly number[] // [6, 10]
-  taxMonths: readonly number[]     // [3, 6, 9, 12]
 }
 
 export const DEFAULT_CONFIG: GameConfig
+
+// 以下为内联规则常量，不在 config：
+//  world/officer.ts   : STAMINA_MAX = 100（固定量纲上限）
+//  economy/develop.ts : DEVELOP_INTEL_DIVISOR = 5、DEVELOP_RAND_MAX = 30（增量公式）
+//  economy/settle.ts  : HARVEST_DIVISOR = 4、TAX_DIVISOR = 2、HARVEST_MONTHS = [6,10]、TAX_MONTHS = [3,6,9,12]
 ```
 
 ### shared/rng.ts
@@ -59,7 +58,8 @@ export interface Officer {
 }
 // 聚合操作（纯函数，含不变量：stamina 夹在 [0, max]）
 export function spendStamina(o: Officer, amount: number): Officer
-export function recoverStamina(o: Officer, amount: number, max: number): Officer
+export const STAMINA_MAX: number // 100（固定量纲上限，内联常量）
+export function recoverStamina(o: Officer, amount: number): Officer  // 封顶 STAMINA_MAX
 export function setBusy(o: Officer, busy: boolean): Officer
 ```
 
@@ -124,10 +124,10 @@ export function develop(
 
 ### economy/settle.ts
 ```ts
-export function harvestAmount(agriculture: number, config: GameConfig): number  // floor(agri / harvestDivisor)
-export function taxAmount(commerce: number, config: GameConfig): number          // floor(commerce / taxDivisor)
-// 按当前 state.month 判定，对所有城收粮(入 food)/收税(入 gold)
-export function settle(state: GameState, config: GameConfig): GameState
+export function harvestAmount(agriculture: number): number  // floor(agri / HARVEST_DIVISOR)
+export function taxAmount(commerce: number): number          // floor(commerce / TAX_DIVISOR)
+// 按当前 state.month 判定（HARVEST_MONTHS/TAX_MONTHS 内联），对所有城收粮(入 food)/收税(入 gold)
+export function settle(state: GameState): GameState
 ```
 
 ### turn/end-month.ts
@@ -175,7 +175,7 @@ export function canApply(state: GameState, action: Action, config?: GameConfig):
 - [x] settle：6 月收粮+收税；10 月仅收粮；3/9/12 月仅收税；其余月份无变化（对每座城含 AI 城）。
 - [x] endMonth：触发 settle、所有 busy 武将回城(busy=false)、已登场武将体力 +4 封顶 100、月份 +1、12 月→次年 1 月。
 - [x] 确定性：相同 seed 跑相同动作序列，结果一致。
-- [x] 配置注入：改 GameConfig（如 cap/cost/divisor/月份表）能改变对应行为。
+- [x] 配置注入：改 GameConfig（成本/恢复）能改变对应行为；公式除数/结算月份为内联规则常量，按精确值断言（不再经 config 注入）。
 
 ## 新建文件
 - `src/core/shared/config.ts`：GameConfig + DEFAULT_CONFIG

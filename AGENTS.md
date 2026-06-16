@@ -10,6 +10,7 @@
 - `core` 内部按限界上下文组织（world / economy / military / turn / ai / shared），采用 **DDD-lite（函数式）**：聚合=数据类型+纯函数、值对象、领域服务、统一语言。
 - 不引入仓储/应用层/事件总线/实体 class；YAGNI，出现真实需求前不提前抽象。
 - 跨上下文协调只走 `core/game.ts` 的 `apply` 总入口委派；上下文之间不互相深耦合。
+- 指令分「校验/变更」两段：`canX` 返回统一的 `CommandCheck`（`shared/command.ts`，`{ok, reason}`），`X` 执行变更且非法即 no-op；`game.canApply/apply` 按 Action 分派委派给各领域服务。
 
 ## 流程
 spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ spec-build（实现）→ spec-refactor（重构）
@@ -19,5 +20,6 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 | 功能 | PRD | 开发文档 | 状态 |
 |------|-----|---------|------|
 | 经营循环 economy-loop | specs/01-economy-loop/prd.md | specs/01-economy-loop/dev.md | done |
+| 兵力系统 troops | specs/02-troops/prd.md | specs/02-troops/dev.md | done |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）

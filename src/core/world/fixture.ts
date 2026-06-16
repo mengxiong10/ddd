@@ -1,6 +1,7 @@
 import type { GameState } from '../game-state'
 import type { City } from './city'
 import type { Officer } from './officer'
+import { STAMINA_MAX } from './officer'
 import type { CityId, OfficerId } from '../shared/ids'
 import { createRng } from '../shared/rng'
 
@@ -8,6 +9,12 @@ import { createRng } from '../shared/rng'
 const START_YEAR = 189
 /** fixture 中每城的农业/商业上限默认值。 */
 const DEFAULT_CAP = 1000
+/** 新字段统一 mock 值（不逐人配，凸显占位、待后续平衡）。 */
+const MOCK_LOYALTY = 50
+const MOCK_RESERVE_TROOPS = 0
+const MOCK_LEVEL = 1
+const MOCK_FORCE = 50
+const MOCK_TROOPS = 100
 
 interface OfficerSeed {
   readonly id: OfficerId
@@ -79,11 +86,13 @@ export function createInitialState(seed: number): GameState {
       agriculture: cs.agriculture, commerce: cs.commerce,
       agricultureCap: DEFAULT_CAP, commerceCap: DEFAULT_CAP,
       gold: cs.gold, food: cs.food,
+      loyalty: MOCK_LOYALTY, reserveTroops: MOCK_RESERVE_TROOPS,
     }
     for (const os of cs.officers) {
       officers[os.id] = {
         id: os.id, name: os.name, intelligence: os.intelligence,
-        lordId: cs.lordId, cityId: cs.id, stamina: 100, busy: false,
+        lordId: cs.lordId, cityId: cs.id, stamina: STAMINA_MAX, busy: false,
+        troops: MOCK_TROOPS, level: MOCK_LEVEL, force: MOCK_FORCE,
       }
     }
   }

@@ -13,12 +13,12 @@ export function endMonth(state: GameState, config: GameConfig): GameState {
   // 1. AI 下令（本切片空步）
   const afterAi = aiTakeTurn(state, config)
   // 2. 月末结算（收粮/收税）
-  const settled = settle(afterAi, config)
+  const settled = settle(afterAi)
   // 3. 占用武将回城 + 体力恢复（封顶）
   const officers: Record<OfficerId, GameState['officers'][OfficerId]> = { ...settled.officers }
   for (const id of Object.keys(officers)) {
     officers[id] = setBusy(
-      recoverStamina(officers[id]!, config.staminaRecoveryPerMonth, config.staminaMax),
+      recoverStamina(officers[id]!, config.staminaRecoveryPerMonth),
       false,
     )
   }

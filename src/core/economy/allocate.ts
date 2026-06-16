@@ -1,0 +1,60 @@
+import type { GameState } from '../game-state'
+import type { CityId, OfficerId } from '../shared/ids'
+import type { CommandCheck } from '../shared/command'
+import type { City } from '../world/city'
+import type { Officer } from '../world/officer'
+import { addReserveTroops } from '../world/city'
+import { setTroops, troopCapacity } from '../world/officer'
+
+/** 可分配上限 = min(带兵量上限, 后备兵 + 武将现有兵)。 */
+export function allocateMaxTroops(officer: Officer, city: City): number {
+  return Math.min(troopCapacity(officer), city.reserveTroops + officer.troops)
+}
+
+/**
+ * 校验分配前置条件（不修改状态）。分配不占人，故只校验目标武将在该城且未占用。
+ * 城/武将存在 → 武将在该城且未占用 → 0 ≤ amount ≤ 可分配上限。
+ */
+export function canAllocate(
+  state: GameState,
+  cityId: CityId,
+  officerId: OfficerId,
+  amount: number,
+): CommandCheck {
+  const city = state.cities[cityId]
+  if (!city) return { ok: false, reason: '城不存在' }
+  const officer = state.officers[officerId]
+  if (!officer) return { ok: false, reason: '武将不存在' }
+  if (officer.cityId !== cityId) return { ok: false, reason: '武将不在该城' }
+  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+
+  if (amount < 0) return { ok: false, reason: '目标兵力不可为负' }
+  if (amount > allocateMaxTroops(officer, city)) return { ok: false, reason: '超过可分配上限' }
+  return { ok: true }
+}
+
+/**
+ * 执行分配：在城后备兵与该武将现有兵之间重分配，立即生效。
+ * 后备兵 += (武将原兵 − N)；武将兵 = N。不占人、不扣体力/金、不动 RNG。
+ * 前置条件不满足时为 no-op，原样返回 state。
+ */
+export function allocate(
+  state: GameState,
+  cityId: CityId,
+  officerId: OfficerId,
+  amount: number,
+): GameState {
+  if (!canAllocate(state, cityId, officerId, amount).ok) return state
+
+  const city = state.cities[cityId]!
+  const officer = state.officers[officerId]!
+
+  const nextCity = addReserveTroops(city, officer.troops - amount)
+  const nextOfficer = setTroops(officer, amount)
+
+  return {
+    ...state,
+    cities: { ...state.cities, [cityId]: nextCity },
+    officers: { ...state.officers, [officerId]: nextOfficer },
+  }
+}

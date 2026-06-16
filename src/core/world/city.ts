@@ -19,6 +19,10 @@ export interface City {
   readonly gold: number
   /** 城粮：来自收粮。 */
   readonly food: number
+  /** 民忠，取值 [0, 100]；决定征兵上限（民忠×20）。本切片静态。 */
+  readonly loyalty: number
+  /** 后备兵：城级未编队兵力，>= 0。征兵注入到此。 */
+  readonly reserveTroops: number
 }
 
 /** 按开发种类取对应的城级上限。 */
@@ -45,4 +49,9 @@ export function addFood(c: City, amount: number): City {
 /** 增加城金（收税）。 */
 export function addGold(c: City, amount: number): City {
   return { ...c, gold: c.gold + amount }
+}
+
+/** 增减后备兵（delta 可负），结果不低于 0（不变量）。 */
+export function addReserveTroops(c: City, delta: number): City {
+  return { ...c, reserveTroops: Math.max(0, c.reserveTroops + delta) }
 }

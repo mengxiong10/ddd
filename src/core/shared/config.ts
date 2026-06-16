@@ -3,42 +3,25 @@ export type DevelopKind = 'agriculture' | 'commerce'
 
 /**
  * 全局不可变数值配置（与可变的 GameState 分离）。
- * 所有规则数值集中于此，便于平衡调整与注入测试；不随对局变化。
- * 注意：农业/商业上限不在这里——它是城级字段（各城可不同），见 City。
+ * 仅收敛「平衡旋钮」——玩家行动的成本与恢复速率；游戏规则本身（产出/转化公式、
+ * 结算日历、量纲上限）为「规则身份」，内联在各领域模块，不进 config（见 CONSTITUTION「配置 vs 内联常量」）。
+ * 注意：农业/商业上限是城级领域数据（各城可不同），见 City，也不在此。
  */
 export interface GameConfig {
   /** 执行一次开垦/招商消耗的城金。 */
   readonly commandGoldCost: number
   /** 执行一次开垦/招商消耗的武将体力。 */
   readonly commandStaminaCost: number
-  /** 武将体力上限（恢复时的封顶值）。 */
-  readonly staminaMax: number
-  /** 每月末所有已登场武将恢复的体力，封顶 staminaMax。 */
+  /** 每月末所有已登场武将恢复的体力，封顶 STAMINA_MAX（见 officer.ts）。 */
   readonly staminaRecoveryPerMonth: number
-  /** 开垦/招商增量公式中的智力除数：增量 = floor(智力 / developIntelDivisor) + RandInt(0, developRandMax)。 */
-  readonly developIntelDivisor: number
-  /** 开垦/招商增量公式中的随机上限（含两端的 RandInt(0, developRandMax)）。 */
-  readonly developRandMax: number
-  /** 收粮公式除数：本次收粮 = floor(农业 / harvestDivisor)。 */
-  readonly harvestDivisor: number
-  /** 收税公式除数：本次收税 = floor(商业 / taxDivisor)。 */
-  readonly taxDivisor: number
-  /** 触发收粮的月份（含）。 */
-  readonly harvestMonths: readonly number[]
-  /** 触发收税的月份（含）。 */
-  readonly taxMonths: readonly number[]
+  /** 征兵消耗的执行人体力（扁平成本，可调）。 */
+  readonly recruitStaminaCost: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
 export const DEFAULT_CONFIG: GameConfig = {
   commandGoldCost: 50,
   commandStaminaCost: 8,
-  staminaMax: 100,
   staminaRecoveryPerMonth: 4,
-  developIntelDivisor: 5,
-  developRandMax: 30,
-  harvestDivisor: 4,
-  taxDivisor: 2,
-  harvestMonths: [6, 10],
-  taxMonths: [3, 6, 9, 12],
+  recruitStaminaCost: 12,
 }
