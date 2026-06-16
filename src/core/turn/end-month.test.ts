@@ -21,7 +21,7 @@ describe('endMonth 月末编排', () => {
   })
 
   it('占用武将回城、体力 +4 封顶', () => {
-    const afterCmd = develop(createInitialState(1), 'chengdu', 'zhugeliang', 'agriculture', cfg)
+    const afterCmd = develop(createInitialState(1), 'zhugeliang', 'agriculture', cfg)
     expect(afterCmd.officers.zhugeliang!.busy).toBe(true)
     expect(afterCmd.officers.zhugeliang!.stamina).toBe(92)
 
@@ -44,7 +44,7 @@ describe('endMonth 月末编排', () => {
 
   it('掠夺先于收粮/收税：收粮月按减半后的农业/商业结算，队列清空、执行人回城', () => {
     // 6 月（收粮+收税）：先掠夺成都（农 300->150、商 200->100），收益粮+750/金+300，再按减半后收粮 floor(150/4)=37、收税 floor(100/2)=50
-    const queued = plunder({ ...createInitialState(1), month: 6 }, 'chengdu', 'zhugeliang', cfg)
+    const queued = plunder({ ...createInitialState(1), month: 6 }, 'zhugeliang', cfg)
     const next = endMonth(queued, cfg)
     const c = next.cities.chengdu!
     expect(c.agriculture).toBe(150)

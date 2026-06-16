@@ -11,6 +11,8 @@
 - 不引入仓储/应用层/事件总线/实体 class；YAGNI，出现真实需求前不提前抽象。
 - 跨上下文协调只走 `core/game.ts` 的 `apply` 总入口委派；上下文之间不互相深耦合。
 - 指令分「校验/变更」两段：`canX` 返回统一的 `CommandCheck`（`shared/command.ts`，`{ok, reason}`），`X` 执行变更且非法即 no-op；`game.canApply/apply` 按 Action 分派委派给各领域服务。
+- 占人指令只传 `officerId`（不传 `cityId`）：作用城 = `officer.cityId`（单一真相源）。`scout` 例外，额外带真输入 `targetCityId`（被侦察的敌城）。
+- 归属（只能指挥自己的将）不在 `core` 校验：`apply` 保持极简、actor-agnostic。行动方身份属入口的环境约束——玩家走 `store` 派发口（注入 `playerLordId`，校验 `officer.lordId === state.playerLordId`），AI 只对自己麾下武将造 action。`lordId` 不作为 Action 字段（单机无信任边界，传了也可伪造）。
 - 占人统一用 `Officer.busy`（横切所有占人指令，月末回城）。**效果延到月末执行**的指令进 `GameState.pendingCommands`（带 `type` 的判别式并集），由 `turn` 层按 `type` 分派执行（与 `game.apply` 同构）；效果即时的指令不入队。月末顺序固定：`pendingCommands → settle（收粮/收税）→ 回城+体力恢复 → 月份+1`。
 
 ## 流程

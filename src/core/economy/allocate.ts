@@ -1,5 +1,5 @@
 import type { GameState } from '../game-state'
-import type { CityId, OfficerId } from '../shared/ids'
+import type { OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
 import type { City } from '../world/city'
 import type { Officer } from '../world/officer'
@@ -12,21 +12,19 @@ export function allocateMaxTroops(officer: Officer, city: City): number {
 }
 
 /**
- * 校验分配前置条件（不修改状态）。分配不占人，故只校验目标武将在该城且未占用。
- * 城/武将存在 → 武将在该城且未占用 → 0 ≤ amount ≤ 可分配上限。
+ * 校验分配前置条件（不修改状态）。分配不占人，作用城 = 武将所在城（officer.cityId）。
+ * 武将存在且未占用 → 0 ≤ amount ≤ 可分配上限。
  */
 export function canAllocate(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   amount: number,
 ): CommandCheck {
-  const city = state.cities[cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.cityId !== cityId) return { ok: false, reason: '武将不在该城' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  const city = state.cities[officer.cityId]
+  if (!city) return { ok: false, reason: '城不存在' }
 
   if (amount < 0) return { ok: false, reason: '目标兵力不可为负' }
   if (amount > allocateMaxTroops(officer, city)) return { ok: false, reason: '超过可分配上限' }
@@ -40,21 +38,20 @@ export function canAllocate(
  */
 export function allocate(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   amount: number,
 ): GameState {
-  if (!canAllocate(state, cityId, officerId, amount).ok) return state
+  if (!canAllocate(state, officerId, amount).ok) return state
 
-  const city = state.cities[cityId]!
   const officer = state.officers[officerId]!
+  const city = state.cities[officer.cityId]!
 
   const nextCity = addReserveTroops(city, officer.troops - amount)
   const nextOfficer = setTroops(officer, amount)
 
   return {
     ...state,
-    cities: { ...state.cities, [cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
   }
 }

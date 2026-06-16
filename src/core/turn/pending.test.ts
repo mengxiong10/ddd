@@ -8,7 +8,7 @@ const cfg = DEFAULT_CONFIG
 
 describe('runPendingCommands 月末待执行分派', () => {
   it('执行掠夺并清空队列', () => {
-    const queued = plunder(createInitialState(1), 'chengdu', 'zhugeliang', cfg)
+    const queued = plunder(createInitialState(1), 'zhugeliang', cfg)
     const next = runPendingCommands(queued, cfg)
     expect(next.cities.chengdu!.agriculture).toBe(150)
     expect(next.cities.chengdu!.food).toBe(400 + 750)
@@ -23,8 +23,8 @@ describe('runPendingCommands 月末待执行分派', () => {
 
   it('同城多条连续减半、收益累加', () => {
     // 诸葛亮 power=150、庞统 power=140（智90+武50）
-    let s = plunder(createInitialState(1), 'chengdu', 'zhugeliang', cfg)
-    s = plunder(s, 'chengdu', 'pangtong', cfg)
+    let s = plunder(createInitialState(1), 'zhugeliang', cfg)
+    s = plunder(s, 'pangtong', cfg)
     const next = runPendingCommands(s, cfg)
     expect(next.cities.chengdu!.agriculture).toBe(75) // 300->150->75
     expect(next.cities.chengdu!.commerce).toBe(50) // 200->100->50
@@ -35,8 +35,8 @@ describe('runPendingCommands 月末待执行分派', () => {
 
   it('结果与下令顺序无关', () => {
     const base = createInitialState(1)
-    const ab = runPendingCommands(plunder(plunder(base, 'chengdu', 'zhugeliang', cfg), 'chengdu', 'pangtong', cfg), cfg)
-    const ba = runPendingCommands(plunder(plunder(base, 'chengdu', 'pangtong', cfg), 'chengdu', 'zhugeliang', cfg), cfg)
+    const ab = runPendingCommands(plunder(plunder(base, 'zhugeliang', cfg), 'pangtong', cfg), cfg)
+    const ba = runPendingCommands(plunder(plunder(base, 'pangtong', cfg), 'zhugeliang', cfg), cfg)
     expect(ab.cities.chengdu).toEqual(ba.cities.chengdu)
   })
 })

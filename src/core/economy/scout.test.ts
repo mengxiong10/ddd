@@ -16,45 +16,41 @@ function withOfficer(s: GameState, id: string, patch: Partial<GameState['officer
 // 玩家刘备：成都/江陵；AI 曹操：许昌/邺城。从成都(诸葛亮)侦察许昌。
 describe('canScout 前置校验', () => {
   it('满足条件时通过', () => {
-    expect(canScout(createInitialState(1), 'chengdu', 'zhugeliang', 'xuchang', cfg).ok).toBe(true)
-  })
-
-  it('武将不在本城 -> 拒绝', () => {
-    expect(canScout(createInitialState(1), 'chengdu', 'guanyu', 'xuchang', cfg).ok).toBe(false)
+    expect(canScout(createInitialState(1), 'zhugeliang', 'xuchang', cfg).ok).toBe(true)
   })
 
   it('武将已占用 -> 拒绝', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
-    expect(canScout(s, 'chengdu', 'zhugeliang', 'xuchang', cfg).ok).toBe(false)
+    expect(canScout(s, 'zhugeliang', 'xuchang', cfg).ok).toBe(false)
   })
 
   it('本城金 < 20 -> 拒绝', () => {
     const s = withCity(createInitialState(1), 'chengdu', { gold: 19 })
-    expect(canScout(s, 'chengdu', 'zhugeliang', 'xuchang', cfg).ok).toBe(false)
+    expect(canScout(s, 'zhugeliang', 'xuchang', cfg).ok).toBe(false)
   })
 
   it('体力 < 10 -> 拒绝', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 9 })
-    expect(canScout(s, 'chengdu', 'zhugeliang', 'xuchang', cfg).ok).toBe(false)
+    expect(canScout(s, 'zhugeliang', 'xuchang', cfg).ok).toBe(false)
   })
 
   it('目标城是己方城 -> 拒绝', () => {
-    expect(canScout(createInitialState(1), 'chengdu', 'zhugeliang', 'jiangling', cfg).ok).toBe(false)
+    expect(canScout(createInitialState(1), 'zhugeliang', 'jiangling', cfg).ok).toBe(false)
   })
 
   it('目标城是本城 -> 拒绝', () => {
-    expect(canScout(createInitialState(1), 'chengdu', 'zhugeliang', 'chengdu', cfg).ok).toBe(false)
+    expect(canScout(createInitialState(1), 'zhugeliang', 'chengdu', cfg).ok).toBe(false)
   })
 
   it('目标城不存在 -> 拒绝', () => {
-    expect(canScout(createInitialState(1), 'chengdu', 'zhugeliang', 'nowhere', cfg).ok).toBe(false)
+    expect(canScout(createInitialState(1), 'zhugeliang', 'nowhere', cfg).ok).toBe(false)
   })
 })
 
 describe('scout 侦察（即时）', () => {
   it('扣体力 10、扣本城金 20、busy=true；不入队、RNG 不变', () => {
     const s = createInitialState(1)
-    const next = scout(s, 'chengdu', 'zhugeliang', 'xuchang', cfg)
+    const next = scout(s, 'zhugeliang', 'xuchang', cfg)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 10)
     expect(next.officers.zhugeliang!.busy).toBe(true)
     expect(next.cities.chengdu!.gold).toBe(500 - 20)
@@ -66,6 +62,6 @@ describe('scout 侦察（即时）', () => {
 
   it('非法下令 no-op（返回原状态）', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 9 })
-    expect(scout(s, 'chengdu', 'zhugeliang', 'xuchang', cfg)).toBe(s)
+    expect(scout(s, 'zhugeliang', 'xuchang', cfg)).toBe(s)
   })
 })

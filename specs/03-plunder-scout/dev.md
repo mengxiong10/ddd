@@ -94,14 +94,15 @@ export function endMonth(state: GameState, config: GameConfig): GameState
 ### game.ts（修改：新增两个 Action）
 ```ts
 export type Action =
-  | { type: 'reclaim'; cityId: CityId; officerId: OfficerId }
-  | { type: 'commerce'; cityId: CityId; officerId: OfficerId }
-  | { type: 'recruit'; cityId: CityId; officerId: OfficerId; amount: number }
-  | { type: 'allocate'; cityId: CityId; officerId: OfficerId; amount: number }
-  | { type: 'plunder'; cityId: CityId; officerId: OfficerId }                  // 掠夺（占人，月末执行）
-  | { type: 'scout'; cityId: CityId; officerId: OfficerId; targetCityId: CityId } // 侦察（占人，即时）
+  | { type: 'reclaim'; officerId: OfficerId }
+  | { type: 'commerce'; officerId: OfficerId }
+  | { type: 'recruit'; officerId: OfficerId; amount: number }
+  | { type: 'allocate'; officerId: OfficerId; amount: number }
+  | { type: 'plunder'; officerId: OfficerId }                  // 掠夺（占人，月末执行）
+  | { type: 'scout'; officerId: OfficerId; targetCityId: CityId } // 侦察（占人，即时）
   | { type: 'endMonth' }
-// canApply/apply 各加 plunder/scout 分派；签名不变。
+// 指令只传 officerId（作用城 = officer.cityId）；scout 额外带真输入 targetCityId。
+// canApply/apply 各加 plunder/scout 分派。归属不在 core，由 store/AI 入口保证。
 ```
 
 ### world/fixture.ts（修改）

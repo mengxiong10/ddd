@@ -1,5 +1,5 @@
 import type { GameState } from '../game-state'
-import type { CityId, OfficerId } from '../shared/ids'
+import type { OfficerId } from '../shared/ids'
 import type { DevelopKind, GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { randInt } from '../shared/rng'
@@ -16,21 +16,19 @@ const DEVELOP_RAND_MAX = 30
 
 /**
  * 校验开垦/招商前置条件（不修改状态），供 UI 置灰/提示与 develop 内部守卫复用。
- * 与君主无关，AI 后续也可复用同一校验。
+ * 作用城 = 武将所在城（officer.cityId，单一真相源）。与君主无关，AI 后续也可复用同一校验。
  */
 export function canDevelop(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   kind: DevelopKind,
   config: GameConfig,
 ): CommandCheck {
-  const city = state.cities[cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.cityId !== cityId) return { ok: false, reason: '武将不在该城' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  const city = state.cities[officer.cityId]
+  if (!city) return { ok: false, reason: '城不存在' }
 
   const attr = kind === 'agriculture' ? city.agriculture : city.commerce
   if (attr >= attributeCap(city, kind)) {
@@ -47,15 +45,14 @@ export function canDevelop(
  */
 export function develop(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   kind: DevelopKind,
   config: GameConfig,
 ): GameState {
-  if (!canDevelop(state, cityId, officerId, kind, config).ok) return state
+  if (!canDevelop(state, officerId, kind, config).ok) return state
 
-  const city = state.cities[cityId]!
   const officer = state.officers[officerId]!
+  const city = state.cities[officer.cityId]!
   // 增量 = floor(智力 / 除数) + RandInt(0, 随机上限)
   const [rand, nextRng] = randInt(state.rng, 0, DEVELOP_RAND_MAX)
   const delta = Math.floor(officer.intelligence / DEVELOP_INTEL_DIVISOR) + rand
@@ -66,7 +63,7 @@ export function develop(
   return {
     ...state,
     rng: nextRng,
-    cities: { ...state.cities, [cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
   }
 }

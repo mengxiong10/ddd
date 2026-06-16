@@ -1,5 +1,5 @@
 import type { GameState } from '../game-state'
-import type { CityId, OfficerId } from '../shared/ids'
+import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { addFood, addGold, ravage } from '../world/city'
@@ -15,19 +15,15 @@ const PLUNDER_GOLD_PER_POWER = 2
 
 /**
  * 校验掠夺前置条件（不修改状态），供 UI 置灰/提示与 plunder 内部守卫复用。
- * 本城/武将存在 → 武将在本城且未占用 → 体力 ≥ plunderStaminaCost。掠夺目标恒为本城。
+ * 武将存在且未占用 → 体力 ≥ plunderStaminaCost。掠夺目标恒为本城（officer.cityId）。
  */
 export function canPlunder(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   config: GameConfig,
 ): CommandCheck {
-  const city = state.cities[cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.cityId !== cityId) return { ok: false, reason: '武将不在该城' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
   if (officer.stamina < config.plunderStaminaCost) return { ok: false, reason: '体力不足' }
   return { ok: true }
@@ -39,11 +35,10 @@ export function canPlunder(
  */
 export function plunder(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   config: GameConfig,
 ): GameState {
-  if (!canPlunder(state, cityId, officerId, config).ok) return state
+  if (!canPlunder(state, officerId, config).ok) return state
 
   const officer = state.officers[officerId]!
   const nextOfficer = setBusy(spendStamina(officer, config.plunderStaminaCost), true)

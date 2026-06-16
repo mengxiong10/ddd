@@ -6,23 +6,21 @@ import { spendGold } from '../world/city'
 import { setBusy, spendStamina } from '../world/officer'
 
 /**
- * 校验侦察前置条件（不修改状态）。
- * 本城/武将存在 → 武将在本城且未占用 → 本城金 ≥ scoutGoldCost → 体力 ≥ scoutStaminaCost
+ * 校验侦察前置条件（不修改状态）。本城 = 武将所在城（officer.cityId）。
+ * 武将存在且未占用 → 本城金 ≥ scoutGoldCost → 体力 ≥ scoutStaminaCost
  * → 目标城存在且非己方（target.lordId ≠ 执行人 lordId，已涵盖「非本城」）。
  */
 export function canScout(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   targetCityId: CityId,
   config: GameConfig,
 ): CommandCheck {
-  const city = state.cities[cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.cityId !== cityId) return { ok: false, reason: '武将不在该城' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  const city = state.cities[officer.cityId]
+  if (!city) return { ok: false, reason: '城不存在' }
   if (city.gold < config.scoutGoldCost) return { ok: false, reason: '城金不足' }
   if (officer.stamina < config.scoutStaminaCost) return { ok: false, reason: '体力不足' }
 
@@ -39,21 +37,20 @@ export function canScout(
  */
 export function scout(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   targetCityId: CityId,
   config: GameConfig,
 ): GameState {
-  if (!canScout(state, cityId, officerId, targetCityId, config).ok) return state
+  if (!canScout(state, officerId, targetCityId, config).ok) return state
 
-  const city = state.cities[cityId]!
   const officer = state.officers[officerId]!
+  const city = state.cities[officer.cityId]!
   const nextCity = spendGold(city, config.scoutGoldCost)
   const nextOfficer = setBusy(spendStamina(officer, config.scoutStaminaCost), true)
 
   return {
     ...state,
-    cities: { ...state.cities, [cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
   }
 }

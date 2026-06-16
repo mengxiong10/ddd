@@ -1,5 +1,5 @@
 import type { GameState } from '../game-state'
-import type { CityId, OfficerId } from '../shared/ids'
+import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import type { City } from '../world/city'
@@ -26,21 +26,19 @@ export function recruitGoldCost(amount: number): number {
 
 /**
  * 校验征兵前置条件（不修改状态），供 UI 置灰/提示与 recruit 内部守卫复用。
- * 城/武将存在 → 武将在该城且未占用 → 城金 ≥ 1 → 体力 ≥ recruitStaminaCost → 1 ≤ amount ≤ 可征上限。
+ * 作用城 = 武将所在城（officer.cityId）。武将存在且未占用 → 城金 ≥ 1 → 体力 ≥ recruitStaminaCost → 1 ≤ amount ≤ 可征上限。
  */
 export function canRecruit(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   amount: number,
   config: GameConfig,
 ): CommandCheck {
-  const city = state.cities[cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.cityId !== cityId) return { ok: false, reason: '武将不在该城' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  const city = state.cities[officer.cityId]
+  if (!city) return { ok: false, reason: '城不存在' }
 
   if (city.gold < 1) return { ok: false, reason: '城金不足' }
   if (officer.stamina < config.recruitStaminaCost) return { ok: false, reason: '体力不足' }
@@ -55,22 +53,21 @@ export function canRecruit(
  */
 export function recruit(
   state: GameState,
-  cityId: CityId,
   officerId: OfficerId,
   amount: number,
   config: GameConfig,
 ): GameState {
-  if (!canRecruit(state, cityId, officerId, amount, config).ok) return state
+  if (!canRecruit(state, officerId, amount, config).ok) return state
 
-  const city = state.cities[cityId]!
   const officer = state.officers[officerId]!
+  const city = state.cities[officer.cityId]!
 
   const nextCity = spendGold(addReserveTroops(city, amount), recruitGoldCost(amount))
   const nextOfficer = setBusy(spendStamina(officer, config.recruitStaminaCost), true)
 
   return {
     ...state,
-    cities: { ...state.cities, [cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
   }
 }

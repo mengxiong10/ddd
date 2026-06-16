@@ -13,28 +13,24 @@ function withOfficer(s: GameState, id: string, patch: Partial<GameState['officer
 // 诸葛亮：智力 100、武力 50(mock) -> power = 150；粮 +=150×5=750、金 +=150×2=300
 describe('canPlunder 前置校验', () => {
   it('满足条件时通过', () => {
-    expect(canPlunder(createInitialState(1), 'chengdu', 'zhugeliang', cfg).ok).toBe(true)
-  })
-
-  it('武将不在该城 -> 拒绝', () => {
-    expect(canPlunder(createInitialState(1), 'chengdu', 'guanyu', cfg).ok).toBe(false)
+    expect(canPlunder(createInitialState(1), 'zhugeliang', cfg).ok).toBe(true)
   })
 
   it('武将已占用 -> 拒绝', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
-    expect(canPlunder(s, 'chengdu', 'zhugeliang', cfg).ok).toBe(false)
+    expect(canPlunder(s, 'zhugeliang', cfg).ok).toBe(false)
   })
 
   it('体力 < 12 -> 拒绝', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 11 })
-    expect(canPlunder(s, 'chengdu', 'zhugeliang', cfg).ok).toBe(false)
+    expect(canPlunder(s, 'zhugeliang', cfg).ok).toBe(false)
   })
 })
 
 describe('plunder 下令（效果延后）', () => {
   it('扣体力 12、busy=true、入队；城/粮/金不变、RNG 不变', () => {
     const s = createInitialState(1)
-    const next = plunder(s, 'chengdu', 'zhugeliang', cfg)
+    const next = plunder(s, 'zhugeliang', cfg)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 12)
     expect(next.officers.zhugeliang!.busy).toBe(true)
     expect(next.pendingCommands).toEqual([{ type: 'plunder', officerId: 'zhugeliang' }])
@@ -47,8 +43,8 @@ describe('plunder 下令（效果延后）', () => {
   })
 
   it('多次下令按顺序入队', () => {
-    let s = plunder(createInitialState(1), 'chengdu', 'zhugeliang', cfg)
-    s = plunder(s, 'chengdu', 'pangtong', cfg)
+    let s = plunder(createInitialState(1), 'zhugeliang', cfg)
+    s = plunder(s, 'pangtong', cfg)
     expect(s.pendingCommands).toEqual([
       { type: 'plunder', officerId: 'zhugeliang' },
       { type: 'plunder', officerId: 'pangtong' },
@@ -57,7 +53,7 @@ describe('plunder 下令（效果延后）', () => {
 
   it('非法下令 no-op（返回原状态）', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 11 })
-    expect(plunder(s, 'chengdu', 'zhugeliang', cfg)).toBe(s)
+    expect(plunder(s, 'zhugeliang', cfg)).toBe(s)
   })
 })
 
