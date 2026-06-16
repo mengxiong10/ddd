@@ -3,9 +3,16 @@ import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import { develop } from '../economy/develop'
 import { plunder } from '../economy/plunder'
+import { campaign } from '../economy/campaign'
+import { isCaptive } from '../world/queries'
+import type { GameState } from '../game-state'
 import { endMonth } from './end-month'
 
 const cfg = DEFAULT_CONFIG
+
+function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+  return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
+}
 
 describe('endMonth 月末编排', () => {
   it('月份 +1', () => {
@@ -54,5 +61,27 @@ describe('endMonth 月末编排', () => {
     expect(c.gold).toBe(500 + 300 + 50)
     expect(next.pendingCommands).toEqual([])
     expect(next.officers.zhugeliang!.busy).toBe(false)
+  })
+
+  it('出征经 endMonth 结算：攻方胜则占城，出征武将月末 busy=false 但不回出发城', () => {
+    // 关羽 500 + 张飞 100 = 600 > 许昌守军 300
+    const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
+    const queued = campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120)
+    const next = endMonth(queued, cfg)
+
+    expect(next.cities.xuchang!.lordId).toBe('liubei')
+    expect(next.officers.guanyu!.cityId).toBe('xuchang') // 进驻新城，未回江陵
+    expect(next.officers.guanyu!.busy).toBe(false)
+    expect(isCaptive(next, 'guanyu')).toBe(false)
+    expect(isCaptive(next, 'caocao')).toBe(true)
+    expect(next.cities.ye!.lordId).toBe('simayi') // 曹操被俘，重选君主
+    expect(next.pendingCommands).toEqual([])
+    expect(next.month).toBe(2)
+  })
+
+  it('整段推进确定性可复现（不耗 RNG）', () => {
+    const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
+    const run = () => endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
+    expect(run()).toEqual(run())
   })
 })

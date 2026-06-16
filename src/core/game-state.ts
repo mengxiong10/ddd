@@ -2,13 +2,23 @@ import type { Rng } from './shared/rng'
 import type { CityId, OfficerId } from './shared/ids'
 import type { City } from './world/city'
 import type { Officer } from './world/officer'
+import type { Adjacency } from './world/adjacency'
 
 /**
  * 效果延到月末执行的指令项；月末由 turn 层按 type 分派（与 game.apply 同构）。
  * 后续新增「月末执行类」指令在此并集追加一个分支。
- * 掠夺目标 = 执行人本城（officer.cityId，本切片武将不跨城），故只存 officerId、不另存 cityId。
+ * - plunder：目标 = 执行人本城（officer.cityId，掠夺不跨城），故只存 officerId。
+ * - campaign：出征——出发城 = 武将共同所在城（执行时仍在本城），故存武将集合 + 目标城 + 随军粮草
+ *   （粮已于下令时扣，胜利并入被占城时需要）。
  */
-export type PendingCommand = { readonly type: 'plunder'; readonly officerId: OfficerId }
+export type PendingCommand =
+  | { readonly type: 'plunder'; readonly officerId: OfficerId }
+  | {
+      readonly type: 'campaign'
+      readonly officerIds: readonly OfficerId[]
+      readonly targetCityId: CityId
+      readonly provisions: number
+    }
 
 /**
  * 对局根状态：唯一的可变态容器，由 apply 纯函数推进。
@@ -27,6 +37,8 @@ export interface GameState {
   readonly officers: Readonly<Record<OfficerId, Officer>>
   /** 随机源状态，随每次消费推进。 */
   readonly rng: Rng
+  /** 城邻接拓扑（静态，fixture 播种）；出征「可达=相邻」据此校验。 */
+  readonly adjacency: Adjacency
   /**
    * 本月待月末执行的指令，按下令顺序入队；月末 runPendingCommands 执行后清空。
    * 仅「效果延后」指令入队（本切片仅掠夺）；占人本身仍由 Officer.busy 表达。

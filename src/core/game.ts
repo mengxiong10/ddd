@@ -8,6 +8,7 @@ import { canRecruit, recruit } from './economy/recruit'
 import { canAllocate, allocate } from './economy/allocate'
 import { canPlunder, plunder } from './economy/plunder'
 import { canScout, scout } from './economy/scout'
+import { canCampaign, campaign } from './economy/campaign'
 import { endMonth } from './turn/end-month'
 
 /**
@@ -21,6 +22,7 @@ export type Action =
   | { type: 'allocate'; officerId: OfficerId; amount: number } // 分配（不占人）
   | { type: 'plunder'; officerId: OfficerId } // 掠夺（占人，效果延到月末）
   | { type: 'scout'; officerId: OfficerId; targetCityId: CityId } // 侦察（占人，即时）
+  | { type: 'campaign'; officerIds: readonly OfficerId[]; targetCityId: CityId; provisions: number } // 出征（占人，效果延到月末）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -38,6 +40,8 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canPlunder(state, action.officerId, config)
     case 'scout':
       return canScout(state, action.officerId, action.targetCityId, config)
+    case 'campaign':
+      return canCampaign(state, action.officerIds, action.targetCityId, action.provisions)
     case 'endMonth':
       return { ok: true }
   }
@@ -58,6 +62,8 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return plunder(state, action.officerId, config)
     case 'scout':
       return scout(state, action.officerId, action.targetCityId, config)
+    case 'campaign':
+      return campaign(state, action.officerIds, action.targetCityId, action.provisions)
     case 'endMonth':
       return endMonth(state, config)
   }

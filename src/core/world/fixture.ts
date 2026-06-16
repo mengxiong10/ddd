@@ -4,6 +4,7 @@ import type { Officer } from './officer'
 import { STAMINA_MAX } from './officer'
 import type { CityId, OfficerId } from '../shared/ids'
 import { createRng } from '../shared/rng'
+import { buildAdjacency } from './adjacency'
 
 /** 起始年份（公元 189 年，东汉末）。 */
 const START_YEAR = 189
@@ -34,6 +35,16 @@ interface CitySeed {
 }
 
 const PLAYER_LORD: OfficerId = 'liubei'
+
+/**
+ * 城邻接边（无向）：成都-江陵（刘备内部）、江陵-许昌（跨势力前线）、许昌-邺城（曹操内部）。
+ * 保证玩家江陵与曹操许昌相邻可攻。
+ */
+const ADJACENCY_EDGES: readonly (readonly [CityId, CityId])[] = [
+  ['chengdu', 'jiangling'],
+  ['jiangling', 'xuchang'],
+  ['xuchang', 'ye'],
+]
 
 const CITY_SEEDS: readonly CitySeed[] = [
   {
@@ -105,5 +116,6 @@ export function createInitialState(seed: number): GameState {
     officers,
     rng: createRng(seed),
     pendingCommands: [],
+    adjacency: buildAdjacency(ADJACENCY_EDGES),
   }
 }

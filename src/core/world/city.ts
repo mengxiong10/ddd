@@ -41,6 +41,11 @@ export function spendGold(c: City, amount: number): City {
   return { ...c, gold: Math.max(0, c.gold - amount) }
 }
 
+/** 扣城粮，不低于 0（不变量）。调用方应已校验余额充足。 */
+export function spendFood(c: City, amount: number): City {
+  return { ...c, food: Math.max(0, c.food - amount) }
+}
+
 /** 增加城粮（收粮）。 */
 export function addFood(c: City, amount: number): City {
   return { ...c, food: c.food + amount }
