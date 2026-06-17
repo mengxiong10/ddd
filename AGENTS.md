@@ -27,6 +27,8 @@
 - **外交指令归经营·月末（`10-diplomacy`）**：招揽/离间/策反/劝降四条 `占人 ✓ · 效果=月末`，下令阶段与月末执行（含 territorial `lordId`/`cityId` 改写）就近收敛于 `economy/diplomacy.ts`，沿用招降在 economy 改归属的先例，**不**触 `military`/`world/succession`。目标用 `targetOfficerId`（敌方武将/太守/君主），`PendingCommand`/`Action` 四分支同形。招揽/离间/策反共用三关（智力差→忠诚→性格，内部 `runThreeGates` 去重）、劝降另套关（城池压制+智力差+君主性格、无忠诚关）。
 - **太守为派生（`world/queries.governorOf`，`10-diplomacy`）**：某城太守 = 君主正驻该城则为君主、否则本城在任武将中有效智力最高者（平局取 id 最小）；零存储字段。策反目标须为**非君主太守** → 君主即太守时不可策反 → 分裂城永不含原君主 → **策反不触发重选君主**（结构上免除接 succession）。
 - **core actor-agnostic 的显式例外（`10-diplomacy`）**：劝降「玩家君主免疫」是**游戏规则**（非归属校验），`executeInduce` 显式读 `state.playerLordId`、目标为玩家君主即失败（防 AI 劝降玩家君主）。除此唯一例外外，`core` 不读 `playerLordId`、不校验归属。
+- **兵种=基础存储 + 有效派生（`11-troop-types`）**：`Officer.troopType` 只存**基础兵种**（fixture 可信播种、不跑 >105 门槛）；**有效兵种**与**移动力**经 `queries.effectiveTroopType`/`officerMovement` 派生、**不写回 Officer**，与 `effectiveOfficer`（有效武力/智力）同构。有效兵种 = 基础兵种被所持「改兵种」道具按装备先后依次覆盖（后者覆盖前者）、门槛（玄兵智力>105/极兵武力>105）取 `effectiveOfficer` 的有效值实时判定（故没收道具会回退）。改兵种道具只能改成水军/玄兵/极兵，骑/步/弓只来自基础兵种。兵种规则收敛在纯模块 `world/troop-type.ts`（移动力表/门槛常量/`resolveOverride`）。下游（战斗）需要时**临场读** `effectiveTroopType`，不预埋。
+- **装备顺序经 `holder.equipSeq`、不拆归属模型（`11-troop-types`）**：保留 `ItemHolder` 判别式（属城 XOR 属将的结构安全不变），officer 分支加 `equipSeq` 表达装备先后；`itemsOfOfficer` 按 `equipSeq` 升序返回。**唯一**写 officer-holder 的路径是 `economy/reward`，由它算 `nextEquipSeq = 1 + 该将现有最大 seq`（首件 0）。不新增「装备/卸下」指令——沿用赏赐/没收为装备/卸下事件。
 
 ## 流程
 spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ spec-build（实现）→ spec-refactor（重构）
@@ -45,5 +47,7 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 | 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | done |
 | 城市灾害 city-disaster | specs/09-city-disaster/prd.md | specs/09-city-disaster/dev.md | done |
 | 外交 diplomacy | specs/10-diplomacy/prd.md | specs/10-diplomacy/dev.md | done |
+| 兵种系统 troop-types | specs/11-troop-types/prd.md | specs/11-troop-types/dev.md | done |
+| 战斗系统 battle | specs/12-battle/prd.md | specs/12-battle/dev.md | draft |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）

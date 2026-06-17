@@ -97,7 +97,7 @@ describe('掠夺 / 侦察 端到端', () => {
 describe('赏赐 / 没收 端到端', () => {
   it('赏赐：道具转给武将、忠诚+8、不占人（同月可再下令）', () => {
     let s = apply(createInitialState(1), { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' })
-    expect(s.items.cixiongshuanggujian!.holder).toEqual({ kind: 'officer', officerId: 'zhugeliang' })
+    expect(s.items.cixiongshuanggujian!.holder).toEqual({ kind: 'officer', officerId: 'zhugeliang', equipSeq: 0 })
     expect(s.officers.zhugeliang!.loyalty).toBe(58)
     expect(s.officers.zhugeliang!.busy).toBe(false)
     s = apply(s, { type: 'reclaim', officerId: 'zhugeliang' }) // 不占人 -> 仍可下令

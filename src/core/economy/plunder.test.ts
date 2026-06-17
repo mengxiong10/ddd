@@ -71,7 +71,7 @@ describe('executePlunder 月末执行', () => {
   it('产出吃道具加成（有效智+力）', () => {
     // 雌雄双股剑 武力+10 给诸葛亮：power = 100 + 60 = 160 -> 粮 +800、金 +320
     const s0 = createInitialState(1)
-    const s = { ...s0, items: { ...s0.items, cixiongshuanggujian: { ...s0.items.cixiongshuanggujian!, holder: { kind: 'officer', officerId: 'zhugeliang' } as const } } }
+    const s = { ...s0, items: { ...s0.items, cixiongshuanggujian: { ...s0.items.cixiongshuanggujian!, holder: { kind: 'officer', officerId: 'zhugeliang', equipSeq: 0 } as const } } }
     const c = executePlunder(s, 'zhugeliang').cities.chengdu!
     expect(c.food).toBe(400 + 800)
     expect(c.gold).toBe(500 + 320)

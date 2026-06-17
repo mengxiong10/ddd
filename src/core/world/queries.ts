@@ -4,6 +4,8 @@ import type { City } from './city'
 import type { Officer } from './officer'
 import { LOYALTY_MAX } from './officer'
 import type { Item } from './item'
+import type { TroopType } from './troop-type'
+import { BASE_MOVEMENT, resolveOverride } from './troop-type'
 
 /**
  * 俘虏判定（派生，非存储字段）：武将自身归属 ≠ 所在城归属即为俘虏。
@@ -63,9 +65,15 @@ export function itemsInCity(state: GameState, cityId: CityId): Item[] {
   return Object.values(state.items).filter((i) => i.holder.kind === 'city' && i.holder.cityId === cityId)
 }
 
-/** 取归属某武将的道具（按 holder 派生）。 */
+/** 取归属某武将的道具（按 holder 派生），按装备先后 equipSeq 升序返回。 */
 export function itemsOfOfficer(state: GameState, officerId: OfficerId): Item[] {
-  return Object.values(state.items).filter((i) => i.holder.kind === 'officer' && i.holder.officerId === officerId)
+  return Object.values(state.items)
+    .filter((i) => i.holder.kind === 'officer' && i.holder.officerId === officerId)
+    .sort((a, b) => {
+      const sa = a.holder.kind === 'officer' ? a.holder.equipSeq : 0
+      const sb = b.holder.kind === 'officer' ? b.holder.equipSeq : 0
+      return sa - sb
+    })
 }
 
 /**
@@ -79,6 +87,28 @@ export function effectiveOfficer(state: GameState, officerId: OfficerId): Office
   const force = officer.force + items.reduce((s, i) => s + i.forceBonus, 0)
   const intelligence = officer.intelligence + items.reduce((s, i) => s + i.intelBonus, 0)
   return { ...officer, force, intelligence }
+}
+
+/**
+ * 有效兵种（派生，不写回 Officer）：以基础兵种为起点，按所持道具装备先后（equipSeq 升序）
+ * 逐件应用其改兵种结果，合法的后者覆盖前者。门槛取 effectiveOfficer 的有效武力/智力
+ * （含该武将所持全部道具加成，包括被判定的这件），故没收道具会使兵种回退。
+ */
+export function effectiveTroopType(state: GameState, officerId: OfficerId): TroopType {
+  const eff = effectiveOfficer(state, officerId)
+  let current = eff.troopType
+  for (const item of itemsOfOfficer(state, officerId)) {
+    const next = resolveOverride(item.troopTypeOverride, eff.force, eff.intelligence)
+    if (next !== null) current = next
+  }
+  return current
+}
+
+/** 移动力（派生，仅展示）= 有效兵种基础移动力 + 所持道具移动力加成之和。 */
+export function officerMovement(state: GameState, officerId: OfficerId): number {
+  const items = itemsOfOfficer(state, officerId)
+  const bonus = items.reduce((sum, i) => sum + i.movementBonus, 0)
+  return BASE_MOVEMENT[effectiveTroopType(state, officerId)] + bonus
 }
 
 /** 武将忠诚（派生）：君主（lordId===自身）恒 LOYALTY_MAX，否则取存储值。 */

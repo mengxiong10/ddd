@@ -1,4 +1,5 @@
 import type { CityId, OfficerId } from '../shared/ids'
+import type { TroopType } from './troop-type'
 
 /** 体力量纲上限（百分制，固定值；规则身份，不入 config）。 */
 export const STAMINA_MAX = 100
@@ -43,6 +44,8 @@ export interface Officer {
   readonly recruiterId: OfficerId | null
   /** 性格（0..4），见 Personality。君主/普通两套表解读同一值。 */
   readonly personality: Personality
+  /** 基础兵种（fixture 可信播种、不跑 >105 门槛）；有效兵种由 queries 派生、不写回。 */
+  readonly troopType: TroopType
 }
 
 /**

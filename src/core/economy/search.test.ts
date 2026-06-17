@@ -25,7 +25,7 @@ function withHiddenItem(s: GameState, id: string, recruiterId: string | null): G
   return {
     ...s,
     items: { ...s.items, [id]: {
-      id, name: id, forceBonus: 1, intelBonus: 0,
+      id, name: id, forceBonus: 1, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0,
       holder: { kind: 'city', cityId: 'chengdu' } as const, discovered: false, recruiterId,
     } },
   }

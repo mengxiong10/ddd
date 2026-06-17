@@ -28,8 +28,8 @@ describe('canReward 前置校验', () => {
     // 注入两件归属诸葛亮的道具
     s = { ...s, items: {
       ...s.items,
-      a: { id: 'a', name: 'A', forceBonus: 1, intelBonus: 0, holder: { kind: 'officer', officerId: 'zhugeliang' }, discovered: true, recruiterId: null },
-      b: { id: 'b', name: 'B', forceBonus: 1, intelBonus: 0, holder: { kind: 'officer', officerId: 'zhugeliang' }, discovered: true, recruiterId: null },
+      a: { id: 'a', name: 'A', forceBonus: 1, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0, holder: { kind: 'officer', officerId: 'zhugeliang', equipSeq: 0 }, discovered: true, recruiterId: null },
+      b: { id: 'b', name: 'B', forceBonus: 1, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0, holder: { kind: 'officer', officerId: 'zhugeliang', equipSeq: 1 }, discovered: true, recruiterId: null },
     } }
     expect(canReward(s, 'zhugeliang', 'cixiongshuanggujian').ok).toBe(false)
   })
@@ -78,6 +78,22 @@ describe('reward 赏赐', () => {
   it('非法 no-op（返回原状态）', () => {
     const s = createInitialState(1)
     expect(reward(s, 'zhugeliang', 'mengde-xinshu')).toBe(s)
+  })
+  it('连赏两件：equipSeq 递增（首件 0、次件 1），表达装备先后', () => {
+    // 成都再放一件道具，使同城可连赏两件给诸葛亮
+    let s = createInitialState(1)
+    s = { ...s, items: { ...s.items, gem: {
+      id: 'gem', name: '玉', forceBonus: 0, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0 as const,
+      holder: { kind: 'city', cityId: 'chengdu' } as const, discovered: true, recruiterId: null,
+    } } }
+    s = reward(s, 'zhugeliang', 'cixiongshuanggujian')
+    s = reward(s, 'zhugeliang', 'gem')
+    const seqOf = (id: string) => {
+      const h = s.items[id]!.holder
+      return h.kind === 'officer' ? h.equipSeq : -1
+    }
+    expect(seqOf('cixiongshuanggujian')).toBe(0)
+    expect(seqOf('gem')).toBe(1)
   })
 })
 

@@ -66,7 +66,7 @@ describe('流放 banish', () => {
     let s = conquered(1)
     s = giveItem(s, 'mengde-xinshu', 'caocao')
     const next = banish(s, 'caocao')
-    expect(next.items['mengde-xinshu']!.holder).toEqual({ kind: 'officer', officerId: 'caocao' })
+    expect(next.items['mengde-xinshu']!.holder).toEqual({ kind: 'officer', officerId: 'caocao', equipSeq: 0 })
     expect(itemsOfOfficer(next, 'caocao').map((i) => i.id)).toContain('mengde-xinshu')
   })
 

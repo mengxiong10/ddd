@@ -18,6 +18,15 @@ function isLord(state: GameState, officerId: OfficerId): boolean {
   return o.lordId === o.id
 }
 
+/** 该武将下一个装备序号 = 1 + 现有所持道具最大 equipSeq（无则 -1 ⇒ 首件为 0）；表达装备先后。 */
+function nextEquipSeq(state: GameState, officerId: OfficerId): number {
+  const max = itemsOfOfficer(state, officerId).reduce(
+    (m, i) => (i.holder.kind === 'officer' ? Math.max(m, i.holder.equipSeq) : m),
+    -1,
+  )
+  return max + 1
+}
+
 /**
  * 校验赏赐前置（不改状态）：作用城 = 武将所在城。
  * 武将存在且非俘虏；道具存在且 holder 为作用城；该武将道具数 < 上限。
@@ -46,7 +55,7 @@ export function canReward(state: GameState, officerId: OfficerId, itemId: ItemId
 export function reward(state: GameState, officerId: OfficerId, itemId: ItemId): GameState {
   if (!canReward(state, officerId, itemId).ok) return state
 
-  const items = { ...state.items, [itemId]: holdByOfficer(state.items[itemId]!, officerId) }
+  const items = { ...state.items, [itemId]: holdByOfficer(state.items[itemId]!, officerId, nextEquipSeq(state, officerId)) }
   if (isLord(state, officerId)) return { ...state, items }
 
   const officer = adjustLoyalty(state.officers[officerId]!, REWARD_LOYALTY_GAIN)
