@@ -3,6 +3,9 @@ import type { CityId, OfficerId } from '../shared/ids'
 /** 体力量纲上限（百分制，固定值；规则身份，不入 config）。 */
 export const STAMINA_MAX = 100
 
+/** 忠诚量纲上限（百分制，固定值；规则身份，不入 config）。 */
+export const LOYALTY_MAX = 100
+
 /** 武将聚合。君主也是一名武将；归属与时间无关的属性为静态。 */
 export interface Officer {
   readonly id: OfficerId
@@ -23,6 +26,11 @@ export interface Officer {
   readonly level: number
   /** 武力，静态属性，参与带兵量公式。 */
   readonly force: number
+  /**
+   * 武将忠诚，取值 [0, LOYALTY_MAX]。与城的「民忠」是不同事实。
+   * 对外读取应走 queries.officerLoyalty（君主派生恒 100）；此存储值对君主无意义。
+   */
+  readonly loyalty: number
 }
 
 /**
@@ -56,4 +64,9 @@ export function recoverStamina(o: Officer, amount: number): Officer {
 /** 设置占用状态（下令离城 / 月末回城）。 */
 export function setBusy(o: Officer, busy: boolean): Officer {
   return { ...o, busy }
+}
+
+/** 增减忠诚，钳制 [0, LOYALTY_MAX]（不变量）。调用方负责跳过君主（君主忠诚派生恒 100）。 */
+export function adjustLoyalty(o: Officer, delta: number): Officer {
+  return { ...o, loyalty: Math.max(0, Math.min(LOYALTY_MAX, o.loyalty + delta)) }
 }

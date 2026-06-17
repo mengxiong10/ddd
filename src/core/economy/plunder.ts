@@ -4,6 +4,7 @@ import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { addFood, addGold, ravage } from '../world/city'
 import { setBusy, spendStamina } from '../world/officer'
+import { effectiveOfficer } from '../world/queries'
 
 /**
  * 掠夺收益转化率（规则身份，内联常量，不入 config）：
@@ -57,7 +58,8 @@ export function plunder(
 export function executePlunder(state: GameState, officerId: OfficerId): GameState {
   const officer = state.officers[officerId]!
   const cityId = officer.cityId
-  const power = officer.intelligence + officer.force
+  const eff = effectiveOfficer(state, officerId)
+  const power = eff.intelligence + eff.force
   const ravaged = ravage(state.cities[cityId]!)
   const nextCity = addGold(addFood(ravaged, power * PLUNDER_FOOD_PER_POWER), power * PLUNDER_GOLD_PER_POWER)
 

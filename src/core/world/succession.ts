@@ -1,6 +1,6 @@
 import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
-import { isCaptive, citiesOfLord } from './queries'
+import { isCaptive, citiesOfLord, effectiveOfficer } from './queries'
 
 /**
  * 被俘君主的重选/灭亡（战后处理，由 military/executeCampaign 调用）：
@@ -19,9 +19,12 @@ export function resolveSuccession(state: GameState, lordId: OfficerId): GameStat
   )
   if (candidates.length === 0) return state
 
-  const newLord = candidates.reduce((best, o) =>
-    o.intelligence > best.intelligence || (o.intelligence === best.intelligence && o.id < best.id) ? o : best,
-  )
+  // 取有效智力（含道具加成）最高者；平局取 id 字典序最小，保确定性。
+  const newLord = candidates.reduce((best, o) => {
+    const oi = effectiveOfficer(state, o.id).intelligence
+    const bi = effectiveOfficer(state, best.id).intelligence
+    return oi > bi || (oi === bi && o.id < best.id) ? o : best
+  })
   const newLordId = newLord.id
   const promotedIds = new Set(candidates.map((o) => o.id))
 

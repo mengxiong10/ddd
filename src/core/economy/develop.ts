@@ -5,6 +5,7 @@ import type { CommandCheck } from '../shared/command'
 import { randInt } from '../shared/rng'
 import { attributeCap, raiseAttribute, spendGold } from '../world/city'
 import { setBusy, spendStamina } from '../world/officer'
+import { effectiveOfficer } from '../world/queries'
 
 /**
  * 开垦/招商增量公式系数（规则身份，内联常量，不入 config）：
@@ -53,9 +54,9 @@ export function develop(
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
-  // 增量 = floor(智力 / 除数) + RandInt(0, 随机上限)
+  // 增量 = floor(有效智力 / 除数) + RandInt(0, 随机上限)；有效智力含道具加成
   const [rand, nextRng] = randInt(state.rng, 0, DEVELOP_RAND_MAX)
-  const delta = Math.floor(officer.intelligence / DEVELOP_INTEL_DIVISOR) + rand
+  const delta = Math.floor(effectiveOfficer(state, officerId).intelligence / DEVELOP_INTEL_DIVISOR) + rand
 
   const nextCity = spendGold(raiseAttribute(city, kind, delta), config.commandGoldCost)
   const nextOfficer = setBusy(spendStamina(officer, config.commandStaminaCost), true)

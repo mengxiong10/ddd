@@ -1,8 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import { createInitialState } from './fixture'
-import { officersInCity, citiesOfLord, isCaptive } from './queries'
+import {
+  officersInCity, citiesOfLord, isCaptive,
+  itemsInCity, itemsOfOfficer, effectiveOfficer, officerLoyalty,
+} from './queries'
 import { setBusy } from './officer'
+import { holdByOfficer } from './item'
 import type { GameState } from '../game-state'
+
+/** 把某道具归属改给某武将。 */
+function giveItem(s: GameState, itemId: string, officerId: string): GameState {
+  return { ...s, items: { ...s.items, [itemId]: holdByOfficer(s.items[itemId]!, officerId) } }
+}
 
 /** 把某城归属改给另一君主（用于制造俘虏：城内原武将 lordId 不变 -> 成俘虏）。 */
 function setCityLord(s: GameState, cityId: string, lordId: string): GameState {
@@ -49,5 +58,35 @@ describe('world queries（基于初始 fixture）', () => {
     // 江陵原有关羽、张飞两将，均成俘虏 -> 在任为 0
     expect(officersInCity(s, 'jiangling')).toHaveLength(2)
     expect(officersInCity(s, 'jiangling', { onlyAvailable: true })).toHaveLength(0)
+  })
+
+  it('itemsInCity / itemsOfOfficer 按 holder 派生，同一道具只出现在一处', () => {
+    const s = createInitialState(1)
+    expect(itemsInCity(s, 'chengdu').map((i) => i.id)).toEqual(['cixiongshuanggujian'])
+    expect(itemsOfOfficer(s, 'guanyu')).toHaveLength(0)
+
+    const s2 = giveItem(s, 'cixiongshuanggujian', 'guanyu')
+    expect(itemsInCity(s2, 'chengdu')).toHaveLength(0)
+    expect(itemsOfOfficer(s2, 'guanyu').map((i) => i.id)).toEqual(['cixiongshuanggujian'])
+  })
+
+  it('effectiveOfficer：force/intel 叠加所持道具加成，其余字段不变', () => {
+    const s = createInitialState(1)
+    const guanyu = s.officers.guanyu!
+    expect(effectiveOfficer(s, 'guanyu')).toEqual(guanyu) // 无道具时原样
+
+    const s2 = giveItem(s, 'cixiongshuanggujian', 'guanyu') // 武力+10
+    const eff = effectiveOfficer(s2, 'guanyu')
+    expect(eff.force).toBe(guanyu.force + 10)
+    expect(eff.intelligence).toBe(guanyu.intelligence)
+    expect({ ...eff, force: guanyu.force }).toEqual(guanyu) // 仅 force 变
+  })
+
+  it('officerLoyalty：君主恒 100（即使存储值非 100），非君主取存储值', () => {
+    const s = createInitialState(1)
+    expect(officerLoyalty(s, 'zhugeliang')).toBe(50)
+    // 刻意把君主存储值改脏，仍应派生 100
+    const dirty = { ...s, officers: { ...s.officers, liubei: { ...s.officers.liubei!, loyalty: 13 } } }
+    expect(officerLoyalty(dirty, 'liubei')).toBe(100)
   })
 })

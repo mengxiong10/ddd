@@ -5,6 +5,7 @@ import type { City } from '../world/city'
 import type { Officer } from '../world/officer'
 import { addReserveTroops } from '../world/city'
 import { setTroops, troopCapacity } from '../world/officer'
+import { effectiveOfficer } from '../world/queries'
 
 /** 可分配上限 = min(带兵量上限, 后备兵 + 武将现有兵)。 */
 export function allocateMaxTroops(officer: Officer, city: City): number {
@@ -27,7 +28,7 @@ export function canAllocate(
   if (!city) return { ok: false, reason: '城不存在' }
 
   if (amount < 0) return { ok: false, reason: '目标兵力不可为负' }
-  if (amount > allocateMaxTroops(officer, city)) return { ok: false, reason: '超过可分配上限' }
+  if (amount > allocateMaxTroops(effectiveOfficer(state, officerId), city)) return { ok: false, reason: '超过可分配上限' }
   return { ok: true }
 }
 

@@ -3,6 +3,7 @@ import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import type { GameState } from '../game-state'
 import { canDevelop, develop } from './develop'
+import { holdByOfficer } from '../world/item'
 
 const cfg = DEFAULT_CONFIG
 
@@ -77,5 +78,14 @@ describe('develop 开垦/招商', () => {
   it('非法下令 no-op（返回原状态）', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
     expect(develop(s, 'zhugeliang', 'agriculture', cfg)).toBe(s)
+  })
+
+  it('开垦增量吃道具加成（有效智力）', () => {
+    const s = createInitialState(7)
+    // 孟德新书 智力+10 给诸葛亮：floor(110/5) − floor(100/5) = 22 − 20 = 2，RNG 同种子抵消
+    const withItem = { ...s, items: { ...s.items, 'mengde-xinshu': holdByOfficer(s.items['mengde-xinshu']!, 'zhugeliang') } }
+    const a = develop(s, 'zhugeliang', 'agriculture', cfg).cities.chengdu!.agriculture
+    const b = develop(withItem, 'zhugeliang', 'agriculture', cfg).cities.chengdu!.agriculture
+    expect(b - a).toBe(2)
   })
 })

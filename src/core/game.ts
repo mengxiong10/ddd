@@ -1,5 +1,5 @@
 import type { GameState } from './game-state'
-import type { CityId, OfficerId } from './shared/ids'
+import type { CityId, ItemId, OfficerId } from './shared/ids'
 import type { GameConfig } from './shared/config'
 import type { CommandCheck } from './shared/command'
 import { DEFAULT_CONFIG } from './shared/config'
@@ -9,6 +9,7 @@ import { canAllocate, allocate } from './economy/allocate'
 import { canPlunder, plunder } from './economy/plunder'
 import { canScout, scout } from './economy/scout'
 import { canCampaign, campaign } from './economy/campaign'
+import { canReward, reward, canConfiscate, confiscate } from './economy/reward'
 import { endMonth } from './turn/end-month'
 
 /**
@@ -23,6 +24,8 @@ export type Action =
   | { type: 'plunder'; officerId: OfficerId } // 掠夺（占人，效果延到月末）
   | { type: 'scout'; officerId: OfficerId; targetCityId: CityId } // 侦察（占人，即时）
   | { type: 'campaign'; officerIds: readonly OfficerId[]; targetCityId: CityId; provisions: number } // 出征（占人，效果延到月末）
+  | { type: 'reward'; officerId: OfficerId; itemId: ItemId } // 赏赐（不占人，即时）
+  | { type: 'confiscate'; officerId: OfficerId; itemId: ItemId } // 没收（不占人，即时）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -42,6 +45,10 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canScout(state, action.officerId, action.targetCityId, config)
     case 'campaign':
       return canCampaign(state, action.officerIds, action.targetCityId, action.provisions)
+    case 'reward':
+      return canReward(state, action.officerId, action.itemId)
+    case 'confiscate':
+      return canConfiscate(state, action.officerId, action.itemId)
     case 'endMonth':
       return { ok: true }
   }
@@ -64,6 +71,10 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return scout(state, action.officerId, action.targetCityId, config)
     case 'campaign':
       return campaign(state, action.officerIds, action.targetCityId, action.provisions)
+    case 'reward':
+      return reward(state, action.officerId, action.itemId)
+    case 'confiscate':
+      return confiscate(state, action.officerId, action.itemId)
     case 'endMonth':
       return endMonth(state, config)
   }

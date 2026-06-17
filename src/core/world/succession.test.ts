@@ -31,4 +31,22 @@ describe('resolveSuccession', () => {
     s = conquer(s, 'ye', 'liubei')
     expect(resolveSuccession(s, 'caocao')).toBe(s)
   })
+
+  it('重选君主按有效智力（道具加成可改写顺位）', () => {
+    // 邺城候选：司马懿96 > 张辽70；给张辽 +30 智力道具 -> 有效100 > 96，改立张辽
+    let s = conquer(createInitialState(1), 'xuchang', 'liubei')
+    s = {
+      ...s,
+      items: {
+        ...s.items,
+        zhangliao_book: {
+          id: 'zhangliao_book', name: '兵书', forceBonus: 0, intelBonus: 30,
+          holder: { kind: 'officer', officerId: 'zhangliao' } as const,
+        },
+      },
+    }
+    const next = resolveSuccession(s, 'caocao')
+    expect(next.cities.ye!.lordId).toBe('zhangliao')
+    expect(next.officers.simayi!.lordId).toBe('zhangliao')
+  })
 })

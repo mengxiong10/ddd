@@ -1,7 +1,8 @@
 import type { Rng } from './shared/rng'
-import type { CityId, OfficerId } from './shared/ids'
+import type { CityId, ItemId, OfficerId } from './shared/ids'
 import type { City } from './world/city'
 import type { Officer } from './world/officer'
+import type { Item } from './world/item'
 import type { Adjacency } from './world/adjacency'
 
 /**
@@ -35,6 +36,8 @@ export interface GameState {
   readonly cities: Readonly<Record<CityId, City>>
   /** 全部武将（含各君主本人），按 id 索引。 */
   readonly officers: Readonly<Record<OfficerId, Officer>>
+  /** 全部道具，按 id 索引；归属（城/将）存于各道具的 holder（单一真相源）。 */
+  readonly items: Readonly<Record<ItemId, Item>>
   /** 随机源状态，随每次消费推进。 */
   readonly rng: Rng
   /** 城邻接拓扑（静态，fixture 播种）；出征「可达=相邻」据此校验。 */

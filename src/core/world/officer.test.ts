@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import type { Officer } from './officer'
-import { spendStamina, recoverStamina, setBusy, troopCapacity, setTroops } from './officer'
+import { spendStamina, recoverStamina, setBusy, troopCapacity, setTroops, adjustLoyalty } from './officer'
 
 const base: Officer = {
   id: 'o1', name: '测试', intelligence: 50, lordId: 'o1', cityId: 'c1', stamina: 100, busy: false,
-  troops: 100, level: 1, force: 50,
+  troops: 100, level: 1, force: 50, loyalty: 50,
 }
 
 describe('officer 聚合', () => {
@@ -34,5 +34,12 @@ describe('officer 聚合', () => {
   it('setTroops 设置武将兵，不低于 0', () => {
     expect(setTroops(base, 300).troops).toBe(300)
     expect(setTroops(base, -5).troops).toBe(0)
+  })
+
+  it('adjustLoyalty 增减忠诚并钳制 [0, 100]', () => {
+    expect(adjustLoyalty(base, 8).loyalty).toBe(58)
+    expect(adjustLoyalty(base, -20).loyalty).toBe(30)
+    expect(adjustLoyalty({ ...base, loyalty: 95 }, 8).loyalty).toBe(100)
+    expect(adjustLoyalty({ ...base, loyalty: 10 }, -20).loyalty).toBe(0)
   })
 })

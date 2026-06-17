@@ -2,6 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import { canAllocate, allocate, allocateMaxTroops } from './allocate'
+import { holdByOfficer } from '../world/item'
+
+function giveItem(s: GameState, itemId: string, officerId: string): GameState {
+  return { ...s, items: { ...s.items, [itemId]: holdByOfficer(s.items[itemId]!, officerId) } }
+}
 
 function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
@@ -18,6 +23,14 @@ describe('分配上限', () => {
     // 后备兵巨大时，带兵量成为瓶颈
     const s2 = withCity(s, 'chengdu', { reserveTroops: 100000 })
     expect(allocateMaxTroops(s2.officers.zhugeliang!, s2.cities.chengdu!)).toBe(1600)
+  })
+
+  it('带兵量上限吃道具加成（有效武力）', () => {
+    const s = withCity(createInitialState(1), 'chengdu', { reserveTroops: 100000 })
+    // 雌雄双股剑 武力+10 给诸葛亮：带兵量 = 100 + 60×10 + 100×10 = 1700
+    const s2 = giveItem(s, 'cixiongshuanggujian', 'zhugeliang')
+    expect(canAllocate(s2, 'zhugeliang', 1700).ok).toBe(true)
+    expect(canAllocate(s, 'zhugeliang', 1700).ok).toBe(false) // 无道具时仍以 1600 为限
   })
 })
 

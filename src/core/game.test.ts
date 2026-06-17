@@ -93,6 +93,31 @@ describe('掠夺 / 侦察 端到端', () => {
   })
 })
 
+describe('赏赐 / 没收 端到端', () => {
+  it('赏赐：道具转给武将、忠诚+8、不占人（同月可再下令）', () => {
+    let s = apply(createInitialState(1), { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' })
+    expect(s.items.cixiongshuanggujian!.holder).toEqual({ kind: 'officer', officerId: 'zhugeliang' })
+    expect(s.officers.zhugeliang!.loyalty).toBe(58)
+    expect(s.officers.zhugeliang!.busy).toBe(false)
+    s = apply(s, { type: 'reclaim', officerId: 'zhugeliang' }) // 不占人 -> 仍可下令
+    expect(s.officers.zhugeliang!.busy).toBe(true)
+  })
+
+  it('没收：道具收回城、忠诚−20', () => {
+    let s = apply(createInitialState(1), { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' })
+    s = apply(s, { type: 'confiscate', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' })
+    expect(s.items.cixiongshuanggujian!.holder).toEqual({ kind: 'city', cityId: 'chengdu' })
+    expect(s.officers.zhugeliang!.loyalty).toBe(38) // 50 +8(赏) −20(没) = 38
+  })
+
+  it('canApply 反映 canReward / canConfiscate 校验', () => {
+    const s = createInitialState(1)
+    expect(canApply(s, { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' }).ok).toBe(true)
+    expect(canApply(s, { type: 'reward', officerId: 'zhugeliang', itemId: 'mengde-xinshu' }).ok).toBe(false)
+    expect(canApply(s, { type: 'confiscate', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' }).ok).toBe(false)
+  })
+})
+
 describe('端到端确定性', () => {
   it('相同 seed + 相同动作序列 -> 完全一致', () => {
     const actions: Action[] = [

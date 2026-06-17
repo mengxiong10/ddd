@@ -2,7 +2,8 @@ import type { GameState } from '../game-state'
 import type { City } from './city'
 import type { Officer } from './officer'
 import { STAMINA_MAX } from './officer'
-import type { CityId, OfficerId } from '../shared/ids'
+import type { Item } from './item'
+import type { CityId, ItemId, OfficerId } from '../shared/ids'
 import { createRng } from '../shared/rng'
 import { buildAdjacency } from './adjacency'
 
@@ -11,11 +12,14 @@ const START_YEAR = 189
 /** fixture 中每城的农业/商业上限默认值。 */
 const DEFAULT_CAP = 1000
 /** 新字段统一 mock 值（不逐人配，凸显占位、待后续平衡）。 */
-const MOCK_LOYALTY = 50
+const MOCK_CITY_LOYALTY = 50
 const MOCK_RESERVE_TROOPS = 0
 const MOCK_LEVEL = 1
 const MOCK_FORCE = 50
 const MOCK_TROOPS = 100
+/** 武将忠诚 mock：君主恒 100（亦由 officerLoyalty 派生保证），其余 50。 */
+const MOCK_LORD_LOYALTY = 100
+const MOCK_OFFICER_LOYALTY = 50
 
 interface OfficerSeed {
   readonly id: OfficerId
@@ -35,6 +39,20 @@ interface CitySeed {
 }
 
 const PLAYER_LORD: OfficerId = 'liubei'
+
+/** 初始道具：均归属城（holder=城），待玩家赏赐给武将。数值为可调默认。 */
+interface ItemSeed {
+  readonly id: ItemId
+  readonly name: string
+  readonly forceBonus: number
+  readonly intelBonus: number
+  readonly cityId: CityId
+}
+
+const ITEM_SEEDS: readonly ItemSeed[] = [
+  { id: 'cixiongshuanggujian', name: '雌雄双股剑', forceBonus: 10, intelBonus: 0, cityId: 'chengdu' },
+  { id: 'mengde-xinshu', name: '孟德新书', forceBonus: 0, intelBonus: 10, cityId: 'xuchang' },
+]
 
 /**
  * 城邻接边（无向）：成都-江陵（刘备内部）、江陵-许昌（跨势力前线）、许昌-邺城（曹操内部）。
@@ -90,6 +108,7 @@ const CITY_SEEDS: readonly CitySeed[] = [
 export function createInitialState(seed: number): GameState {
   const cities: Record<CityId, City> = {}
   const officers: Record<OfficerId, Officer> = {}
+  const items: Record<ItemId, Item> = {}
 
   for (const cs of CITY_SEEDS) {
     cities[cs.id] = {
@@ -97,14 +116,22 @@ export function createInitialState(seed: number): GameState {
       agriculture: cs.agriculture, commerce: cs.commerce,
       agricultureCap: DEFAULT_CAP, commerceCap: DEFAULT_CAP,
       gold: cs.gold, food: cs.food,
-      loyalty: MOCK_LOYALTY, reserveTroops: MOCK_RESERVE_TROOPS,
+      loyalty: MOCK_CITY_LOYALTY, reserveTroops: MOCK_RESERVE_TROOPS,
     }
     for (const os of cs.officers) {
       officers[os.id] = {
         id: os.id, name: os.name, intelligence: os.intelligence,
         lordId: cs.lordId, cityId: cs.id, stamina: STAMINA_MAX, busy: false,
         troops: MOCK_TROOPS, level: MOCK_LEVEL, force: MOCK_FORCE,
+        loyalty: os.id === cs.lordId ? MOCK_LORD_LOYALTY : MOCK_OFFICER_LOYALTY,
       }
+    }
+  }
+
+  for (const is of ITEM_SEEDS) {
+    items[is.id] = {
+      id: is.id, name: is.name, forceBonus: is.forceBonus, intelBonus: is.intelBonus,
+      holder: { kind: 'city', cityId: is.cityId },
     }
   }
 
@@ -114,6 +141,7 @@ export function createInitialState(seed: number): GameState {
     playerLordId: PLAYER_LORD,
     cities,
     officers,
+    items,
     rng: createRng(seed),
     pendingCommands: [],
     adjacency: buildAdjacency(ADJACENCY_EDGES),
