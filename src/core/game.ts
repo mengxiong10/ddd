@@ -17,6 +17,10 @@ import { canMove, move } from './economy/move'
 import { canTransport, transport } from './economy/transport'
 import { canSearch, search } from './economy/search'
 import { canSuborn, suborn } from './economy/suborn'
+import {
+  canEntice, entice, canAlienate, alienate,
+  canInstigate, instigate, canInduce, induce,
+} from './economy/diplomacy'
 import { canBehead, behead, canBanish, banish } from './economy/captive'
 import { canGovern, govern } from './economy/govern'
 import { endMonth } from './turn/end-month'
@@ -42,6 +46,10 @@ export type Action =
   | { type: 'transport'; officerId: OfficerId; targetCityId: CityId; food: number; gold: number; troops: number } // 输送（占人，效果延到月末）
   | { type: 'search'; officerId: OfficerId } // 搜寻（占人，效果延到月末）
   | { type: 'suborn'; officerId: OfficerId; captiveId: OfficerId } // 招降（占人，效果延到月末）
+  | { type: 'entice'; officerId: OfficerId; targetOfficerId: OfficerId } // 招揽（占人，月末）
+  | { type: 'alienate'; officerId: OfficerId; targetOfficerId: OfficerId } // 离间（占人，月末）
+  | { type: 'instigate'; officerId: OfficerId; targetOfficerId: OfficerId } // 策反（占人，月末）
+  | { type: 'induce'; officerId: OfficerId; targetOfficerId: OfficerId } // 劝降（占人，月末）
   | { type: 'behead'; captiveId: OfficerId } // 处斩（不占人，即时）
   | { type: 'banish'; officerId: OfficerId } // 流放（不占人，即时）
   | { type: 'govern'; officerId: OfficerId } // 治理（占人，即时）
@@ -82,6 +90,14 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canSearch(state, action.officerId, config)
     case 'suborn':
       return canSuborn(state, action.officerId, action.captiveId, config)
+    case 'entice':
+      return canEntice(state, action.officerId, action.targetOfficerId, config)
+    case 'alienate':
+      return canAlienate(state, action.officerId, action.targetOfficerId, config)
+    case 'instigate':
+      return canInstigate(state, action.officerId, action.targetOfficerId, config)
+    case 'induce':
+      return canInduce(state, action.officerId, action.targetOfficerId, config)
     case 'behead':
       return canBehead(state, action.captiveId)
     case 'banish':
@@ -128,6 +144,14 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return search(state, action.officerId, config)
     case 'suborn':
       return suborn(state, action.officerId, action.captiveId, config)
+    case 'entice':
+      return entice(state, action.officerId, action.targetOfficerId, config)
+    case 'alienate':
+      return alienate(state, action.officerId, action.targetOfficerId, config)
+    case 'instigate':
+      return instigate(state, action.officerId, action.targetOfficerId, config)
+    case 'induce':
+      return induce(state, action.officerId, action.targetOfficerId, config)
     case 'behead':
       return behead(state, action.captiveId)
     case 'banish':

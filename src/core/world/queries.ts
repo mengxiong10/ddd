@@ -86,3 +86,24 @@ export function officerLoyalty(state: GameState, officerId: OfficerId): number {
   const officer = state.officers[officerId]!
   return officer.lordId === officer.id ? LOYALTY_MAX : officer.loyalty
 }
+
+/**
+ * 太守（派生，零存储字段）：某城的领头武将。
+ * - 该城归属君主（id===city.lordId 的武将）正驻本城（其 cityId===本城）→ 返该君主。
+ * - 否则 → 本城在任武将（lordId===city.lordId，自动排除俘虏/在野）中有效智力最高者，平局取 id 字典序最小。
+ * - 空城 / 仅俘虏 → null。
+ * 智力取 effectiveOfficer 有效值。仅服务策反（instigate）目标判定。
+ */
+export function governorOf(state: GameState, cityId: CityId): Officer | null {
+  const city = state.cities[cityId]
+  if (!city) return null
+  const lord = state.officers[city.lordId]
+  if (lord && lord.cityId === cityId) return lord
+  const serving = Object.values(state.officers).filter((o) => o.cityId === cityId && o.lordId === city.lordId)
+  if (serving.length === 0) return null
+  return serving.reduce((best, o) => {
+    const oi = effectiveOfficer(state, o.id).intelligence
+    const bi = effectiveOfficer(state, best.id).intelligence
+    return oi > bi || (oi === bi && o.id < best.id) ? o : best
+  })
+}

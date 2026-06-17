@@ -5,6 +5,7 @@ import { executeMove } from '../economy/move'
 import { executeTransport } from '../economy/transport'
 import { executeSearch } from '../economy/search'
 import { executeSuborn } from '../economy/suborn'
+import { executeEntice, executeAlienate, executeInstigate, executeInduce } from '../economy/diplomacy'
 import { executeCampaign } from '../military/campaign'
 
 /**
@@ -39,6 +40,18 @@ export function runPendingCommands(state: GameState, _config: GameConfig): GameS
         break
       case 'suborn':
         next = executeSuborn(next, cmd.officerId, cmd.captiveId)
+        break
+      case 'entice':
+        next = executeEntice(next, cmd.officerId, cmd.targetOfficerId)
+        break
+      case 'alienate':
+        next = executeAlienate(next, cmd.officerId, cmd.targetOfficerId)
+        break
+      case 'instigate':
+        next = executeInstigate(next, cmd.officerId, cmd.targetOfficerId)
+        break
+      case 'induce':
+        next = executeInduce(next, cmd.officerId, cmd.targetOfficerId)
         break
       case 'campaign':
         next = executeCampaign(next, cmd.officerIds, cmd.targetCityId, cmd.provisions)

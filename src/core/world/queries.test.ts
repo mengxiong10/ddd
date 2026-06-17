@@ -4,6 +4,7 @@ import {
   officersInCity, citiesOfLord, isCaptive,
   itemsInCity, itemsOfOfficer, effectiveOfficer, officerLoyalty,
   wanderingOfficersInCity, undiscoveredItemsInCity, captivesInCity,
+  governorOf,
 } from './queries'
 import { setBusy } from './officer'
 import { holdByOfficer } from './item'
@@ -129,6 +130,44 @@ describe('在野/未发现（登场与搜寻）', () => {
     }
     expect(undiscoveredItemsInCity(hidden, 'chengdu').map((i) => i.id)).toEqual(['gem'])
     expect(itemsInCity(hidden, 'chengdu').map((i) => i.id).sort()).toEqual(['cixiongshuanggujian', 'gem'])
+  })
+
+  it('governorOf：君主驻城则太守=君主（即便他人智力更高）', () => {
+    const s = createInitialState(1)
+    // 成都驻刘备(君主,75)、诸葛亮(100)、庞统(90)：太守=刘备
+    expect(governorOf(s, 'chengdu')!.id).toBe('liubei')
+  })
+
+  it('governorOf：君主不在城则取在任最高有效智力者', () => {
+    const s = createInitialState(1)
+    // 江陵无君主：关羽(75) > 张飞(60) -> 太守=关羽
+    expect(governorOf(s, 'jiangling')!.id).toBe('guanyu')
+  })
+
+  it('governorOf：有效智力含道具加成', () => {
+    const s = createInitialState(1)
+    const boosted: GameState = {
+      ...s,
+      items: { ...s.items, boost: {
+        id: 'boost', name: '智珠', forceBonus: 0, intelBonus: 20,
+        holder: { kind: 'officer', officerId: 'zhangfei' } as const, discovered: true, recruiterId: null,
+      } },
+    }
+    // 张飞 60+20=80 > 关羽 75 -> 太守=张飞
+    expect(governorOf(boosted, 'jiangling')!.id).toBe('zhangfei')
+  })
+
+  it('governorOf：平局取 id 字典序最小', () => {
+    const s = createInitialState(1)
+    const tied = { ...s, officers: { ...s.officers, zhangfei: { ...s.officers.zhangfei!, intelligence: 75 } } }
+    // 关羽/张飞均 75 -> 'guanyu' < 'zhangfei'
+    expect(governorOf(tied, 'jiangling')!.id).toBe('guanyu')
+  })
+
+  it('governorOf：空城/仅俘虏返回 null', () => {
+    const s = setCityLord(createInitialState(1), 'jiangling', 'caocao')
+    // 江陵被曹操占，关羽/张飞成俘虏（lordId≠城归属），曹操不在江陵 -> 无在任 -> null
+    expect(governorOf(s, 'jiangling')).toBeNull()
   })
 
   it('captivesInCity 只返回本城俘虏（非俘虏/在野不计入）', () => {

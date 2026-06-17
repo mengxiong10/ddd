@@ -35,6 +35,11 @@ export type PendingCommand =
   | { readonly type: 'search'; readonly officerId: OfficerId }
   // suborn：招降——执行人 + 被招降的本城俘虏；月末四关判定（见 economy/suborn.executeSuborn）。
   | { readonly type: 'suborn'; readonly officerId: OfficerId; readonly captiveId: OfficerId }
+  // 外交（10-diplomacy）：执行人 + 敌方目标武将（武将/太守/君主）；月末判定见 economy/diplomacy。
+  | { readonly type: 'entice'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
+  | { readonly type: 'alienate'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
+  | { readonly type: 'instigate'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
+  | { readonly type: 'induce'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
 
 /**
  * 待登场池条目（判别式）：未登场武将/道具的承载，登场前不进 officers/items。

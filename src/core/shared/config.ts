@@ -42,6 +42,22 @@ export interface GameConfig {
   readonly governStaminaCost: number
   /** 治理消耗的本城金（扁平成本，门槛同值）。 */
   readonly governGoldCost: number
+  /** 招揽消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly enticeStaminaCost: number
+  /** 招揽消耗的本城金（扁平成本，门槛同值）。 */
+  readonly enticeGoldCost: number
+  /** 离间消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly alienateStaminaCost: number
+  /** 离间消耗的本城金（扁平成本，门槛同值）。 */
+  readonly alienateGoldCost: number
+  /** 策反消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly instigateStaminaCost: number
+  /** 策反消耗的本城金（扁平成本，门槛同值）。 */
+  readonly instigateGoldCost: number
+  /** 劝降消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly induceStaminaCost: number
+  /** 劝降消耗的本城金（扁平成本，门槛同值）。 */
+  readonly induceGoldCost: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
@@ -63,4 +79,12 @@ export const DEFAULT_CONFIG: GameConfig = {
   subornGoldCost: 100,
   governStaminaCost: 8,
   governGoldCost: 50,
+  enticeStaminaCost: 20,
+  enticeGoldCost: 50,
+  alienateStaminaCost: 20,
+  alienateGoldCost: 50,
+  instigateStaminaCost: 20,
+  instigateGoldCost: 50,
+  induceStaminaCost: 10,
+  induceGoldCost: 50,
 }
