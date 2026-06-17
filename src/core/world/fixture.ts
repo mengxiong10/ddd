@@ -1,6 +1,6 @@
 import type { DebutEntry, GameState } from '../game-state'
 import type { City } from './city'
-import type { Officer } from './officer'
+import type { Officer, Personality } from './officer'
 import { STAMINA_MAX } from './officer'
 import type { Item } from './item'
 import type { CityId, ItemId, OfficerId } from '../shared/ids'
@@ -25,6 +25,8 @@ interface OfficerSeed {
   readonly id: OfficerId
   readonly name: string
   readonly intelligence: number
+  /** 性格 0..4（君主取君主表含义、普通取普通表含义）。 */
+  readonly personality: Personality
 }
 
 interface CitySeed {
@@ -68,11 +70,12 @@ const DEBUT_OFFICER_SEEDS: readonly {
   readonly debutYear: number
   readonly targetCityId: CityId | null
   readonly recruiterId: OfficerId | null
+  readonly personality: Personality
 }[] = [
   // 赵云：指定登场江陵，无指定伯乐（按执行人智力判定）。
-  { id: 'zhaoyun', name: '赵云', intelligence: 76, force: 96, debutYear: 191, targetCityId: 'jiangling', recruiterId: null },
+  { id: 'zhaoyun', name: '赵云', intelligence: 76, force: 96, debutYear: 191, targetCityId: 'jiangling', recruiterId: null, personality: 0 }, // 忠义
   // 姜维：随机落城，伯乐=诸葛亮（仅诸葛亮搜寻必中）。
-  { id: 'jiangwei', name: '姜维', intelligence: 92, force: 88, debutYear: 192, targetCityId: null, recruiterId: 'zhugeliang' },
+  { id: 'jiangwei', name: '姜维', intelligence: 92, force: 88, debutYear: 192, targetCityId: null, recruiterId: 'zhugeliang', personality: 1 }, // 大志
 ]
 
 const DEBUT_ITEM_SEEDS: readonly {
@@ -103,34 +106,34 @@ const CITY_SEEDS: readonly CitySeed[] = [
     id: 'chengdu', name: '成都', lordId: 'liubei',
     agriculture: 300, commerce: 200, gold: 500, food: 400, population: 30000,
     officers: [
-      { id: 'liubei', name: '刘备', intelligence: 75 },
-      { id: 'zhugeliang', name: '诸葛亮', intelligence: 100 },
-      { id: 'pangtong', name: '庞统', intelligence: 90 },
+      { id: 'liubei', name: '刘备', intelligence: 75, personality: 1 }, // 君主·大义
+      { id: 'zhugeliang', name: '诸葛亮', intelligence: 100, personality: 0 }, // 忠义
+      { id: 'pangtong', name: '庞统', intelligence: 90, personality: 1 }, // 大志
     ],
   },
   {
     id: 'jiangling', name: '江陵', lordId: 'liubei',
     agriculture: 250, commerce: 280, gold: 400, food: 300, population: 25000,
     officers: [
-      { id: 'guanyu', name: '关羽', intelligence: 75 },
-      { id: 'zhangfei', name: '张飞', intelligence: 60 },
+      { id: 'guanyu', name: '关羽', intelligence: 75, personality: 0 }, // 忠义
+      { id: 'zhangfei', name: '张飞', intelligence: 60, personality: 4 }, // 卤莽
     ],
   },
   {
     id: 'xuchang', name: '许昌', lordId: 'caocao',
     agriculture: 350, commerce: 320, gold: 600, food: 500, population: 40000,
     officers: [
-      { id: 'caocao', name: '曹操', intelligence: 90 },
-      { id: 'xunyu', name: '荀彧', intelligence: 95 },
-      { id: 'guojia', name: '郭嘉', intelligence: 98 },
+      { id: 'caocao', name: '曹操', intelligence: 90, personality: 2 }, // 君主·奸诈
+      { id: 'xunyu', name: '荀彧', intelligence: 95, personality: 0 }, // 忠义
+      { id: 'guojia', name: '郭嘉', intelligence: 98, personality: 1 }, // 大志
     ],
   },
   {
     id: 'ye', name: '邺城', lordId: 'caocao',
     agriculture: 300, commerce: 260, gold: 450, food: 350, population: 35000,
     officers: [
-      { id: 'simayi', name: '司马懿', intelligence: 96 },
-      { id: 'zhangliao', name: '张辽', intelligence: 70 },
+      { id: 'simayi', name: '司马懿', intelligence: 96, personality: 1 }, // 大志
+      { id: 'zhangliao', name: '张辽', intelligence: 70, personality: 0 }, // 忠义
     ],
   },
 ]
@@ -159,7 +162,7 @@ export function createInitialState(seed: number): GameState {
         lordId: cs.lordId, cityId: cs.id, stamina: STAMINA_MAX, busy: false,
         troops: MOCK_TROOPS, level: MOCK_LEVEL, force: MOCK_FORCE,
         loyalty: os.id === cs.lordId ? MOCK_LORD_LOYALTY : MOCK_OFFICER_LOYALTY,
-        recruiterId: null,
+        recruiterId: null, personality: os.personality,
       }
     }
   }
@@ -182,7 +185,7 @@ export function createInitialState(seed: number): GameState {
         id: s.id, name: s.name, intelligence: s.intelligence,
         lordId: null, stamina: STAMINA_MAX, busy: false,
         troops: 0, level: MOCK_LEVEL, force: s.force,
-        loyalty: MOCK_OFFICER_LOYALTY, recruiterId: s.recruiterId,
+        loyalty: MOCK_OFFICER_LOYALTY, recruiterId: s.recruiterId, personality: s.personality,
       },
     })),
     ...DEBUT_ITEM_SEEDS.map((s): DebutEntry => ({

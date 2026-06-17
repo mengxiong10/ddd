@@ -41,6 +41,11 @@ export function wanderingOfficersInCity(state: GameState, cityId: CityId): Offic
   return Object.values(state.officers).filter((o) => o.cityId === cityId && o.lordId === null)
 }
 
+/** 本城俘虏（isCaptive 为真者）：招降/处斩的候选、UI 列示。派生，无第二份存储。 */
+export function captivesInCity(state: GameState, cityId: CityId): Officer[] {
+  return Object.values(state.officers).filter((o) => o.cityId === cityId && isCaptive(state, o.id))
+}
+
 /** 本城未发现道具（holder=本城 且 discovered=false）：搜寻发现的候选。 */
 export function undiscoveredItemsInCity(state: GameState, cityId: CityId): Item[] {
   return Object.values(state.items).filter(

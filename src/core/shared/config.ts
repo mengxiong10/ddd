@@ -34,6 +34,10 @@ export interface GameConfig {
   readonly tradeStaminaCost: number
   /** 搜寻消耗的执行人体力（扁平成本，门槛同值）。 */
   readonly searchStaminaCost: number
+  /** 招降消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly subornStaminaCost: number
+  /** 招降消耗的本城金（扁平成本，门槛同值）。 */
+  readonly subornGoldCost: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
@@ -51,4 +55,6 @@ export const DEFAULT_CONFIG: GameConfig = {
   transportStaminaCost: 8,
   tradeStaminaCost: 12,
   searchStaminaCost: 8,
+  subornStaminaCost: 15,
+  subornGoldCost: 100,
 }

@@ -16,6 +16,8 @@ import { canTrade, trade, type TradeMode } from './economy/trade'
 import { canMove, move } from './economy/move'
 import { canTransport, transport } from './economy/transport'
 import { canSearch, search } from './economy/search'
+import { canSuborn, suborn } from './economy/suborn'
+import { canBehead, behead, canBanish, banish } from './economy/captive'
 import { endMonth } from './turn/end-month'
 
 /**
@@ -38,6 +40,9 @@ export type Action =
   | { type: 'move'; officerId: OfficerId; targetCityId: CityId } // 移动（占人，效果延到月末）
   | { type: 'transport'; officerId: OfficerId; targetCityId: CityId; food: number; gold: number; troops: number } // 输送（占人，效果延到月末）
   | { type: 'search'; officerId: OfficerId } // 搜寻（占人，效果延到月末）
+  | { type: 'suborn'; officerId: OfficerId; captiveId: OfficerId } // 招降（占人，效果延到月末）
+  | { type: 'behead'; captiveId: OfficerId } // 处斩（不占人，即时）
+  | { type: 'banish'; officerId: OfficerId } // 流放（不占人，即时）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -73,6 +78,12 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canTransport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
     case 'search':
       return canSearch(state, action.officerId, config)
+    case 'suborn':
+      return canSuborn(state, action.officerId, action.captiveId, config)
+    case 'behead':
+      return canBehead(state, action.captiveId)
+    case 'banish':
+      return canBanish(state, action.officerId)
     case 'endMonth':
       return { ok: true }
   }
@@ -111,6 +122,12 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return transport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
     case 'search':
       return search(state, action.officerId, config)
+    case 'suborn':
+      return suborn(state, action.officerId, action.captiveId, config)
+    case 'behead':
+      return behead(state, action.captiveId)
+    case 'banish':
+      return banish(state, action.officerId)
     case 'endMonth':
       return endMonth(state, config)
   }

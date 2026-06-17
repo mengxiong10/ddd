@@ -38,6 +38,6 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 | 道具系统 items | specs/05-items/prd.md | specs/05-items/dev.md | done |
 | 登场与搜寻 debut-search | specs/06-debut-search/prd.md | specs/06-debut-search/dev.md | done |
 | 城务指令 city-commands | specs/07-city-commands/prd.md | specs/07-city-commands/dev.md | done |
-| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | ready |
+| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | done |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）

@@ -1,6 +1,6 @@
 import type { DebutEntry, GameState } from '../game-state'
 import type { CityId } from '../shared/ids'
-import { randInt } from '../shared/rng'
+import { pickRandomCityWithRng } from './placement'
 
 /**
  * 月末登场（由 turn/end-month 在「月份+1」之后调用，用新年份判定）：
@@ -12,7 +12,6 @@ import { randInt } from '../shared/rng'
 export function runDebuts(state: GameState): GameState {
   if (state.pendingDebuts.length === 0) return state
 
-  const cityIds = Object.keys(state.cities)
   let rng = state.rng
   const officers = { ...state.officers }
   const items = { ...state.items }
@@ -27,9 +26,9 @@ export function runDebuts(state: GameState): GameState {
     if (entry.targetCityId !== null) {
       cityId = entry.targetCityId
     } else {
-      const [idx, next] = randInt(rng, 0, cityIds.length - 1)
+      const [picked, next] = pickRandomCityWithRng(state, rng)
       rng = next
-      cityId = cityIds[idx]!
+      cityId = picked
     }
     if (entry.type === 'officer') {
       officers[entry.officer.id] = { ...entry.officer, cityId }

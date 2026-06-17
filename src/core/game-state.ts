@@ -33,6 +33,8 @@ export type PendingCommand =
     }
   // search：目标 = 执行人本城（officer.cityId，搜寻不跨城），故只存 officerId。
   | { readonly type: 'search'; readonly officerId: OfficerId }
+  // suborn：招降——执行人 + 被招降的本城俘虏；月末四关判定（见 economy/suborn.executeSuborn）。
+  | { readonly type: 'suborn'; readonly officerId: OfficerId; readonly captiveId: OfficerId }
 
 /**
  * 待登场池条目（判别式）：未登场武将/道具的承载，登场前不进 officers/items。

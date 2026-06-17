@@ -192,6 +192,56 @@ describe('移动 / 输送 端到端', () => {
   })
 })
 
+describe('招降 / 处斩 / 流放 端到端', () => {
+  // 许昌被刘备占（曹操等成俘虏），关羽进许昌当执行人。
+  function conquered(seed: number) {
+    let s = createInitialState(seed)
+    s = { ...s, cities: { ...s.cities, xuchang: { ...s.cities.xuchang!, lordId: 'liubei' } } }
+    s = { ...s, officers: { ...s.officers, guanyu: { ...s.officers.guanyu!, cityId: 'xuchang', intelligence: 100 } } }
+    s = { ...s, officers: { ...s.officers, caocao: { ...s.officers.caocao!, intelligence: 1, loyalty: 0 } } }
+    return s
+  }
+
+  it('招降占人、月末四关后归己（忠诚0必成），执行人回城、队列清空', () => {
+    let s = apply(conquered(1), { type: 'suborn', officerId: 'guanyu', captiveId: 'caocao' })
+    expect(s.officers.guanyu!.busy).toBe(true)
+    expect(s.officers.caocao!.lordId).toBe('caocao') // 下令当下未生效
+    expect(s.pendingCommands).toHaveLength(1)
+    s = apply(s, { type: 'endMonth' })
+    expect(s.officers.caocao!.lordId).toBe('liubei') // 月末归己
+    expect(s.officers.guanyu!.busy).toBe(false)
+    expect(s.pendingCommands).toEqual([])
+  })
+
+  it('同城两招降同一俘虏：先成者归己，后者守卫跳过（不报错）', () => {
+    let s = conquered(1)
+    s = { ...s, officers: { ...s.officers, zhangfei: { ...s.officers.zhangfei!, cityId: 'xuchang', intelligence: 100 } } }
+    s = apply(s, { type: 'suborn', officerId: 'guanyu', captiveId: 'caocao' })
+    s = apply(s, { type: 'suborn', officerId: 'zhangfei', captiveId: 'caocao' })
+    expect(s.pendingCommands).toHaveLength(2)
+    s = apply(s, { type: 'endMonth' })
+    expect(s.officers.caocao!.lordId).toBe('liubei')
+  })
+
+  it('处斩即时删除俘虏', () => {
+    const s = apply(conquered(1), { type: 'behead', captiveId: 'caocao' })
+    expect(s.officers.caocao).toBeUndefined()
+  })
+
+  it('流放即时变在野', () => {
+    const s = apply(conquered(1), { type: 'banish', officerId: 'caocao' })
+    expect(s.officers.caocao!.lordId).toBeNull()
+  })
+
+  it('canApply 反映 canSuborn / canBehead / canBanish 校验', () => {
+    const s = conquered(1)
+    expect(canApply(s, { type: 'suborn', officerId: 'guanyu', captiveId: 'caocao' }).ok).toBe(true)
+    expect(canApply(s, { type: 'behead', captiveId: 'caocao' }).ok).toBe(true)
+    expect(canApply(s, { type: 'banish', officerId: 'liubei' }).ok).toBe(false) // 在任君主
+    expect(canApply(createInitialState(1), { type: 'behead', captiveId: 'caocao' }).ok).toBe(false) // 未被俘
+  })
+})
+
 describe('端到端确定性', () => {
   it('相同 seed + 相同动作序列 -> 完全一致', () => {
     const actions: Action[] = [

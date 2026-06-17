@@ -3,7 +3,7 @@ import { createInitialState } from './fixture'
 import {
   officersInCity, citiesOfLord, isCaptive,
   itemsInCity, itemsOfOfficer, effectiveOfficer, officerLoyalty,
-  wanderingOfficersInCity, undiscoveredItemsInCity,
+  wanderingOfficersInCity, undiscoveredItemsInCity, captivesInCity,
 } from './queries'
 import { setBusy } from './officer'
 import { holdByOfficer } from './item'
@@ -129,5 +129,21 @@ describe('在野/未发现（登场与搜寻）', () => {
     }
     expect(undiscoveredItemsInCity(hidden, 'chengdu').map((i) => i.id)).toEqual(['gem'])
     expect(itemsInCity(hidden, 'chengdu').map((i) => i.id).sort()).toEqual(['cixiongshuanggujian', 'gem'])
+  })
+
+  it('captivesInCity 只返回本城俘虏（非俘虏/在野不计入）', () => {
+    const s = createInitialState(1)
+    expect(captivesInCity(s, 'xuchang')).toHaveLength(0) // 初始无俘虏
+    // 许昌被刘备占 -> 城内曹操/荀彧/郭嘉成俘虏
+    const conquered = setCityLord(s, 'xuchang', 'liubei')
+    expect(captivesInCity(conquered, 'xuchang').map((o) => o.id).sort()).toEqual(['caocao', 'guojia', 'xunyu'])
+    // 在野武将（lordId=null）不算俘虏
+    const wandering = {
+      ...conquered,
+      officers: { ...conquered.officers, ronin: {
+        ...conquered.officers.caocao!, id: 'ronin', lordId: null, cityId: 'xuchang',
+      } },
+    }
+    expect(captivesInCity(wandering, 'xuchang').map((o) => o.id)).not.toContain('ronin')
   })
 })

@@ -4,6 +4,7 @@ import { executePlunder } from '../economy/plunder'
 import { executeMove } from '../economy/move'
 import { executeTransport } from '../economy/transport'
 import { executeSearch } from '../economy/search'
+import { executeSuborn } from '../economy/suborn'
 import { executeCampaign } from '../military/campaign'
 
 /**
@@ -35,6 +36,9 @@ export function runPendingCommands(state: GameState, _config: GameConfig): GameS
         break
       case 'search':
         next = executeSearch(next, cmd.officerId)
+        break
+      case 'suborn':
+        next = executeSuborn(next, cmd.officerId, cmd.captiveId)
         break
       case 'campaign':
         next = executeCampaign(next, cmd.officerIds, cmd.targetCityId, cmd.provisions)

@@ -6,6 +6,14 @@ export const STAMINA_MAX = 100
 /** 忠诚量纲上限（百分制，固定值；规则身份，不入 config）。 */
 export const LOYALTY_MAX = 100
 
+/**
+ * 武将性格：单值 0..4，存储一处、两套表解读同一值（由 lordId===id 派生切换）：
+ * - 君主（lordId===自身）：0 和平 / 1 大义 / 2 奸诈 / 3 狂人 / 4 冒进。
+ * - 普通武将：0 忠义 / 1 大志 / 2 贪财 / 3 怕死 / 4 卤莽（驱动招降难度）。
+ * 文字标签属 UI 展示，不入 core。
+ */
+export type Personality = 0 | 1 | 2 | 3 | 4
+
 /** 武将聚合。君主也是一名武将；归属与时间无关的属性为静态。 */
 export interface Officer {
   readonly id: OfficerId
@@ -33,6 +41,8 @@ export interface Officer {
   readonly loyalty: number
   /** 伯乐：能招募该（在野）武将的特定武将 id；null = 无指定（搜寻时按执行人智力判定）。 */
   readonly recruiterId: OfficerId | null
+  /** 性格（0..4），见 Personality。君主/普通两套表解读同一值。 */
+  readonly personality: Personality
 }
 
 /**
