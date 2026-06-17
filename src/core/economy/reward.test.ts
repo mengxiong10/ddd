@@ -28,8 +28,8 @@ describe('canReward 前置校验', () => {
     // 注入两件归属诸葛亮的道具
     s = { ...s, items: {
       ...s.items,
-      a: { id: 'a', name: 'A', forceBonus: 1, intelBonus: 0, holder: { kind: 'officer', officerId: 'zhugeliang' } },
-      b: { id: 'b', name: 'B', forceBonus: 1, intelBonus: 0, holder: { kind: 'officer', officerId: 'zhugeliang' } },
+      a: { id: 'a', name: 'A', forceBonus: 1, intelBonus: 0, holder: { kind: 'officer', officerId: 'zhugeliang' }, discovered: true, recruiterId: null },
+      b: { id: 'b', name: 'B', forceBonus: 1, intelBonus: 0, holder: { kind: 'officer', officerId: 'zhugeliang' }, discovered: true, recruiterId: null },
     } }
     expect(canReward(s, 'zhugeliang', 'cixiongshuanggujian').ok).toBe(false)
   })
@@ -42,6 +42,11 @@ describe('canReward 前置校验', () => {
     const s = createInitialState(1)
     expect(canReward(s, 'nobody', 'cixiongshuanggujian').ok).toBe(false)
     expect(canReward(s, 'zhugeliang', 'noitem').ok).toBe(false)
+  })
+  it('道具未被发现 -> 拒绝（搜寻发现前不可赏赐）', () => {
+    const s = createInitialState(1)
+    const hidden = { ...s, items: { ...s.items, cixiongshuanggujian: { ...s.items.cixiongshuanggujian!, discovered: false } } }
+    expect(canReward(hidden, 'zhugeliang', 'cixiongshuanggujian').ok).toBe(false)
   })
 })
 

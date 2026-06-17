@@ -32,6 +32,7 @@ export function canReward(state: GameState, officerId: OfficerId, itemId: ItemId
   if (!(item.holder.kind === 'city' && item.holder.cityId === officer.cityId)) {
     return { ok: false, reason: '道具不属于该城' }
   }
+  if (!item.discovered) return { ok: false, reason: '道具未被发现' }
   if (itemsOfOfficer(state, officerId).length >= MAX_ITEMS_PER_OFFICER) {
     return { ok: false, reason: '武将道具已满' }
   }

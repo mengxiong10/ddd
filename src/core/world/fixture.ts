@@ -1,4 +1,4 @@
-import type { GameState } from '../game-state'
+import type { DebutEntry, GameState } from '../game-state'
 import type { City } from './city'
 import type { Officer } from './officer'
 import { STAMINA_MAX } from './officer'
@@ -53,6 +53,39 @@ interface ItemSeed {
 const ITEM_SEEDS: readonly ItemSeed[] = [
   { id: 'cixiongshuanggujian', name: '雌雄双股剑', forceBonus: 10, intelBonus: 0, cityId: 'chengdu' },
   { id: 'mengde-xinshu', name: '孟德新书', forceBonus: 0, intelBonus: 10, cityId: 'xuchang' },
+]
+
+/**
+ * 待登场池播种（未登场武将/道具）：到达 debutYear 后于月末登场。
+ * targetCityId=null 表示登场时随机落城。officer 的 lordId=null（无主/在野）、troops=0；
+ * item 的 discovered=false（未发现）。recruiterId=null 表示无指定伯乐。
+ */
+const DEBUT_OFFICER_SEEDS: readonly {
+  readonly id: OfficerId
+  readonly name: string
+  readonly intelligence: number
+  readonly force: number
+  readonly debutYear: number
+  readonly targetCityId: CityId | null
+  readonly recruiterId: OfficerId | null
+}[] = [
+  // 赵云：指定登场江陵，无指定伯乐（按执行人智力判定）。
+  { id: 'zhaoyun', name: '赵云', intelligence: 76, force: 96, debutYear: 191, targetCityId: 'jiangling', recruiterId: null },
+  // 姜维：随机落城，伯乐=诸葛亮（仅诸葛亮搜寻必中）。
+  { id: 'jiangwei', name: '姜维', intelligence: 92, force: 88, debutYear: 192, targetCityId: null, recruiterId: 'zhugeliang' },
+]
+
+const DEBUT_ITEM_SEEDS: readonly {
+  readonly id: ItemId
+  readonly name: string
+  readonly forceBonus: number
+  readonly intelBonus: number
+  readonly debutYear: number
+  readonly targetCityId: CityId | null
+  readonly recruiterId: OfficerId | null
+}[] = [
+  // 青釭剑：指定登场许昌，无指定伯乐。
+  { id: 'qinggangjian', name: '青釭剑', forceBonus: 12, intelBonus: 0, debutYear: 191, targetCityId: 'xuchang', recruiterId: null },
 ]
 
 /**
@@ -126,6 +159,7 @@ export function createInitialState(seed: number): GameState {
         lordId: cs.lordId, cityId: cs.id, stamina: STAMINA_MAX, busy: false,
         troops: MOCK_TROOPS, level: MOCK_LEVEL, force: MOCK_FORCE,
         loyalty: os.id === cs.lordId ? MOCK_LORD_LOYALTY : MOCK_OFFICER_LOYALTY,
+        recruiterId: null,
       }
     }
   }
@@ -134,8 +168,33 @@ export function createInitialState(seed: number): GameState {
     items[is.id] = {
       id: is.id, name: is.name, forceBonus: is.forceBonus, intelBonus: is.intelBonus,
       holder: { kind: 'city', cityId: is.cityId },
+      discovered: true, recruiterId: null,
     }
   }
+
+  // 待登场池：officer 用 Omit<…,'cityId'>（lordId=null、troops=0），item 用 Omit<…,'holder'>（discovered=false）。
+  const pendingDebuts: DebutEntry[] = [
+    ...DEBUT_OFFICER_SEEDS.map((s): DebutEntry => ({
+      type: 'officer',
+      debutYear: s.debutYear,
+      targetCityId: s.targetCityId,
+      officer: {
+        id: s.id, name: s.name, intelligence: s.intelligence,
+        lordId: null, stamina: STAMINA_MAX, busy: false,
+        troops: 0, level: MOCK_LEVEL, force: s.force,
+        loyalty: MOCK_OFFICER_LOYALTY, recruiterId: s.recruiterId,
+      },
+    })),
+    ...DEBUT_ITEM_SEEDS.map((s): DebutEntry => ({
+      type: 'item',
+      debutYear: s.debutYear,
+      targetCityId: s.targetCityId,
+      item: {
+        id: s.id, name: s.name, forceBonus: s.forceBonus, intelBonus: s.intelBonus,
+        discovered: false, recruiterId: s.recruiterId,
+      },
+    })),
+  ]
 
   return {
     year: START_YEAR,
@@ -146,6 +205,7 @@ export function createInitialState(seed: number): GameState {
     items,
     rng: createRng(seed),
     pendingCommands: [],
+    pendingDebuts,
     adjacency: buildAdjacency(ADJACENCY_EDGES),
   }
 }

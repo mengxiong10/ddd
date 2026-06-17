@@ -4,7 +4,7 @@ import { holdByOfficer, holdByCity, MAX_ITEMS_PER_OFFICER } from './item'
 
 const base: Item = {
   id: 'sword', name: '青釭剑', forceBonus: 10, intelBonus: 0,
-  holder: { kind: 'city', cityId: 'c1' },
+  holder: { kind: 'city', cityId: 'c1' }, discovered: true, recruiterId: null,
 }
 
 describe('item 聚合', () => {

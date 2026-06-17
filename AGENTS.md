@@ -20,6 +20,8 @@
 - **武将忠诚派生君主恒 100**：`Officer.loyalty` 为存储字段，但对外读取走 `queries.officerLoyalty`——君主（`officer.lordId===officer.id`）恒返回 100（即便经重选君主换人也成立），赏赐/没收对君主跳过写入。
 - **即时·不占人指令**：赏赐/没收（及分配）效果在下令瞬间结算，**不入 `pendingCommands`、不置 `Officer.busy`、不耗 RNG**，且**不校验 busy**（君主对武将下令，武将本月仍可被其他指令占用）。归属（己方）校验同样不在 `core`，留 store 派发口。
 - **登场/在野/未发现（`06-debut-search`）**：未登场武将/道具存 `GameState.pendingDebuts`（独立池，**不进** `officers`/`items`），**登场为运行时月末事件**——`world/debut.runDebuts` 在月末「月份+1」**之后**按新年份判定（`year ≥ debutYear`），选城（指定城或全部城随机、消耗 RNG）后物化进 `officers`/`items` 并出池。月末固定顺序因此扩展为 `pendingCommands → settle → 回城+体力恢复 → 月份+1 → 登场`。池条目用 `Omit<Officer,'cityId'>`/`Omit<Item,'holder'>` 表达「除落城外全量」，**不放宽** `cityId`/`holder` 类型（活代码零改动）。`Officer.lordId` 可空，`null`=**无主**（统一覆盖未登场/在野）；在野武将（活在 `officers`、`lordId===null`）不进在任、不参与守城、不被指令指派、非俘虏，仅可经**搜寻**招募（`isCaptive`/`officersInCity` 加 `null` 守卫）。道具新增 `discovered`：未发现道具不可被赏赐。
+- **性格单值双表解读**：`Officer.personality`（`0..4`）单存一处；君主表（和平/大义/奸诈/狂人/冒进）/普通武将表（忠义/大志/贪财/怕死/卤莽）由 `lordId===id` 派生切换、不另存第二份；重选君主后新君主自动改用君主表解读其原值。文字标签属 UI，不入 core。
+- **无己方执行人的处置类指令归属口径**：处斩/流放（目标可能是敌方俘虏，无己方执行人）按**作用城归属**（`city.lordId===playerLordId`）在 store 派发口校验，区别于占人指令按执行人归属（`officer.lordId===playerLordId`）；`core` 仍 actor-agnostic、不校验归属。
 - **下令 vs 战斗结算分上下文**：所有指令的**下令阶段**（`canX`/`X`：校验、扣本城资源、占人、入队）归 `economy/`，形态一致、与指令面板对应；**战斗的战中/战后结算**（出征 `executeCampaign`：战斗、占领、俘虏，调用 `world/succession` 重选君主）归 `military/`。两半经 `game.apply`、`turn/pending` 两个既有分派点接线，互不 import。经营领域的月末执行（掠夺破坏本城、收粮收税）仍就近留 `economy/`。
 
 ## 流程
@@ -34,8 +36,8 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 | 掠夺/侦察 plunder-scout | specs/03-plunder-scout/prd.md | specs/03-plunder-scout/dev.md | done |
 | 出征 campaign | specs/04-campaign/prd.md | specs/04-campaign/dev.md | done |
 | 道具系统 items | specs/05-items/prd.md | specs/05-items/dev.md | done |
-| 登场与搜寻 debut-search | specs/06-debut-search/prd.md | specs/06-debut-search/dev.md | ready |
+| 登场与搜寻 debut-search | specs/06-debut-search/prd.md | specs/06-debut-search/dev.md | done |
 | 城务指令 city-commands | specs/07-city-commands/prd.md | specs/07-city-commands/dev.md | done |
-| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | - | draft |
+| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | ready |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）

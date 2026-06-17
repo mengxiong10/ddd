@@ -17,6 +17,10 @@ export interface Item {
   /** 智力加成，≥0。 */
   readonly intelBonus: number
   readonly holder: ItemHolder
+  /** 是否已被发现：fixture 既有道具恒 true；登场道具落城为 false，未发现则不可被赏赐。 */
+  readonly discovered: boolean
+  /** 伯乐：能发现该道具的特定武将 id；null = 无指定（任何执行人可发现）。 */
+  readonly recruiterId: OfficerId | null
 }
 
 /** 每名武将最多持有道具数（量纲上限，规则身份，内联常量）。 */
@@ -30,4 +34,9 @@ export function holdByOfficer(item: Item, officerId: OfficerId): Item {
 /** 归属改到某城（纯函数）。 */
 export function holdByCity(item: Item, cityId: CityId): Item {
   return { ...item, holder: { kind: 'city', cityId } }
+}
+
+/** 标记已发现（纯函数）：搜寻发现后置 true，方可被赏赐。 */
+export function discover(item: Item): Item {
+  return { ...item, discovered: true }
 }

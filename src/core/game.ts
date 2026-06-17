@@ -15,6 +15,7 @@ import { canBanquet, banquet } from './economy/banquet'
 import { canTrade, trade, type TradeMode } from './economy/trade'
 import { canMove, move } from './economy/move'
 import { canTransport, transport } from './economy/transport'
+import { canSearch, search } from './economy/search'
 import { endMonth } from './turn/end-month'
 
 /**
@@ -36,6 +37,7 @@ export type Action =
   | { type: 'trade'; officerId: OfficerId; mode: TradeMode; amount: number } // 交易（占人，即时）
   | { type: 'move'; officerId: OfficerId; targetCityId: CityId } // 移动（占人，效果延到月末）
   | { type: 'transport'; officerId: OfficerId; targetCityId: CityId; food: number; gold: number; troops: number } // 输送（占人，效果延到月末）
+  | { type: 'search'; officerId: OfficerId } // 搜寻（占人，效果延到月末）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -69,6 +71,8 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canMove(state, action.officerId, action.targetCityId)
     case 'transport':
       return canTransport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
+    case 'search':
+      return canSearch(state, action.officerId, config)
     case 'endMonth':
       return { ok: true }
   }
@@ -105,6 +109,8 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return move(state, action.officerId, action.targetCityId)
     case 'transport':
       return transport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
+    case 'search':
+      return search(state, action.officerId, config)
     case 'endMonth':
       return endMonth(state, config)
   }

@@ -4,11 +4,12 @@ import type { OfficerId } from '../shared/ids'
 import { settle } from '../economy/settle'
 import { aiTakeTurn } from '../ai/ai'
 import { recoverStamina, setBusy } from '../world/officer'
+import { runDebuts } from '../world/debut'
 import { runPendingCommands } from './pending'
 
 /**
  * 推进一个月——唯一掌握"月末顺序"的地方：
- * AI 下令(本切片空步) → 执行待月末指令(掠夺等) → 结算收粮/收税 → 占用武将回城 + 体力恢复 → 月份 +1（跨年）。
+ * AI 下令(本切片空步) → 执行待月末指令(掠夺等) → 结算收粮/收税 → 占用武将回城 + 体力恢复 → 月份 +1（跨年）→ 登场。
  */
 export function endMonth(state: GameState, config: GameConfig): GameState {
   // 1. AI 下令（本切片空步）
@@ -29,5 +30,6 @@ export function endMonth(state: GameState, config: GameConfig): GameState {
   const month = settled.month === 12 ? 1 : settled.month + 1
   const year = settled.month === 12 ? settled.year + 1 : settled.year
 
-  return { ...settled, officers, month, year }
+  // 5. 登场：用推进后的新年份判定待登场池（在月份+1 之后）
+  return runDebuts({ ...settled, officers, month, year })
 }

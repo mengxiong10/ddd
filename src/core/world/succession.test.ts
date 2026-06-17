@@ -42,6 +42,7 @@ describe('resolveSuccession', () => {
         zhangliao_book: {
           id: 'zhangliao_book', name: '兵书', forceBonus: 0, intelBonus: 30,
           holder: { kind: 'officer', officerId: 'zhangliao' } as const,
+          discovered: true, recruiterId: null,
         },
       },
     }

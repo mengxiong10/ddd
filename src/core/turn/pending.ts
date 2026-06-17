@@ -3,6 +3,7 @@ import type { GameConfig } from '../shared/config'
 import { executePlunder } from '../economy/plunder'
 import { executeMove } from '../economy/move'
 import { executeTransport } from '../economy/transport'
+import { executeSearch } from '../economy/search'
 import { executeCampaign } from '../military/campaign'
 
 /**
@@ -31,6 +32,9 @@ export function runPendingCommands(state: GameState, _config: GameConfig): GameS
         break
       case 'transport':
         next = executeTransport(next, cmd.officerId, cmd.targetCityId, cmd.food, cmd.gold, cmd.troops)
+        break
+      case 'search':
+        next = executeSearch(next, cmd.officerId)
         break
       case 'campaign':
         next = executeCampaign(next, cmd.officerIds, cmd.targetCityId, cmd.provisions)

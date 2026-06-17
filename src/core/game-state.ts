@@ -31,6 +31,28 @@ export type PendingCommand =
       readonly gold: number
       readonly troops: number
     }
+  // search：目标 = 执行人本城（officer.cityId，搜寻不跨城），故只存 officerId。
+  | { readonly type: 'search'; readonly officerId: OfficerId }
+
+/**
+ * 待登场池条目（判别式）：未登场武将/道具的承载，登场前不进 officers/items。
+ * 除「落城才能定」的字段外存全量——officer 用 Omit<…,'cityId'>（lordId 已为 null）、
+ * item 用 Omit<…,'holder'>（discovered 已为 false）；登场时由 world/debut 补全落城字段。
+ * debutYear/targetCityId 为调度元数据（targetCityId=null 表示随机落城）。
+ */
+export type DebutEntry =
+  | {
+      readonly type: 'officer'
+      readonly debutYear: number
+      readonly targetCityId: CityId | null
+      readonly officer: Omit<Officer, 'cityId'>
+    }
+  | {
+      readonly type: 'item'
+      readonly debutYear: number
+      readonly targetCityId: CityId | null
+      readonly item: Omit<Item, 'holder'>
+    }
 
 /**
  * 对局根状态：唯一的可变态容器，由 apply 纯函数推进。
@@ -58,4 +80,9 @@ export interface GameState {
    * 仅「效果延后」指令入队（本切片仅掠夺）；占人本身仍由 Officer.busy 表达。
    */
   readonly pendingCommands: readonly PendingCommand[]
+  /**
+   * 未登场武将/道具池（独立于 officers/items）；月末「月份+1」后到达登场年者登场并出池。
+   * 见 world/debut.runDebuts。
+   */
+  readonly pendingDebuts: readonly DebutEntry[]
 }

@@ -12,8 +12,8 @@ export interface Officer {
   readonly name: string
   /** 静态属性，参与开垦/招商增量公式；本游戏不做成长。 */
   readonly intelligence: number
-  /** 归属君主；君主本人 lordId 指向自身。 */
-  readonly lordId: OfficerId
+  /** 归属君主；君主本人 lordId 指向自身。null = 无主（覆盖未登场/在野），仅可经搜寻招募。 */
+  readonly lordId: OfficerId | null
   /** 所属城（本切片不跨城移动）。 */
   readonly cityId: CityId
   /** 体力，取值 [0, STAMINA_MAX]。 */
@@ -31,6 +31,8 @@ export interface Officer {
    * 对外读取应走 queries.officerLoyalty（君主派生恒 100）；此存储值对君主无意义。
    */
   readonly loyalty: number
+  /** 伯乐：能招募该（在野）武将的特定武将 id；null = 无指定（搜寻时按执行人智力判定）。 */
+  readonly recruiterId: OfficerId | null
 }
 
 /**

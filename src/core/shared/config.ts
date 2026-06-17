@@ -32,6 +32,8 @@ export interface GameConfig {
   readonly transportStaminaCost: number
   /** 交易消耗的执行人体力（扁平成本，门槛同值）。 */
   readonly tradeStaminaCost: number
+  /** 搜寻消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly searchStaminaCost: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
@@ -48,4 +50,5 @@ export const DEFAULT_CONFIG: GameConfig = {
   banquetGoldCost: 100,
   transportStaminaCost: 8,
   tradeStaminaCost: 12,
+  searchStaminaCost: 8,
 }
