@@ -79,9 +79,46 @@ describe('endMonth 月末编排', () => {
     expect(next.month).toBe(2)
   })
 
-  it('整段推进确定性可复现（不耗 RNG）', () => {
+  it('整段推进确定性可复现', () => {
     const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
     const run = () => endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
     expect(run()).toEqual(run())
+  })
+})
+
+function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+  return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
+}
+
+describe('endMonth 灾害（月末最后一步）', () => {
+  it('灾害在登场之后：先收粮再灾害——饥荒城借当月收粮翻身后恢复正常', () => {
+    // 6 月收粮：成都农业 300 → 收粮 floor(300/4)=75。饥荒不碰粮，收粮后粮>0 → 恢复正常。
+    const s = withCity({ ...createInitialState(1), month: 6 }, 'chengdu', { status: 'famine', food: 0 })
+    const next = endMonth(s, cfg)
+    expect(next.cities.chengdu!.food).toBeGreaterThan(0)
+    expect(next.cities.chengdu!.status).toBe('normal')
+  })
+
+  it('异常城月末按破坏表受损（防灾=0 不恢复，旱灾粮 -5%）', () => {
+    // 非结算月（1月），仅看破坏：旱灾粮食 floor(food×0.95)
+    const s = withCity(createInitialState(1), 'chengdu', { status: 'drought', disasterPrevention: 0, food: 400 })
+    const next = endMonth(s, cfg)
+    expect(next.cities.chengdu!.status).toBe('drought')
+    expect(next.cities.chengdu!.food).toBe(Math.floor(400 * 0.95))
+  })
+
+  it('全城防灾=100 时收粮/收税不被灾害扰动（日历不回归）', () => {
+    let s: GameState = {
+      ...createInitialState(1),
+      month: 6,
+      cities: Object.fromEntries(
+        Object.entries(createInitialState(1).cities).map(([id, c]) => [id, { ...c, disasterPrevention: 100 }]),
+      ),
+    }
+    const before = s.cities.chengdu!
+    s = endMonth(s, cfg)
+    expect(s.cities.chengdu!.food).toBe(before.food + Math.floor(before.agriculture / 4))
+    expect(s.cities.chengdu!.gold).toBe(before.gold + Math.floor(before.commerce / 2))
+    expect(s.cities.chengdu!.status).toBe('normal')
   })
 })

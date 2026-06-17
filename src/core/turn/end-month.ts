@@ -5,11 +5,13 @@ import { settle } from '../economy/settle'
 import { aiTakeTurn } from '../ai/ai'
 import { recoverStamina, setBusy } from '../world/officer'
 import { runDebuts } from '../world/debut'
+import { runDisasters } from '../world/disaster'
 import { runPendingCommands } from './pending'
 
 /**
  * 推进一个月——唯一掌握"月末顺序"的地方：
- * AI 下令(本切片空步) → 执行待月末指令(掠夺等) → 结算收粮/收税 → 占用武将回城 + 体力恢复 → 月份 +1（跨年）→ 登场。
+ * AI 下令(本切片空步) → 执行待月末指令(掠夺等) → 结算收粮/收税 → 占用武将回城 + 体力恢复 → 月份 +1（跨年）→ 登场 → 灾害（破坏/生成/恢复）。
+ * 灾害为纯追加最后一步：饥荒可借当月收粮翻身，且不挪动既有步骤、不改税粮日历。
  */
 export function endMonth(state: GameState, config: GameConfig): GameState {
   // 1. AI 下令（本切片空步）
@@ -31,5 +33,8 @@ export function endMonth(state: GameState, config: GameConfig): GameState {
   const year = settled.month === 12 ? settled.year + 1 : settled.year
 
   // 5. 登场：用推进后的新年份判定待登场池（在月份+1 之后）
-  return runDebuts({ ...settled, officers, month, year })
+  const debuted = runDebuts({ ...settled, officers, month, year })
+
+  // 6. 灾害：月末最后一步——异常城破坏+判恢复、正常城判生成
+  return runDisasters(debuted)
 }

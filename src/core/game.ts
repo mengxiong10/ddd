@@ -18,6 +18,7 @@ import { canTransport, transport } from './economy/transport'
 import { canSearch, search } from './economy/search'
 import { canSuborn, suborn } from './economy/suborn'
 import { canBehead, behead, canBanish, banish } from './economy/captive'
+import { canGovern, govern } from './economy/govern'
 import { endMonth } from './turn/end-month'
 
 /**
@@ -43,6 +44,7 @@ export type Action =
   | { type: 'suborn'; officerId: OfficerId; captiveId: OfficerId } // 招降（占人，效果延到月末）
   | { type: 'behead'; captiveId: OfficerId } // 处斩（不占人，即时）
   | { type: 'banish'; officerId: OfficerId } // 流放（不占人，即时）
+  | { type: 'govern'; officerId: OfficerId } // 治理（占人，即时）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -84,6 +86,8 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canBehead(state, action.captiveId)
     case 'banish':
       return canBanish(state, action.officerId)
+    case 'govern':
+      return canGovern(state, action.officerId, config)
     case 'endMonth':
       return { ok: true }
   }
@@ -128,6 +132,8 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return behead(state, action.captiveId)
     case 'banish':
       return banish(state, action.officerId)
+    case 'govern':
+      return govern(state, action.officerId, config)
     case 'endMonth':
       return endMonth(state, config)
   }

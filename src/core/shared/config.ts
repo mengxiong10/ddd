@@ -38,6 +38,10 @@ export interface GameConfig {
   readonly subornStaminaCost: number
   /** 招降消耗的本城金（扁平成本，门槛同值）。 */
   readonly subornGoldCost: number
+  /** 治理消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly governStaminaCost: number
+  /** 治理消耗的本城金（扁平成本，门槛同值）。 */
+  readonly governGoldCost: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
@@ -57,4 +61,6 @@ export const DEFAULT_CONFIG: GameConfig = {
   searchStaminaCost: 8,
   subornStaminaCost: 15,
   subornGoldCost: 100,
+  governStaminaCost: 8,
+  governGoldCost: 50,
 }

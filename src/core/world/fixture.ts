@@ -14,6 +14,8 @@ const DEFAULT_CAP = 1000
 /** 新字段统一 mock 值（不逐人配，凸显占位、待后续平衡）。 */
 const MOCK_CITY_LOYALTY = 50
 const MOCK_RESERVE_TROOPS = 0
+/** 初始防灾值统一 mock（不逐城配，待平衡阶段再调）。 */
+const MOCK_DISASTER_PREVENTION = 50
 const MOCK_LEVEL = 1
 const MOCK_FORCE = 50
 const MOCK_TROOPS = 100
@@ -155,6 +157,7 @@ export function createInitialState(seed: number): GameState {
       gold: cs.gold, food: cs.food,
       loyalty: MOCK_CITY_LOYALTY, reserveTroops: MOCK_RESERVE_TROOPS,
       population: cs.population,
+      status: 'normal', disasterPrevention: MOCK_DISASTER_PREVENTION,
     }
     for (const os of cs.officers) {
       officers[os.id] = {

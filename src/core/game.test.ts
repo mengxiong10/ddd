@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { createInitialState } from './world/fixture'
 import { apply, canApply, type Action } from './game'
+import type { GameState } from './game-state'
 
 function run(seed: number, actions: Action[]) {
   return actions.reduce((s, a) => apply(s, a), createInitialState(seed))
@@ -257,8 +258,15 @@ describe('端到端确定性', () => {
   })
 
   it('推进半年后在 6 月完成首次收粮+收税', () => {
-    // 起始 1 月，连续 5 次 endMonth 到 6 月，再 endMonth 触发 6 月结算
-    let s = createInitialState(1)
+    // 起始 1 月，连续 5 次 endMonth 到 6 月，再 endMonth 触发 6 月结算。
+    // 防灾值置满 100 隔绝灾害噪声（永不发灾、无破坏），只验收粮/收税日历本身。
+    const init = createInitialState(1)
+    let s: GameState = {
+      ...init,
+      cities: Object.fromEntries(
+        Object.entries(init.cities).map(([id, c]) => [id, { ...c, disasterPrevention: 100 }]),
+      ),
+    }
     for (let i = 0; i < 5; i++) s = apply(s, { type: 'endMonth' })
     expect(s.month).toBe(6)
     const before = s.cities.chengdu!
