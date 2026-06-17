@@ -1,6 +1,8 @@
 import type { GameState, PendingCommand } from '../game-state'
 import type { GameConfig } from '../shared/config'
 import { executePlunder } from '../economy/plunder'
+import { executeMove } from '../economy/move'
+import { executeTransport } from '../economy/transport'
 import { executeCampaign } from '../military/campaign'
 
 /**
@@ -23,6 +25,12 @@ export function runPendingCommands(state: GameState, _config: GameConfig): GameS
     switch (cmd.type) {
       case 'plunder':
         next = executePlunder(next, cmd.officerId)
+        break
+      case 'move':
+        next = executeMove(next, cmd.officerId, cmd.targetCityId)
+        break
+      case 'transport':
+        next = executeTransport(next, cmd.officerId, cmd.targetCityId, cmd.food, cmd.gold, cmd.troops)
         break
       case 'campaign':
         next = executeCampaign(next, cmd.officerIds, cmd.targetCityId, cmd.provisions)

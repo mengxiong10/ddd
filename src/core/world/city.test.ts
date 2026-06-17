@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import type { City } from './city'
-import { attributeCap, raiseAttribute, spendGold, addFood, addGold, addReserveTroops, ravage } from './city'
+import { attributeCap, raiseAttribute, spendGold, addFood, addGold, addReserveTroops, ravage, gainLoyalty, addPopulation } from './city'
 
 const base: City = {
   id: 'c1', name: '成都', lordId: 'o1',
   agriculture: 300, commerce: 200, agricultureCap: 1000, commerceCap: 1000,
-  gold: 500, food: 400, loyalty: 50, reserveTroops: 0,
+  gold: 500, food: 400, loyalty: 50, reserveTroops: 0, population: 30000,
 }
 
 describe('city 聚合', () => {
@@ -51,5 +51,15 @@ describe('city 聚合', () => {
 
   it('ravage 连续两次再减半（基于上次结果）', () => {
     expect(ravage(ravage(base)).agriculture).toBe(75)
+  })
+
+  it('gainLoyalty 回升民忠，封顶 100、不碰其它字段', () => {
+    expect(gainLoyalty(base, 4).loyalty).toBe(54)
+    expect(gainLoyalty({ ...base, loyalty: 98 }, 4).loyalty).toBe(100)
+    expect(gainLoyalty(base, 4).food).toBe(base.food)
+  })
+
+  it('addPopulation 累加人口', () => {
+    expect(addPopulation(base, 100).population).toBe(30100)
   })
 })

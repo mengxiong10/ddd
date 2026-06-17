@@ -22,6 +22,16 @@ export interface GameConfig {
   readonly scoutStaminaCost: number
   /** 侦察消耗的本城金（扁平成本，门槛同值）。 */
   readonly scoutGoldCost: number
+  /** 出巡消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly patrolStaminaCost: number
+  /** 出巡消耗的本城金（扁平成本，门槛同值）。 */
+  readonly patrolGoldCost: number
+  /** 宴请消耗的本城金（扁平成本，门槛同值）。 */
+  readonly banquetGoldCost: number
+  /** 输送消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly transportStaminaCost: number
+  /** 交易消耗的执行人体力（扁平成本，门槛同值）。 */
+  readonly tradeStaminaCost: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
@@ -33,4 +43,9 @@ export const DEFAULT_CONFIG: GameConfig = {
   plunderStaminaCost: 12,
   scoutStaminaCost: 10,
   scoutGoldCost: 20,
+  patrolStaminaCost: 8,
+  patrolGoldCost: 50,
+  banquetGoldCost: 100,
+  transportStaminaCost: 8,
+  tradeStaminaCost: 12,
 }

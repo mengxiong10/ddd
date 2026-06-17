@@ -35,6 +35,7 @@ interface CitySeed {
   readonly commerce: number
   readonly gold: number
   readonly food: number
+  readonly population: number
   readonly officers: readonly OfficerSeed[]
 }
 
@@ -67,7 +68,7 @@ const ADJACENCY_EDGES: readonly (readonly [CityId, CityId])[] = [
 const CITY_SEEDS: readonly CitySeed[] = [
   {
     id: 'chengdu', name: '成都', lordId: 'liubei',
-    agriculture: 300, commerce: 200, gold: 500, food: 400,
+    agriculture: 300, commerce: 200, gold: 500, food: 400, population: 30000,
     officers: [
       { id: 'liubei', name: '刘备', intelligence: 75 },
       { id: 'zhugeliang', name: '诸葛亮', intelligence: 100 },
@@ -76,7 +77,7 @@ const CITY_SEEDS: readonly CitySeed[] = [
   },
   {
     id: 'jiangling', name: '江陵', lordId: 'liubei',
-    agriculture: 250, commerce: 280, gold: 400, food: 300,
+    agriculture: 250, commerce: 280, gold: 400, food: 300, population: 25000,
     officers: [
       { id: 'guanyu', name: '关羽', intelligence: 75 },
       { id: 'zhangfei', name: '张飞', intelligence: 60 },
@@ -84,7 +85,7 @@ const CITY_SEEDS: readonly CitySeed[] = [
   },
   {
     id: 'xuchang', name: '许昌', lordId: 'caocao',
-    agriculture: 350, commerce: 320, gold: 600, food: 500,
+    agriculture: 350, commerce: 320, gold: 600, food: 500, population: 40000,
     officers: [
       { id: 'caocao', name: '曹操', intelligence: 90 },
       { id: 'xunyu', name: '荀彧', intelligence: 95 },
@@ -93,7 +94,7 @@ const CITY_SEEDS: readonly CitySeed[] = [
   },
   {
     id: 'ye', name: '邺城', lordId: 'caocao',
-    agriculture: 300, commerce: 260, gold: 450, food: 350,
+    agriculture: 300, commerce: 260, gold: 450, food: 350, population: 35000,
     officers: [
       { id: 'simayi', name: '司马懿', intelligence: 96 },
       { id: 'zhangliao', name: '张辽', intelligence: 70 },
@@ -117,6 +118,7 @@ export function createInitialState(seed: number): GameState {
       agricultureCap: DEFAULT_CAP, commerceCap: DEFAULT_CAP,
       gold: cs.gold, food: cs.food,
       loyalty: MOCK_CITY_LOYALTY, reserveTroops: MOCK_RESERVE_TROOPS,
+      population: cs.population,
     }
     for (const os of cs.officers) {
       officers[os.id] = {

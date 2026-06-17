@@ -11,6 +11,8 @@ import type { Adjacency } from './world/adjacency'
  * - plunder：目标 = 执行人本城（officer.cityId，掠夺不跨城），故只存 officerId。
  * - campaign：出征——出发城 = 武将共同所在城（执行时仍在本城），故存武将集合 + 目标城 + 随军粮草
  *   （粮已于下令时扣，胜利并入被占城时需要）。
+ * - move：移动——月末把武将落到目标己方城（占人例外，不回出发城），存 officerId + 目标城。
+ * - transport：输送——资源已于下令时从出发城扣除，月末按概率送达目标城，存 officerId + 目标城 + 粮/金/兵。
  */
 export type PendingCommand =
   | { readonly type: 'plunder'; readonly officerId: OfficerId }
@@ -19,6 +21,15 @@ export type PendingCommand =
       readonly officerIds: readonly OfficerId[]
       readonly targetCityId: CityId
       readonly provisions: number
+    }
+  | { readonly type: 'move'; readonly officerId: OfficerId; readonly targetCityId: CityId }
+  | {
+      readonly type: 'transport'
+      readonly officerId: OfficerId
+      readonly targetCityId: CityId
+      readonly food: number
+      readonly gold: number
+      readonly troops: number
     }
 
 /**

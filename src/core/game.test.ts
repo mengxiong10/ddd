@@ -118,6 +118,80 @@ describe('赏赐 / 没收 端到端', () => {
   })
 })
 
+describe('出巡 / 宴请 / 交易 端到端', () => {
+  it('出巡占人、即时提升民忠+人口，月末回城', () => {
+    let s = apply(createInitialState(1), { type: 'patrol', officerId: 'zhugeliang' })
+    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(s.cities.chengdu!.population).toBe(30000 + 100)
+    expect(s.cities.chengdu!.loyalty).toBeGreaterThan(50)
+    expect(s.cities.chengdu!.gold).toBe(500 - 50)
+    expect(s.pendingCommands).toEqual([])
+    s = apply(s, { type: 'endMonth' })
+    expect(s.officers.zhugeliang!.busy).toBe(false)
+  })
+
+  it('宴请不占人：被宴请者同月仍可被派去开垦', () => {
+    let s = apply(createInitialState(1), { type: 'banquet', officerId: 'zhugeliang' })
+    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(s.cities.chengdu!.gold).toBe(500 - 100)
+    s = apply(s, { type: 'reclaim', officerId: 'zhugeliang' })
+    expect(s.officers.zhugeliang!.busy).toBe(true)
+  })
+
+  it('交易买入即时结算并占人', () => {
+    const s = apply(createInitialState(1), { type: 'trade', officerId: 'zhugeliang', mode: 'buy', amount: 50 })
+    expect(s.cities.chengdu!.food).toBe(450)
+    expect(s.cities.chengdu!.gold).toBe(250)
+    expect(s.officers.zhugeliang!.busy).toBe(true)
+  })
+
+  it('canApply 反映 canPatrol / canBanquet / canTrade 校验', () => {
+    const s = createInitialState(1)
+    expect(canApply(s, { type: 'patrol', officerId: 'zhugeliang' }).ok).toBe(true)
+    expect(canApply(s, { type: 'banquet', officerId: 'nobody' }).ok).toBe(false)
+    expect(canApply(s, { type: 'trade', officerId: 'zhugeliang', mode: 'buy', amount: 99999 }).ok).toBe(false)
+  })
+})
+
+describe('移动 / 输送 端到端', () => {
+  it('移动占人、月末落到目标己方城（不回出发城）、队列清空', () => {
+    let s = apply(createInitialState(1), { type: 'move', officerId: 'zhugeliang', targetCityId: 'jiangling' })
+    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(s.officers.zhugeliang!.cityId).toBe('chengdu') // 下令当下未移动
+    expect(s.pendingCommands).toHaveLength(1)
+    s = apply(s, { type: 'endMonth' })
+    expect(s.officers.zhugeliang!.cityId).toBe('jiangling')
+    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(s.pendingCommands).toEqual([])
+  })
+
+  it('输送：下令即扣出发城资源，月末送达/永损后执行人回原城', () => {
+    let s0 = createInitialState(1)
+    s0 = { ...s0, cities: { ...s0.cities, chengdu: { ...s0.cities.chengdu!, reserveTroops: 100 } } }
+    const beforeJL = s0.cities.jiangling!
+    let s = apply(s0, { type: 'transport', officerId: 'zhugeliang', targetCityId: 'jiangling', food: 100, gold: 50, troops: 30 })
+    expect(s.cities.chengdu!.food).toBe(400 - 100)
+    expect(s.cities.chengdu!.reserveTroops).toBe(100 - 30)
+    expect(s.pendingCommands).toHaveLength(1)
+    s = apply(s, { type: 'endMonth' })
+    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(s.officers.zhugeliang!.cityId).toBe('chengdu') // 执行人回原城
+    // 送达或永损二选一，但目标城不会减少
+    const jl = s.cities.jiangling!
+    const delivered = jl.food === beforeJL.food + 100
+    expect(delivered || jl.food === beforeJL.food).toBe(true)
+    expect(s.pendingCommands).toEqual([])
+  })
+
+  it('canApply 反映 canMove / canTransport 校验', () => {
+    const s = createInitialState(1)
+    expect(canApply(s, { type: 'move', officerId: 'zhugeliang', targetCityId: 'jiangling' }).ok).toBe(true)
+    expect(canApply(s, { type: 'move', officerId: 'zhugeliang', targetCityId: 'xuchang' }).ok).toBe(false)
+    expect(canApply(s, { type: 'transport', officerId: 'zhugeliang', targetCityId: 'jiangling', food: 0, gold: 0, troops: 0 }).ok).toBe(true)
+    expect(canApply(s, { type: 'transport', officerId: 'zhugeliang', targetCityId: 'xuchang', food: 0, gold: 0, troops: 0 }).ok).toBe(false)
+  })
+})
+
 describe('端到端确定性', () => {
   it('相同 seed + 相同动作序列 -> 完全一致', () => {
     const actions: Action[] = [

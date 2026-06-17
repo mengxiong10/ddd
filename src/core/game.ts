@@ -10,6 +10,11 @@ import { canPlunder, plunder } from './economy/plunder'
 import { canScout, scout } from './economy/scout'
 import { canCampaign, campaign } from './economy/campaign'
 import { canReward, reward, canConfiscate, confiscate } from './economy/reward'
+import { canPatrol, patrol } from './economy/patrol'
+import { canBanquet, banquet } from './economy/banquet'
+import { canTrade, trade, type TradeMode } from './economy/trade'
+import { canMove, move } from './economy/move'
+import { canTransport, transport } from './economy/transport'
 import { endMonth } from './turn/end-month'
 
 /**
@@ -26,6 +31,11 @@ export type Action =
   | { type: 'campaign'; officerIds: readonly OfficerId[]; targetCityId: CityId; provisions: number } // 出征（占人，效果延到月末）
   | { type: 'reward'; officerId: OfficerId; itemId: ItemId } // 赏赐（不占人，即时）
   | { type: 'confiscate'; officerId: OfficerId; itemId: ItemId } // 没收（不占人，即时）
+  | { type: 'patrol'; officerId: OfficerId } // 出巡（占人，即时）
+  | { type: 'banquet'; officerId: OfficerId } // 宴请（不占人，即时）
+  | { type: 'trade'; officerId: OfficerId; mode: TradeMode; amount: number } // 交易（占人，即时）
+  | { type: 'move'; officerId: OfficerId; targetCityId: CityId } // 移动（占人，效果延到月末）
+  | { type: 'transport'; officerId: OfficerId; targetCityId: CityId; food: number; gold: number; troops: number } // 输送（占人，效果延到月末）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -49,6 +59,16 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canReward(state, action.officerId, action.itemId)
     case 'confiscate':
       return canConfiscate(state, action.officerId, action.itemId)
+    case 'patrol':
+      return canPatrol(state, action.officerId, config)
+    case 'banquet':
+      return canBanquet(state, action.officerId, config)
+    case 'trade':
+      return canTrade(state, action.officerId, action.mode, action.amount, config)
+    case 'move':
+      return canMove(state, action.officerId, action.targetCityId)
+    case 'transport':
+      return canTransport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
     case 'endMonth':
       return { ok: true }
   }
@@ -75,6 +95,16 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return reward(state, action.officerId, action.itemId)
     case 'confiscate':
       return confiscate(state, action.officerId, action.itemId)
+    case 'patrol':
+      return patrol(state, action.officerId, config)
+    case 'banquet':
+      return banquet(state, action.officerId, config)
+    case 'trade':
+      return trade(state, action.officerId, action.mode, action.amount, config)
+    case 'move':
+      return move(state, action.officerId, action.targetCityId)
+    case 'transport':
+      return transport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
     case 'endMonth':
       return endMonth(state, config)
   }
