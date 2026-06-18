@@ -26,3 +26,9 @@ export function randInt(rng: Rng, min: number, max: number): readonly [value: nu
   const value = min + (u % span)
   return [value, { seed: u }]
 }
+
+/** 等概率取数组一元素，消耗 rng。前置：items 非空（调用方保证）。 */
+export function pickRandom<T>(rng: Rng, items: readonly T[]): readonly [item: T, next: Rng] {
+  const [idx, next] = randInt(rng, 0, items.length - 1)
+  return [items[idx]!, next]
+}

@@ -58,6 +58,8 @@ export interface GameConfig {
   readonly induceStaminaCost: number
   /** 劝降消耗的本城金（扁平成本，门槛同值）。 */
   readonly induceGoldCost: number
+  /** AI 自动升级速度：每月每名 AI 武将 RandInt(0,99) < 此值则 +1 级。0=关。AI 难度旋钮。 */
+  readonly aiLevelUpRate: number
 }
 
 /** 默认配置：当前数值为可调默认值，待平衡阶段再细调。 */
@@ -87,4 +89,5 @@ export const DEFAULT_CONFIG: GameConfig = {
   instigateGoldCost: 50,
   induceStaminaCost: 10,
   induceGoldCost: 50,
+  aiLevelUpRate: 0,
 }

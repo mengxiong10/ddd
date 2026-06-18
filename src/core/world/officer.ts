@@ -92,6 +92,11 @@ export function setBusy(o: Officer, busy: boolean): Officer {
   return { ...o, busy }
 }
 
+/** 直接升 1 级（AI 自动升级 / 军备 month%3 用）；不走经验、无上限。 */
+export function levelUp(o: Officer): Officer {
+  return { ...o, level: o.level + 1 }
+}
+
 /** 增减忠诚，钳制 [0, LOYALTY_MAX]（不变量）。调用方负责跳过君主（君主忠诚派生恒 100）。 */
 export function adjustLoyalty(o: Officer, delta: number): Officer {
   return { ...o, loyalty: Math.max(0, Math.min(LOYALTY_MAX, o.loyalty + delta)) }

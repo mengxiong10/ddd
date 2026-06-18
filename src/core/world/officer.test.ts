@@ -7,6 +7,7 @@ import {
   troopCapacity,
   setTroops,
   adjustLoyalty,
+  levelUp,
 } from './officer'
 
 const base: Officer = {
@@ -62,5 +63,10 @@ describe('officer 聚合', () => {
     expect(adjustLoyalty(base, -20).loyalty).toBe(30)
     expect(adjustLoyalty({ ...base, loyalty: 95 }, 8).loyalty).toBe(100)
     expect(adjustLoyalty({ ...base, loyalty: 10 }, -20).loyalty).toBe(0)
+  })
+
+  it('levelUp 直接升 1 级', () => {
+    expect(levelUp(base).level).toBe(2)
+    expect(levelUp({ ...base, level: 9 }).level).toBe(10)
   })
 })

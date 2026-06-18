@@ -31,7 +31,7 @@ const INDUCE_CITY_RATIO = 2
 type DiplomacyType = 'entice' | 'alienate' | 'instigate' | 'induce'
 
 /** 敌方在任非君主武将（招揽/离间目标）：存在、非在野(null)、非己方、非君主、非俘虏。 */
-function isEnemyServingNonLord(
+export function isEnemyServingNonLord(
   state: GameState,
   execLord: OfficerId | null,
   targetId: OfficerId
@@ -45,7 +45,7 @@ function isEnemyServingNonLord(
 }
 
 /** 策反目标：敌方在任非君主武将，且恰为其所在城太守（君主驻该城时太守=君主 → 自动排除）。 */
-function isInstigateTarget(
+export function isInstigateTarget(
   state: GameState,
   execLord: OfficerId | null,
   targetId: OfficerId

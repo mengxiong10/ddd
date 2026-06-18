@@ -36,6 +36,7 @@
 - **确定性红线再收窄：`resolveCampaignOutcome` 也消耗 `GameState.rng`（`14-campaign-aftermath`）**。败军逐人命运（按 officerId 字典序、吃有效智力）：①`RandInt(0,99)>有效智力`→被俘（进目标城、兵清零、`lordId` 不变=派生俘虏）②否则取 `citiesOfLord(其 lordId)`（按 id 排序）随机一座→逃跑成功（保留兵、非俘虏）③无城→逃跑失败：`RandInt(0,99)===0`→战死（道具 `discover(holdByCity(目标城))`、officer 永久删除），否则被俘。整局同 seed 仍可复现。
 - **重选君主拆 actor-agnostic 纯工具 + 显式 `playerLordId` 例外（`14-campaign-aftermath`）**：`world/succession` 改为纯工具（`successionCandidates`/`pickSuccessor`/`promoteLord`/`canChooseSuccessor`，候选=该势力非俘虏非自身武将、自动选取有效智力最高平局 id 最小、`promoteLord` 把势力城+非俘虏武将归新君且新君忠诚 100、`oldLord===playerLordId` 时一并迁 `playerLordId`），**不读 `playerLordId`**；删旧 `resolveSuccession`。「AI 自动立新君 vs 玩家手动选」的分支由 `aftermath.resolveStrickenLord` 读 `state.playerLordId` 决定——这是 core actor-agnostic 的**第二处显式游戏规则例外**（同 10 劝降玩家君主免疫）。遭劫君主无城/无候选→灭亡（不立新君）；君主战死被删也能触发（守卫不依赖 `isCaptive`）。
 - **玩家决策暂停态 `GameState.pendingSuccession`（`14-campaign-aftermath`，类比 `activeBattle`）**：玩家君主遭劫时 `resolveStrickenLord` 不换主、只设 `pendingSuccession={lordId}`（窄态、候选动态派生），`resumeMonth` 检测到即提前返回（月份不推进）；新 action `{type:'chooseSuccessor',officerId}` 委派 `turn.chooseSuccessor`——`promoteLord` 兑现换主→清空 `pendingSuccession`→续跑 `advanceCampaigns`（可重入：同月剩余 campaign 可再起战斗）。`endMonth`/`canApply` 在 `pendingSuccession` 非空时拒绝推进。纯同步、无 Promise。`turn` import `world/succession`（`promoteLord`/`canChooseSuccessor`）+ `military`（`concludeBattle`），`military/aftermath` 不 import `turn`。
+- **AI 经营走「作弊简化下令 + 复用月末执行」（`15-ai-economy`）**：`core/ai/aiTakeTurn`（月末 `endMonth` 最前、玩家命令之前）对每座非玩家城（`lordId≠playerLordId`）按**君主性格**选内政/外交/军备一条路径，逐在任武将（按 id 升序）随机生成命令。AI 是**作弊简化路径**：固定成长（开垦/招商 +200、出巡民忠+4·人口+100、治理防灾+4）、不扣金/体力、不吃智力公式、**不走 `canX`**；AI 下令 = 立即施加固定效果（含**即时**招降/处斩，区别于玩家月末四关模型）或 `busyEnqueue`（仅置 `Officer.busy` + push `PendingCommand`，不复用会扣成本的 `search()/move()/entice()` 下令体）。**月末结算复用现有 `executeSearch/executeMove/executeEntice/…`**（单一月末结算源），故 `turn` 层不改。全程消费 `GameState.rng`、城与武将均按 id 升序遍历、同 seed 可复现。**本切片不产生任何 AI 出征**（军备出征分支留 TODO），`advanceCampaigns`「无非玩家 campaign」假设仍成立。布局仿 `military/battle`：`ai.ts` 编排 + `ai-shared.ts`（破环共享助手）+ `ai-internal/diplomacy/military.ts` 三叶；`ai/*` 单向依赖 economy/world/shared，不被反向依赖。
 
 ## 流程
 
@@ -59,5 +60,6 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 | 战斗系统 battle                    | specs/12-battle/prd.md              | specs/12-battle/dev.md              | done |
 | 战斗技能 battle-skills             | specs/13-battle-skills/prd.md       | specs/13-battle-skills/dev.md       | done |
 | 完整战后处理 campaign-aftermath    | specs/14-campaign-aftermath/prd.md  | specs/14-campaign-aftermath/dev.md  | done |
+| AI 经营 ai-economy                 | specs/15-ai-economy/prd.md          | specs/15-ai-economy/dev.md          | done |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）
