@@ -4,7 +4,7 @@ import type { Position } from '../shared/position'
 import { samePos } from '../shared/position'
 import type { CommandCheck } from '../shared/command'
 import type { Rng } from '../shared/rng'
-import { effectiveOfficer, effectiveTroopType } from '../world/queries'
+import { effectiveOfficer, effectiveTroopType, governorOf } from '../world/queries'
 import type { MapId, BattleMap } from './battle-map'
 import {
   BATTLE_MAPS,
@@ -78,7 +78,8 @@ export interface BattleUnit {
 
 /**
  * 战斗子状态：月末遇玩家 campaign 时挂在 GameState.activeBattle。
- * 携带写回所需的来源 campaign 信息（攻守君主/目标城/随军粮草/出征武将）。
+ * 唯一持有的来源 campaign 信息是 targetCityId；攻方君主与攻/守名单均由 units 派生
+ * （攻方君主 = 攻方单位对应 Officer 的 lordId，整场不变；名单由 units.side），不另存。
  */
 export interface BattleState {
   readonly mode: BattleMode
@@ -92,18 +93,13 @@ export interface BattleState {
   /** 玩家方 / 对手方战场粮草。 */
   readonly playerProvisions: number
   readonly opponentProvisions: number
-  /** 主将 = 防守方第一名有效武将；被击溃立即触发胜负。 */
-  readonly commanderId: OfficerId
+  /** 攻方主将 = 攻方第一名（出征名单首位）；开战定格、不随减员漂移；被击溃 → 攻方负。 */
+  readonly attackerCommanderId: OfficerId
+  /** 守方主将 = 守方第一名（太守领衔）；开战定格、不随减员漂移；被击溃 → 守方负。 */
+  readonly defenderCommanderId: OfficerId
   /** 战斗结果；null=进行中。 */
   readonly outcome: BattleOutcome | null
-  // —— 写回用的来源 campaign 信息 ——
-  readonly attackerLord: OfficerId
-  readonly defenderLord: OfficerId
   readonly targetCityId: CityId
-  /** 随军粮草（胜利并入被占城，复用 04 resolveCampaignOutcome）。 */
-  readonly provisions: number
-  /** 出征武将（攻方），写回 cityId 用。 */
-  readonly officerIds: readonly OfficerId[]
 }
 
 /**
@@ -158,12 +154,18 @@ export function initBattle(
   const defenderSide: BattleSide = mode === 'attack' ? 'opponent' : 'player'
   const map: BattleMap = BATTLE_MAPS[target.battleMapId] ?? BATTLE_MAPS.plains!
 
-  // 防守方 = 目标城归属方在城武将（自动排除俘虏/在野），按 id 定序、限 10。
-  const defenderIds = Object.values(state.officers)
-    .filter((o) => o.cityId === targetCityId && o.lordId === defenderLord)
-    .map((o) => o.id)
-    .sort()
-    .slice(0, MAX_BATTLE_UNITS)
+  // 防守方 = 目标城归属方在城武将（自动排除俘虏/在野）：太守领衔，其余按兵力降序（平局 id 升序），限 10。
+  const governor = governorOf(state, targetCityId)
+  const defenders = Object.values(state.officers).filter(
+    (o) => o.cityId === targetCityId && o.lordId === defenderLord
+  )
+  const rest = defenders
+    .filter((o) => o.id !== governor?.id)
+    .sort((a, b) => b.troops - a.troops || (a.id < b.id ? -1 : 1))
+  const defenderIds = [...(governor ? [governor.id] : []), ...rest.map((o) => o.id)].slice(
+    0,
+    MAX_BATTLE_UNITS
+  )
   const attackerIds = officerIds.slice(0, MAX_BATTLE_UNITS)
 
   const units: Record<OfficerId, BattleUnit> = {}
@@ -198,18 +200,16 @@ export function initBattle(
     units,
     playerProvisions: mode === 'attack' ? provisions : cityFood,
     opponentProvisions: mode === 'attack' ? cityFood : provisions,
-    commanderId: defenderIds[0] ?? '',
+    attackerCommanderId: attackerIds[0] ?? '',
+    defenderCommanderId: defenderIds[0] ?? '',
     outcome: null,
-    attackerLord,
-    defenderLord,
     targetCityId,
-    provisions,
-    officerIds: attackerIds,
   }
 }
 
 /** 即时胜负检查（每次 act 后）：城池格 / 主将击溃 / 全灭。无则 null。 */
 export function checkImmediateVictory(battle: BattleState, map: BattleMap): BattleOutcome | null {
+  const attackerSide: BattleSide = battle.mode === 'attack' ? 'player' : 'opponent'
   const defenderSide: BattleSide = battle.mode === 'attack' ? 'opponent' : 'player'
   // 城池格：进攻方=玩家进城胜；防守方=对手进城败
   for (const u of aliveUnits(battle)) {
@@ -217,9 +217,12 @@ export function checkImmediateVictory(battle: BattleState, map: BattleMap): Batt
     if (battle.mode === 'attack' && u.side === 'player') return 'playerWin'
     if (battle.mode === 'defend' && u.side === 'opponent') return 'playerLose'
   }
-  // 主将（防守方第一名）被击溃 → 防守方负
-  const commander = battle.units[battle.commanderId]
-  if (commander && commander.status === 'dead')
+  // 任一方主将被击溃 → 该方负（攻方主将=出征首位；守方主将=太守）
+  const attackerCommander = battle.units[battle.attackerCommanderId]
+  if (attackerCommander && attackerCommander.status === 'dead')
+    return attackerSide === 'player' ? 'playerLose' : 'playerWin'
+  const defenderCommander = battle.units[battle.defenderCommanderId]
+  if (defenderCommander && defenderCommander.status === 'dead')
     return defenderSide === 'player' ? 'playerLose' : 'playerWin'
   // 全灭 → 另一方胜
   if (!sideAlive(battle, 'player')) return 'playerLose'
@@ -603,8 +606,9 @@ export function reduceBattle(state: GameState, action: BattleAction): GameState 
 
 /**
  * 分胜负后写回（不 import turn）：每单位 troops/experience/level 写回 Officer；
- * 从 BattleState 组装 CampaignOutcome（attackerWins 由 mode+outcome、defenderIds 由 units.side、
- * mergedFood=双方剩余战场粮草之和），交 resolveCampaignOutcome 做完整战后处理；清空 activeBattle。
+ * 从 BattleState 组装 CampaignOutcome（attackerWins 由 mode+outcome、攻/守名单由 units.side 派生、
+ * attackerLord 由攻方单位 Officer.lordId 派生、mergedFood=双方剩余战场粮草之和），
+ * 交 resolveCampaignOutcome 做完整战后处理；清空 activeBattle。
  * 要求 battle.outcome 非空。
  */
 export function concludeBattle(state: GameState): GameState {
@@ -619,18 +623,21 @@ export function concludeBattle(state: GameState): GameState {
   }
   const attackerWins =
     battle.mode === 'attack' ? battle.outcome === 'playerWin' : battle.outcome === 'playerLose'
-  const defenderSide: BattleSide = battle.mode === 'attack' ? 'opponent' : 'player'
-  const defenderIds = Object.values(battle.units)
-    .filter((u) => u.side === defenderSide)
-    .map((u) => u.officerId)
+  const attackerSide: BattleSide = battle.mode === 'attack' ? 'player' : 'opponent'
+  const idsBySide = (side: BattleSide): OfficerId[] =>
+    Object.values(battle.units)
+      .filter((u) => u.side === side)
+      .map((u) => u.officerId)
+  const attackerIds = idsBySide(attackerSide)
+  // 攻方君主 = 任一攻方单位对应 Officer 的 lordId（整场不变；占城前 officers 必含且必有主）。
+  const attackerLord = officers[attackerIds[0]!]!.lordId!
   const withTroops: GameState = { ...state, officers, activeBattle: null }
   return resolveCampaignOutcome(withTroops, {
     attackerWins,
-    attackerLord: battle.attackerLord,
-    defenderLord: battle.defenderLord,
+    attackerLord,
     targetCityId: battle.targetCityId,
-    attackerIds: battle.officerIds,
-    defenderIds,
+    attackerIds,
+    defenderIds: idsBySide(attackerSide === 'player' ? 'opponent' : 'player'),
     mergedFood: battle.playerProvisions + battle.opponentProvisions,
   })
 }

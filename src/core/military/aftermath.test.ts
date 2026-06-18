@@ -24,7 +24,6 @@ function outcome(over: Partial<CampaignOutcome> = {}): CampaignOutcome {
   return {
     attackerWins: true,
     attackerLord: 'liubei',
-    defenderLord: 'caocao',
     targetCityId: 'xuchang',
     attackerIds: ['guanyu', 'zhangfei'],
     defenderIds: ['caocao', 'xunyu', 'guojia'],

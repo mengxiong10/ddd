@@ -42,10 +42,9 @@ export function canChooseSuccessor(state: GameState, officerId: OfficerId): Comm
 // 战后处理一次性入参（concludeBattle 从 BattleState 组装）。
 export interface CampaignOutcome {
   readonly attackerWins: boolean
-  readonly attackerLord: OfficerId
-  readonly defenderLord: OfficerId
+  readonly attackerLord: OfficerId // 攻方君主；胜利占城翻 city.lordId 用（败方君主无需，遭劫君主从 defeated 派生）
   readonly targetCityId: CityId
-  readonly attackerIds: readonly OfficerId[] // 攻方参战武将
+  readonly attackerIds: readonly OfficerId[] // 攻方参战武将（concludeBattle 由 units.side 派生）
   readonly defenderIds: readonly OfficerId[] // 守方参战武将（concludeBattle 由 units.side 派生）
   readonly mergedFood: number // 覆盖式粮草合并值 = playerProvisions + opponentProvisions
 }
@@ -90,7 +89,8 @@ export interface GameState {
 ```ts
 // 写回每单位 troops/experience/level 后，从 BattleState 组装 CampaignOutcome：
 //  attackerWins = mode==='attack' ? outcome==='playerWin' : outcome==='playerLose'
-//  defenderIds = units 中 side===防守方 的 officerId；attackerIds = battle.officerIds
+//  attackerIds/defenderIds = units 中 side===攻/守方 的 officerId（均派生，BattleState 不再存名单）
+//  attackerLord = 任一攻方单位对应 Officer.lordId（整场不变，BattleState 不再存）
 //  mergedFood = playerProvisions + opponentProvisions
 // 调 resolveCampaignOutcome(withTroops, outcome)；清空 activeBattle。签名不变。
 export function concludeBattle(state: GameState): GameState
@@ -150,7 +150,7 @@ export type Action =
 - [x] 遭劫君主（被俘∪战死）：有城+有候选时——AI 自动换主（智力最高、忠诚 100、势力城+武将归新君）；玩家则设 `pendingSuccession` 且**不**换主、不 Game Over。
 - [x] 遭劫君主无候选或无城 → 灭亡（不立新君、剩余皆俘虏）；君主战死被删也能触发立新君（不依赖 isCaptive）。
 - [x] 城市战损无条件（胜/负、攻/守均扣一次）；粮草合并为覆盖式（目标城 food=双方剩余战场粮之和，非累加）。
-- [x] `concludeBattle` 组装 `CampaignOutcome` 正确（attackerWins 由 mode+outcome；defenderIds 由 units.side；mergedFood）。
+- [x] `concludeBattle` 组装 `CampaignOutcome` 正确（attackerWins 由 mode+outcome；攻/守名单由 units.side、attackerLord 由攻方单位 Officer.lordId 派生；mergedFood）。
 - [x] 端到端：玩家进攻胜→占城+AI 败军命运+AI 君主重选/灭亡，续跑尾段；玩家进攻败且带君主被俘→`resumeMonth` 挂起 `pendingSuccession`→`chooseSuccessor` 兑现换主（playerLordId 改）→续跑剩余 campaign/尾段。
 - [x] `endMonth`/`canApply` 在 `pendingSuccession` 非空时拒绝推进；`chooseSuccessor` 非法 no-op。
 - [x] 整局同 seed 可复现（战后处理耗 RNG 但确定）；删 `executeCampaign` 后既有非战斗月行为不回归。

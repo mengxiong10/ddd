@@ -32,13 +32,10 @@ function makeBattle(units: BattleUnit[]): BattleState {
     units: Object.fromEntries(units.map((u) => [u.officerId, u])),
     playerProvisions: 100,
     opponentProvisions: 100,
-    commanderId: 'caocao',
+    attackerCommanderId: 'guanyu',
+    defenderCommanderId: 'caocao',
     outcome: null,
-    attackerLord: 'liubei',
-    defenderLord: 'caocao',
     targetCityId: 'xuchang',
-    provisions: 50,
-    officerIds: ['guanyu'],
   }
 }
 const has = (ps: Position[], p: Position) => ps.some((q) => samePos(q, p))

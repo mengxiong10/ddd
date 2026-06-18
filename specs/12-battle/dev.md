@@ -156,14 +156,12 @@ export interface BattleState {
   readonly units: Readonly<Record<OfficerId, BattleUnit>>
   readonly playerProvisions: number // 玩家方战场粮草
   readonly opponentProvisions: number // 对手方战场粮草
-  readonly commanderId: OfficerId // 主将 = 防守方第一名有效武将
+  readonly attackerCommanderId: OfficerId // 攻方主将 = 出征名单首位；开战定格；被击溃→攻方负
+  readonly defenderCommanderId: OfficerId // 守方主将 = 太守（守方列首位）；开战定格；被击溃→守方负
   readonly outcome: BattleOutcome | null // null=进行中
-  // 写回用的来源 campaign 信息：
-  readonly attackerLord: OfficerId
-  readonly defenderLord: OfficerId
-  readonly targetCityId: CityId
-  readonly provisions: number // 随军粮草（胜利并入被占城，复用 04）
-  readonly officerIds: readonly OfficerId[] // 出征武将（攻方），写回 cityId 用
+  readonly targetCityId: CityId // 唯一持有的来源 campaign 信息
+  // 攻方君主、攻/守参战名单均由 units 派生（不存）：攻方君主=攻方单位 Officer.lordId（整场不变）、
+  //   名单=units.side；粮草已转入 playerProvisions/opponentProvisions（随军粮草不再单存）。
 }
 
 // 战斗专属 action（经 game.apply 的 {type:'battle', action} 包装分派）
@@ -178,7 +176,9 @@ export type BattleAction =
   | { type: 'retreat' }
 
 // 从一条玩家 campaign 初始化战斗：读目标城 battleMap、按攻守模式摆双方单位（≤10/方）、
-// 算战场粮草（攻=provisions、守=目标城开战快照城粮）、定主将、day=1、outcome=null。
+// 算战场粮草（攻=provisions、守=目标城开战快照城粮）、day=1、outcome=null。
+// 守方选取：太守（governorOf）领衔，其余按兵力降序（平局 id 升序）、限 10。
+// 双主将：攻方主将=出征名单首位、守方主将=守方首位（即太守）。
 export function initBattle(state: GameState, cmd: CampaignPending): BattleState
 
 // 轻校验（供 canApply）：activeBattle 存在、未结束、该单位己方存活未行动、moveTo 可达、attack 目标在范围且有敌。
@@ -189,7 +189,8 @@ export function canBattle(state: GameState, action: BattleAction): CommandCheck
 // retreat=玩家方失败。每步后跑 checkVictory 写 outcome。非法 no-op。
 export function reduceBattle(state: GameState, action: BattleAction): GameState
 
-// 胜负判定（§6.7.3）：返回 outcome 或 null。触发点（击溃/城池格/撤退即时；粮草/30天在 endDay）合并在此纯判定。
+// 胜负判定（§6.7.3）：返回 outcome 或 null。触发点（城池格/任一方主将击溃/全灭即时；撤退即时；粮草/30天在 endDay）。
+// 任一方主将（攻方=出征首位、守方=太守）被击溃 → 该方负（按 mode 映射成 player/opponent）。
 export function checkVictory(battle: BattleState, map: BattleMap): BattleOutcome | null
 
 // 分胜负后写回（不 import turn）：把每单位 troops/experience/level 写回 Officer，
@@ -283,10 +284,10 @@ export type Action =
 - [ ] `dailyFoodCost` = floor(sqrt(总兵力)/3)。
 - [ ] `reachableTiles`：按兵种地形消耗算预算；存活单位挡格；友方不挡路径只挡落点；敌方四邻接敌停步区进入后压到1、不可穿越；上限 8。
 - [ ] `attackableTiles`：三类兵种掩码（十字/周身/散点）正确、越界剔除。
-- [ ] `initBattle`：≤10/方按出生点摆位、主将=防守方第一名、战场粮草攻=provisions/守=目标城快照城粮、day=1。
+- [ ] `initBattle`：≤10/方按出生点摆位；守方=太守领衔+其余兵力降序；攻方主将=出征首位、守方主将=太守；战场粮草攻=provisions/守=目标城快照城粮、day=1。
 - [ ] `reduceBattle` act：移动+攻击结算扣兵/给经验/升级/置 acted；只移动+休息也置 acted；非法（越界/超范围/已行动/非己方）no-op。
 - [ ] `reduceBattle` endDay：对手 no-op、双方扣当日粮草(≤当前)、day+1、刷新 acted。
-- [ ] `checkVictory` 全表：主将击溃/全灭/城池格（攻入=玩家进攻胜、守方城池被入=玩家防守败）/粮草=0（同日双归零按玩家败）/30天（进攻超时败、防守超时胜）/撤退败。
+- [ ] `checkVictory` 全表：任一方主将击溃（攻方主将=出征首位、守方主将=太守，按 mode 映射 player/opponent）/全灭/城池格（攻入=玩家进攻胜、守方城池被入=玩家防守败）/粮草=0（同日双归零按玩家败）/30天（进攻超时败、防守超时胜）/撤退败。
 - [ ] `concludeBattle`：单位 troops/experience/level 写回 Officer；attackerWins 由 mode+outcome 推；占城/俘虏/重选君主与 04 一致（复用 resolveCampaignOutcome）；activeBattle 清空。
 - [ ] `endMonth` 端到端：含玩家 campaign 时挂起为 activeBattle（不继续尾段）；`resumeMonth` 写回并续跑（多支 campaign 逐场、无则尾段）；无 campaign 的普通月与既有行为完全一致、可复现（战斗不耗 RNG）。
 - [ ] 既有 04 速算行为经 `resolveCampaignOutcome` 重构后不回归。
@@ -333,7 +334,7 @@ export type Action =
 
 - **地图数据放 `military/battle-map.ts` 模块常量 `BATTLE_MAPS`**（程序化 `makeTemplateMap` 构造 32×32 模板），不进 `GameState`/存档（静态规则数据、避免快照膨胀）；`City.battleMapId` 用 `string`（仅地图键）而非引入 `MapId` 类型，**避免 `world → military` 反向依赖**。
 - **`initBattle` 签名**用 `(state, officerIds, targetCityId, provisions)` 与 `executeCampaign` 同形，不引 `CampaignPending` 类型；`turn/end-month.advanceCampaigns` 从队列取 campaign 项传入。
-- **主将「防守方第一名」**取目标城归属方在城武将按 `officerId` 字典序的首位（确定性）。
+- **双主将**：守方=目标城归属方在城武将「太守（`governorOf`）领衔、其余按兵力降序（平局 `id` 升序）」的首位；攻方=出征名单首位。两者开战定格存 `attackerCommanderId`/`defenderCommanderId`（不随减员漂移、不可事后按当前兵力重算），任一方主将击溃即该方负。
 - **即时胜负**函数命名为 `checkImmediateVictory`（日界判定 `checkDayBoundaryVictory` 内联于 `advanceDay`）。
 
 ## 决策升级

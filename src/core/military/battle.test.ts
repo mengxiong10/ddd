@@ -46,13 +46,10 @@ function makeBattle(units: BattleUnit[], over: Partial<BattleState> = {}): Battl
     units: Object.fromEntries(units.map((u) => [u.officerId, u])),
     playerProvisions: 1000,
     opponentProvisions: 1000,
-    commanderId: 'caocao',
+    attackerCommanderId: 'guanyu',
+    defenderCommanderId: 'caocao',
     outcome: null,
-    attackerLord: 'liubei',
-    defenderLord: 'caocao',
     targetCityId: 'xuchang',
-    provisions: 120,
-    officerIds: ['guanyu', 'zhangfei'],
     ...over,
   }
 }
@@ -66,8 +63,11 @@ describe('initBattle 玩家进攻许昌', () => {
     expect(b.units.guanyu!.side).toBe('player')
     expect(b.units.caocao!.side).toBe('opponent')
   })
-  it('主将=防守方第一名（id 定序）', () => {
-    expect(b.commanderId).toBe('caocao')
+  it('守方主将=太守（曹操驻许昌即太守、列首位）', () => {
+    expect(b.defenderCommanderId).toBe('caocao')
+  })
+  it('攻方主将=出征名单首位', () => {
+    expect(b.attackerCommanderId).toBe('guanyu')
   })
   it('战场粮草：攻方=随军粮草、守方=目标城开战城粮', () => {
     expect(b.playerProvisions).toBe(120)
@@ -77,6 +77,21 @@ describe('initBattle 玩家进攻许昌', () => {
     expect(b.units.guanyu!.pos).toEqual(map.attackerSpawns[0])
     expect(b.units.caocao!.pos).toEqual(map.defenderSpawns[0])
     expect(b.units.guanyu!.troops).toBe(100)
+  })
+  it('守方排序：太守领衔，其余按兵力降序入位', () => {
+    const base = createInitialState(1)
+    const s2: GameState = {
+      ...base,
+      officers: {
+        ...base.officers,
+        xunyu: { ...base.officers.xunyu!, troops: 500 },
+        guojia: { ...base.officers.guojia!, troops: 100 },
+      },
+    }
+    const b2 = initBattle(s2, ['guanyu'], 'xuchang', 100)
+    expect(b2.units.caocao!.pos).toEqual(map.defenderSpawns[0]) // 太守领衔
+    expect(b2.units.xunyu!.pos).toEqual(map.defenderSpawns[1]) // 兵力高者次位
+    expect(b2.units.guojia!.pos).toEqual(map.defenderSpawns[2])
   })
 })
 
@@ -157,6 +172,14 @@ describe('checkImmediateVictory 城池格 / 全灭', () => {
     const b = makeBattle([
       unit('guanyu', 'player', { x: 5, y: 5 }, 0),
       unit('caocao', 'opponent', { x: 6, y: 5 }),
+    ])
+    expect(checkImmediateVictory(b, map)).toBe('playerLose')
+  })
+  it('攻方主将（首位）被击溃 → 玩家败（即便其余攻方单位存活）', () => {
+    const b = makeBattle([
+      unit('guanyu', 'player', { x: 5, y: 5 }, 0), // 攻方主将阵亡
+      unit('zhangfei', 'player', { x: 5, y: 6 }, 100), // 其余攻方存活
+      unit('caocao', 'opponent', { x: 20, y: 20 }, 100),
     ])
     expect(checkImmediateVictory(b, map)).toBe('playerLose')
   })

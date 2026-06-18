@@ -11,8 +11,8 @@ import { successionCandidates, pickSuccessor, promoteLord } from '../world/succe
  */
 export interface CampaignOutcome {
   readonly attackerWins: boolean
+  /** 攻方君主；胜利占城时翻 city.lordId 用（败方君主无需，遭劫君主从 defeated 派生）。 */
   readonly attackerLord: OfficerId
-  readonly defenderLord: OfficerId
   readonly targetCityId: CityId
   /** 攻方参战武将。 */
   readonly attackerIds: readonly OfficerId[]
