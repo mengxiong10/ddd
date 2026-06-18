@@ -49,7 +49,10 @@ export function attributeCap(c: City, kind: DevelopKind): number {
 
 /** 提升农业或商业，按城级上限截断（不变量：不超上限）。 */
 export function raiseAttribute(c: City, kind: DevelopKind, delta: number): City {
-  const next = Math.min(attributeCap(c, kind), (kind === 'agriculture' ? c.agriculture : c.commerce) + delta)
+  const next = Math.min(
+    attributeCap(c, kind),
+    (kind === 'agriculture' ? c.agriculture : c.commerce) + delta
+  )
   return kind === 'agriculture' ? { ...c, agriculture: next } : { ...c, commerce: next }
 }
 
@@ -107,9 +110,31 @@ export function setStatus(c: City, status: CityStatus): City {
   return { ...c, status }
 }
 
+/**
+ * 战后城市战损（规则身份，内联）：无条件、胜负皆受——农业/商业/金各 floor(×0.95)、民忠 floor(×0.90)。
+ * 不碰粮（战后由粮草合并覆盖）、后备兵、人口。新值取 floor，于非负值保证 ≥0、不超原上限。
+ */
+const BATTLE_DAMAGE_KEEP = 0.95
+const BATTLE_DAMAGE_LOYALTY_KEEP = 0.9
+export function applyBattleDamage(c: City): City {
+  return {
+    ...c,
+    agriculture: Math.floor(c.agriculture * BATTLE_DAMAGE_KEEP),
+    commerce: Math.floor(c.commerce * BATTLE_DAMAGE_KEEP),
+    gold: Math.floor(c.gold * BATTLE_DAMAGE_KEEP),
+    loyalty: Math.floor(c.loyalty * BATTLE_DAMAGE_LOYALTY_KEEP),
+  }
+}
+
 /** 防灾值回升，钳制 [0, DISASTER_PREVENTION_MAX]（治理用）。 */
 export function raisePrevention(c: City, delta: number): City {
-  return { ...c, disasterPrevention: Math.max(0, Math.min(DISASTER_PREVENTION_MAX, c.disasterPrevention + delta)) }
+  return {
+    ...c,
+    disasterPrevention: Math.max(
+      0,
+      Math.min(DISASTER_PREVENTION_MAX, c.disasterPrevention + delta)
+    ),
+  }
 }
 
 /**
@@ -117,16 +142,41 @@ export function raisePrevention(c: City, delta: number): City {
  * 损失按当前值百分比扣，新值 = floor(当前 × 剩余比例)；「减半」即剩余 0.5（floor(当前/2)）。
  * 未列字段保持不变。normal 无条目（不破坏）。
  */
-type DamageFactors = Partial<Record<'food' | 'commerce' | 'gold' | 'loyalty' | 'reserveTroops' | 'population' | 'agriculture', number>>
+type DamageFactors = Partial<
+  Record<
+    'food' | 'commerce' | 'gold' | 'loyalty' | 'reserveTroops' | 'population' | 'agriculture',
+    number
+  >
+>
 const DISASTER_DAMAGE: Record<Exclude<CityStatus, 'normal'>, DamageFactors> = {
   // 饥荒：商业-5% 民忠-5% 后备兵减半 人口-25% 农业-5%
-  famine: { commerce: 0.95, loyalty: 0.95, reserveTroops: 0.5, population: 0.75, agriculture: 0.95 },
+  famine: {
+    commerce: 0.95,
+    loyalty: 0.95,
+    reserveTroops: 0.5,
+    population: 0.75,
+    agriculture: 0.95,
+  },
   // 旱灾：粮-5% 后备兵-25% 人口-25% 农业-5%
   drought: { food: 0.95, reserveTroops: 0.75, population: 0.75, agriculture: 0.95 },
   // 水灾：粮-5% 商业-10% 金-10% 后备兵-25% 人口-25% 农业-5%
-  flood: { food: 0.95, commerce: 0.9, gold: 0.9, reserveTroops: 0.75, population: 0.75, agriculture: 0.95 },
+  flood: {
+    food: 0.95,
+    commerce: 0.9,
+    gold: 0.9,
+    reserveTroops: 0.75,
+    population: 0.75,
+    agriculture: 0.95,
+  },
   // 暴动：粮-5% 商业-5% 金-5% 民忠-10% 后备兵减半 农业-5%
-  riot: { food: 0.95, commerce: 0.95, gold: 0.95, loyalty: 0.9, reserveTroops: 0.5, agriculture: 0.95 },
+  riot: {
+    food: 0.95,
+    commerce: 0.95,
+    gold: 0.95,
+    loyalty: 0.9,
+    reserveTroops: 0.5,
+    agriculture: 0.95,
+  },
 }
 
 /**

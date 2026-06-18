@@ -38,8 +38,16 @@ export type PendingCommand =
   | { readonly type: 'suborn'; readonly officerId: OfficerId; readonly captiveId: OfficerId }
   // 外交（10-diplomacy）：执行人 + 敌方目标武将（武将/太守/君主）；月末判定见 economy/diplomacy。
   | { readonly type: 'entice'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
-  | { readonly type: 'alienate'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
-  | { readonly type: 'instigate'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
+  | {
+      readonly type: 'alienate'
+      readonly officerId: OfficerId
+      readonly targetOfficerId: OfficerId
+    }
+  | {
+      readonly type: 'instigate'
+      readonly officerId: OfficerId
+      readonly targetOfficerId: OfficerId
+    }
   | { readonly type: 'induce'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
 
 /**
@@ -99,4 +107,9 @@ export interface GameState {
    * 分胜负后由 turn.resumeMonth 写回并清空、续跑月末。普通态恒为 null。
    */
   readonly activeBattle: BattleState | null
+  /**
+   * 待玩家选新君（`14-campaign-aftermath`）：非空=月末挂起在「玩家君主遭劫、等手动立新君」，
+   * 经 chooseSuccessor action 兑现后续跑月末。仅玩家势力触发（AI 立即自动立新君）。普通态恒为 null。
+   */
+  readonly pendingSuccession: { readonly lordId: OfficerId } | null
 }

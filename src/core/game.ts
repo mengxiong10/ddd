@@ -18,12 +18,19 @@ import { canTransport, transport } from './economy/transport'
 import { canSearch, search } from './economy/search'
 import { canSuborn, suborn } from './economy/suborn'
 import {
-  canEntice, entice, canAlienate, alienate,
-  canInstigate, instigate, canInduce, induce,
+  canEntice,
+  entice,
+  canAlienate,
+  alienate,
+  canInstigate,
+  instigate,
+  canInduce,
+  induce,
 } from './economy/diplomacy'
 import { canBehead, behead, canBanish, banish } from './economy/captive'
 import { canGovern, govern } from './economy/govern'
-import { endMonth, resumeMonth } from './turn/end-month'
+import { endMonth, resumeMonth, chooseSuccessor } from './turn/end-month'
+import { canChooseSuccessor } from './world/succession'
 import { canBattle, reduceBattle, type BattleAction } from './military/battle'
 
 /**
@@ -44,7 +51,14 @@ export type Action =
   | { type: 'banquet'; officerId: OfficerId } // 宴请（不占人，即时）
   | { type: 'trade'; officerId: OfficerId; mode: TradeMode; amount: number } // 交易（占人，即时）
   | { type: 'move'; officerId: OfficerId; targetCityId: CityId } // 移动（占人，效果延到月末）
-  | { type: 'transport'; officerId: OfficerId; targetCityId: CityId; food: number; gold: number; troops: number } // 输送（占人，效果延到月末）
+  | {
+      type: 'transport'
+      officerId: OfficerId
+      targetCityId: CityId
+      food: number
+      gold: number
+      troops: number
+    } // 输送（占人，效果延到月末）
   | { type: 'search'; officerId: OfficerId } // 搜寻（占人，效果延到月末）
   | { type: 'suborn'; officerId: OfficerId; captiveId: OfficerId } // 招降（占人，效果延到月末）
   | { type: 'entice'; officerId: OfficerId; targetOfficerId: OfficerId } // 招揽（占人，月末）
@@ -56,10 +70,15 @@ export type Action =
   | { type: 'govern'; officerId: OfficerId } // 治理（占人，即时）
   | { type: 'battle'; action: BattleAction } // 战斗推进（单包装委派 military/battle，不需 config）
   | { type: 'resumeMonth' } // 战斗分胜负后续跑月末（写回 + 续 campaign/尾段）
+  | { type: 'chooseSuccessor'; officerId: OfficerId } // 玩家君主遭劫后手动立新君（续跑月末）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
-export function canApply(state: GameState, action: Action, config: GameConfig = DEFAULT_CONFIG): CommandCheck {
+export function canApply(
+  state: GameState,
+  action: Action,
+  config: GameConfig = DEFAULT_CONFIG
+): CommandCheck {
   switch (action.type) {
     case 'reclaim':
       return canDevelop(state, action.officerId, 'agriculture', config)
@@ -88,7 +107,15 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
     case 'move':
       return canMove(state, action.officerId, action.targetCityId)
     case 'transport':
-      return canTransport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
+      return canTransport(
+        state,
+        action.officerId,
+        action.targetCityId,
+        action.food,
+        action.gold,
+        action.troops,
+        config
+      )
     case 'search':
       return canSearch(state, action.officerId, config)
     case 'suborn':
@@ -111,13 +138,21 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canBattle(state, action.action)
     case 'resumeMonth':
       return { ok: true }
+    case 'chooseSuccessor':
+      return canChooseSuccessor(state, action.officerId)
     case 'endMonth':
-      return state.activeBattle ? { ok: false, reason: '战斗进行中，请先结束战斗' } : { ok: true }
+      if (state.activeBattle) return { ok: false, reason: '战斗进行中，请先结束战斗' }
+      if (state.pendingSuccession) return { ok: false, reason: '请先选定新君' }
+      return { ok: true }
   }
 }
 
 /** 唯一状态变更入口：按 action 类型分派到对应领域服务，返回新状态（纯函数）。 */
-export function apply(state: GameState, action: Action, config: GameConfig = DEFAULT_CONFIG): GameState {
+export function apply(
+  state: GameState,
+  action: Action,
+  config: GameConfig = DEFAULT_CONFIG
+): GameState {
   switch (action.type) {
     case 'reclaim':
       return develop(state, action.officerId, 'agriculture', config)
@@ -146,7 +181,15 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
     case 'move':
       return move(state, action.officerId, action.targetCityId)
     case 'transport':
-      return transport(state, action.officerId, action.targetCityId, action.food, action.gold, action.troops, config)
+      return transport(
+        state,
+        action.officerId,
+        action.targetCityId,
+        action.food,
+        action.gold,
+        action.troops,
+        config
+      )
     case 'search':
       return search(state, action.officerId, config)
     case 'suborn':
@@ -169,6 +212,8 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return reduceBattle(state, action.action)
     case 'resumeMonth':
       return resumeMonth(state, config)
+    case 'chooseSuccessor':
+      return chooseSuccessor(state, action.officerId, config)
     case 'endMonth':
       return endMonth(state, config)
   }

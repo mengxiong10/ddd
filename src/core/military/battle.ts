@@ -7,14 +7,26 @@ import type { Rng } from '../shared/rng'
 import { effectiveOfficer, effectiveTroopType } from '../world/queries'
 import type { MapId, BattleMap } from './battle-map'
 import {
-  BATTLE_MAPS, MAX_DAYS, REDUCTION_TIER, DEFENSE_COEF_PCT, isCityTile, terrainAt,
+  BATTLE_MAPS,
+  MAX_DAYS,
+  REDUCTION_TIER,
+  DEFENSE_COEF_PCT,
+  isCityTile,
+  terrainAt,
 } from './battle-map'
 import {
-  COUNTER_PCT, baseAttack, baseDefense, terrainAttack, terrainDefense,
-  attackDamage, experienceGain, applyLevelUp, dailyFoodCost,
+  COUNTER_PCT,
+  baseAttack,
+  baseDefense,
+  terrainAttack,
+  terrainDefense,
+  attackDamage,
+  experienceGain,
+  applyLevelUp,
+  dailyFoodCost,
 } from './battle-combat'
 import { reachableTiles, attackableTiles, skillTargetTiles } from './battle-movement'
-import { resolveCampaignOutcome } from './campaign'
+import { resolveCampaignOutcome } from './aftermath'
 import { troopCapacity } from '../world/officer'
 import type { Weather } from './battle-weather'
 import { INITIAL_WEATHER, refreshWeather } from './battle-weather'
@@ -22,8 +34,16 @@ import type { BattleStatus } from './battle-status'
 import { dailyStatusCheck, stoneDamage, canActWithStatus, canCastWithStatus } from './battle-status'
 import type { SkillId, SkillDef } from './battle-skill'
 import {
-  SKILL_DEFS, availableSkills, effectValue, skillGatesPass, rollSkillSuccess,
-  weatherMul, targetTerrainMul, casterTerrainMul, targetTroopMul, initialMp,
+  SKILL_DEFS,
+  availableSkills,
+  effectValue,
+  skillGatesPass,
+  rollSkillSuccess,
+  weatherMul,
+  targetTerrainMul,
+  casterTerrainMul,
+  targetTroopMul,
+  initialMp,
 } from './battle-skill'
 
 /** 阵营：玩家方 / 对手方。 */
@@ -108,11 +128,14 @@ export type BattleAction =
 /** 单次出征参战武将上限（与 economy/campaign 同步的量纲上限）。 */
 const MAX_BATTLE_UNITS = 10
 
-const aliveUnits = (battle: BattleState): BattleUnit[] => Object.values(battle.units).filter((u) => u.status !== 'dead')
+const aliveUnits = (battle: BattleState): BattleUnit[] =>
+  Object.values(battle.units).filter((u) => u.status !== 'dead')
 const unitAt = (battle: BattleState, p: Position): BattleUnit | undefined =>
   aliveUnits(battle).find((u) => samePos(u.pos, p))
 const sideTroops = (battle: BattleState, side: BattleSide): number =>
-  aliveUnits(battle).filter((u) => u.side === side).reduce((s, u) => s + u.troops, 0)
+  aliveUnits(battle)
+    .filter((u) => u.side === side)
+    .reduce((s, u) => s + u.troops, 0)
 const sideAlive = (battle: BattleState, side: BattleSide): boolean =>
   aliveUnits(battle).some((u) => u.side === side)
 
@@ -125,7 +148,7 @@ export function initBattle(
   state: GameState,
   officerIds: readonly OfficerId[],
   targetCityId: CityId,
-  provisions: number,
+  provisions: number
 ): BattleState {
   const attackerLord = state.officers[officerIds[0]!]!.lordId!
   const target = state.cities[targetCityId]!
@@ -150,9 +173,16 @@ export function initBattle(
       const eff = effectiveOfficer(state, id)
       const mp = initialMp(eff.intelligence, eff.force, o.level, o.stamina)
       units[id] = {
-        officerId: id, side, pos: spawns[i] ?? spawns[spawns.length - 1]!,
-        troops: o.troops, experience: o.experience, level: o.level,
-        acted: false, mp, maxMp: mp, status: o.troops === 0 ? 'dead' : 'normal',
+        officerId: id,
+        side,
+        pos: spawns[i] ?? spawns[spawns.length - 1]!,
+        troops: o.troops,
+        experience: o.experience,
+        level: o.level,
+        acted: false,
+        mp,
+        maxMp: mp,
+        status: o.troops === 0 ? 'dead' : 'normal',
       }
     })
   }
@@ -161,12 +191,20 @@ export function initBattle(
 
   const cityFood = target.food
   return {
-    mode, mapId: map.id, weather: INITIAL_WEATHER, day: 1, units,
+    mode,
+    mapId: map.id,
+    weather: INITIAL_WEATHER,
+    day: 1,
+    units,
     playerProvisions: mode === 'attack' ? provisions : cityFood,
     opponentProvisions: mode === 'attack' ? cityFood : provisions,
     commanderId: defenderIds[0] ?? '',
     outcome: null,
-    attackerLord, defenderLord, targetCityId, provisions, officerIds: attackerIds,
+    attackerLord,
+    defenderLord,
+    targetCityId,
+    provisions,
+    officerIds: attackerIds,
   }
 }
 
@@ -181,7 +219,8 @@ export function checkImmediateVictory(battle: BattleState, map: BattleMap): Batt
   }
   // 主将（防守方第一名）被击溃 → 防守方负
   const commander = battle.units[battle.commanderId]
-  if (commander && commander.status === 'dead') return defenderSide === 'player' ? 'playerLose' : 'playerWin'
+  if (commander && commander.status === 'dead')
+    return defenderSide === 'player' ? 'playerLose' : 'playerWin'
   // 全灭 → 另一方胜
   if (!sideAlive(battle, 'player')) return 'playerLose'
   if (!sideAlive(battle, 'opponent')) return 'playerWin'
@@ -197,7 +236,8 @@ function checkDayBoundaryVictory(battle: BattleState): BattleOutcome | null {
 }
 
 const setOutcome = (state: GameState, battle: BattleState, outcome: BattleOutcome): GameState => ({
-  ...state, activeBattle: { ...battle, outcome },
+  ...state,
+  activeBattle: { ...battle, outcome },
 })
 
 /**
@@ -254,7 +294,10 @@ export function canBattle(state: GameState, action: BattleAction): CommandCheck 
   if (!canActWithStatus(unit.status)) return { ok: false, reason: '混乱/石阵中，无法行动' }
 
   const map = BATTLE_MAPS[battle.mapId]!
-  if (action.moveTo && !reachableTiles(state, battle, action.officerId).some((p) => samePos(p, action.moveTo!))) {
+  if (
+    action.moveTo &&
+    !reachableTiles(state, battle, action.officerId).some((p) => samePos(p, action.moveTo!))
+  ) {
     return { ok: false, reason: '移动目标不可达' }
   }
   const from = action.moveTo ?? unit.pos
@@ -275,21 +318,31 @@ export function canBattle(state: GameState, action: BattleAction): CommandCheck 
 
 /** 校验一次施法（供 canBattle）：禁咒/已掌握/MP/四关/范围/阵营。 */
 function canCast(
-  state: GameState, battle: BattleState, map: BattleMap, caster: BattleUnit, from: Position,
-  term: { skillId: SkillId; target?: Position },
+  state: GameState,
+  battle: BattleState,
+  map: BattleMap,
+  caster: BattleUnit,
+  from: Position,
+  term: { skillId: SkillId; target?: Position }
 ): CommandCheck {
   if (!canCastWithStatus(caster.status)) return { ok: false, reason: '禁咒中，无法施法' }
   const def: SkillDef | undefined = SKILL_DEFS[term.skillId]
   if (!def) return { ok: false, reason: '技能不存在' }
   const officer = state.officers[caster.officerId]!
   const isLord = officer.lordId === officer.id
-  const avail = availableSkills(effectiveTroopType(state, caster.officerId), caster.level, officer.personalSkills, isLord)
+  const avail = availableSkills(
+    effectiveTroopType(state, caster.officerId),
+    caster.level,
+    officer.personalSkills,
+    isLord
+  )
   if (!avail.has(def.id)) return { ok: false, reason: '未掌握该技能' }
   if (caster.mp < def.mp) return { ok: false, reason: 'MP 不足' }
   const casterTerrain = terrainAt(map, from)
   if (def.target === 'self') {
     return skillGatesPass(def, battle.weather, casterTerrain)
-      ? { ok: true } : { ok: false, reason: '天气/地形不允许' }
+      ? { ok: true }
+      : { ok: false, reason: '天气/地形不允许' }
   }
   if (!term.target) return { ok: false, reason: '需选择目标' }
   if (!skillTargetTiles(map, from, def.id).some((p) => samePos(p, term.target!))) {
@@ -297,17 +350,23 @@ function canCast(
   }
   const tu = unitAt(battle, term.target)
   if (!tu) return { ok: false, reason: '目标格无单位' }
-  if (def.target === 'enemy' && tu.side === caster.side) return { ok: false, reason: '该技能须对敌方' }
-  if (def.target === 'ally' && tu.side !== caster.side) return { ok: false, reason: '该技能须对友方' }
+  if (def.target === 'enemy' && tu.side === caster.side)
+    return { ok: false, reason: '该技能须对敌方' }
+  if (def.target === 'ally' && tu.side !== caster.side)
+    return { ok: false, reason: '该技能须对友方' }
   const gate = skillGatesPass(def, battle.weather, casterTerrain, {
-    terrain: terrainAt(map, tu.pos), troop: effectiveTroopType(state, tu.officerId),
+    terrain: terrainAt(map, tu.pos),
+    troop: effectiveTroopType(state, tu.officerId),
   })
   return gate ? { ok: true } : { ok: false, reason: '天气/地形/兵种不允许' }
 }
 
 /** 计算一次普攻对目标的实际扣兵（吃有效武力/智力/兵种与双方脚下地形）。 */
 function computeDamage(
-  state: GameState, map: BattleMap, attacker: BattleUnit, defender: BattleUnit,
+  state: GameState,
+  map: BattleMap,
+  attacker: BattleUnit,
+  defender: BattleUnit
 ): number {
   const atkType = effectiveTroopType(state, attacker.officerId)
   const defType = effectiveTroopType(state, defender.officerId)
@@ -315,39 +374,71 @@ function computeDamage(
   const defIntel = effectiveOfficer(state, defender.officerId).intelligence
   const atkTerrain = terrainAt(map, attacker.pos)
   const defTerrain = terrainAt(map, defender.pos)
-  const atkPower = terrainAttack(baseAttack(atkForce, attacker.level, atkType), REDUCTION_TIER[atkType][atkTerrain])
-  const defPower = terrainDefense(
-    baseDefense(defIntel, defender.level, defType), REDUCTION_TIER[defType][defTerrain], DEFENSE_COEF_PCT[defTerrain],
+  const atkPower = terrainAttack(
+    baseAttack(atkForce, attacker.level, atkType),
+    REDUCTION_TIER[atkType][atkTerrain]
   )
-  return attackDamage(atkPower, defPower, attacker.troops, COUNTER_PCT[atkType][defType], defender.troops)
+  const defPower = terrainDefense(
+    baseDefense(defIntel, defender.level, defType),
+    REDUCTION_TIER[defType][defTerrain],
+    DEFENSE_COEF_PCT[defTerrain]
+  )
+  return attackDamage(
+    atkPower,
+    defPower,
+    attacker.troops,
+    COUNTER_PCT[atkType][defType],
+    defender.troops
+  )
 }
 
 /** 上/下/左/右四邻（围攻遍历定序）。 */
-const ORTHO: readonly Position[] = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }]
+const ORTHO: readonly Position[] = [
+  { x: 0, y: -1 },
+  { x: 0, y: 1 },
+  { x: -1, y: 0 },
+  { x: 1, y: 0 },
+]
 
 /** 一次普攻（mutate units）：扣目标兵力/置死亡，行动者获经验/升级。普攻与围攻共用。 */
 function basicAttack(
-  state: GameState, map: BattleMap, units: Record<OfficerId, BattleUnit>,
-  attacker: BattleUnit, defender: BattleUnit,
+  state: GameState,
+  map: BattleMap,
+  units: Record<OfficerId, BattleUnit>,
+  attacker: BattleUnit,
+  defender: BattleUnit
 ): void {
   const dmg = computeDamage(state, map, attacker, defender)
   const newTroops = Math.max(0, defender.troops - dmg)
   const routed = newTroops === 0
-  units[defender.officerId] = { ...defender, troops: newTroops, status: routed ? 'dead' : defender.status }
+  units[defender.officerId] = {
+    ...defender,
+    troops: newTroops,
+    status: routed ? 'dead' : defender.status,
+  }
   const leveled = applyLevelUp(
-    attacker.level, attacker.experience + experienceGain(dmg, attacker.level, defender.level, routed),
+    attacker.level,
+    attacker.experience + experienceGain(dmg, attacker.level, defender.level, routed)
   )
   units[attacker.officerId] = { ...attacker, level: leveled.level, experience: leveled.experience }
 }
 
 /** 施法成功后的效果结算（mutate units），返回天气/rng/双方战场粮草补丁。 */
 function applyCastEffect(
-  state: GameState, map: BattleMap, battle: BattleState, units: Record<OfficerId, BattleUnit>,
-  caster: BattleUnit, def: SkillDef, target: BattleUnit | undefined, rng: Rng,
+  state: GameState,
+  map: BattleMap,
+  battle: BattleState,
+  units: Record<OfficerId, BattleUnit>,
+  caster: BattleUnit,
+  def: SkillDef,
+  target: BattleUnit | undefined,
+  rng: Rng
 ): { weather: Weather; rng: Rng; playerProvisions: number; opponentProvisions: number } {
   const base = {
-    weather: battle.weather, rng,
-    playerProvisions: battle.playerProvisions, opponentProvisions: battle.opponentProvisions,
+    weather: battle.weather,
+    rng,
+    playerProvisions: battle.playerProvisions,
+    opponentProvisions: battle.opponentProvisions,
   }
   // 天变：刷新天气；谍报：core 无效果（UI 读对手粮草）
   if (def.special === 'weather') {
@@ -364,7 +455,7 @@ function applyCastEffect(
       if (cur.status === 'dead') break
       const p: Position = { x: target.pos.x + s.x, y: target.pos.y + s.y }
       const ally = Object.values(units).find(
-        (u) => u.status !== 'dead' && u.side === caster.side && samePos(u.pos, p),
+        (u) => u.status !== 'dead' && u.side === caster.side && samePos(u.pos, p)
       )
       if (ally) basicAttack(state, map, units, ally, cur)
     }
@@ -382,22 +473,41 @@ function applyCastEffect(
     // 破粮：扣敌方（caster 对侧）战场粮草
     const val = effectValue(def.baseFood, mw, mtt, mterr, mc)
     if (caster.side === 'player') {
-      return { ...base, opponentProvisions: Math.max(0, base.opponentProvisions - Math.min(val, base.opponentProvisions)) }
+      return {
+        ...base,
+        opponentProvisions: Math.max(
+          0,
+          base.opponentProvisions - Math.min(val, base.opponentProvisions)
+        ),
+      }
     }
-    return { ...base, playerProvisions: Math.max(0, base.playerProvisions - Math.min(val, base.playerProvisions)) }
+    return {
+      ...base,
+      playerProvisions: Math.max(0, base.playerProvisions - Math.min(val, base.playerProvisions)),
+    }
   }
 
   if (def.baseTroops > 0) {
     const val = effectValue(def.baseTroops, mw, mtt, mterr, mc)
     if (def.target === 'ally') {
-      const cap = Math.max(0, troopCapacity({ ...effectiveOfficer(state, target.officerId), level: cur.level }) - cur.troops)
-      units[target.officerId] = { ...cur, troops: cur.troops + Math.min(val, cap), status: def.status ?? cur.status }
+      const cap = Math.max(
+        0,
+        troopCapacity({ ...effectiveOfficer(state, target.officerId), level: cur.level }) -
+          cur.troops
+      )
+      units[target.officerId] = {
+        ...cur,
+        troops: cur.troops + Math.min(val, cap),
+        status: def.status ?? cur.status,
+      }
     } else {
       const dmg = Math.min(val, cur.troops)
       const newTroops = cur.troops - dmg
       const routed = newTroops === 0
       units[target.officerId] = {
-        ...cur, troops: newTroops, status: routed ? 'dead' : (def.status ?? cur.status),
+        ...cur,
+        troops: newTroops,
+        status: routed ? 'dead' : (def.status ?? cur.status),
       }
     }
     return base
@@ -409,8 +519,9 @@ function applyCastEffect(
 }
 
 function applyAct(
-  state: GameState, battle: BattleState,
-  action: Extract<BattleAction, { type: 'act' }>,
+  state: GameState,
+  battle: BattleState,
+  action: Extract<BattleAction, { type: 'act' }>
 ): GameState {
   if (!canBattle(state, action).ok) return state
   const map = BATTLE_MAPS[battle.mapId]!
@@ -435,7 +546,9 @@ function applyAct(
     units[action.officerId] = charged
     const target = def.target === 'self' || !term.target ? undefined : unitAt(battle, term.target)
     const castAbility = effectiveOfficer(state, action.officerId).intelligence + acting.level + 5
-    const targetResist = target ? effectiveOfficer(state, target.officerId).intelligence + target.level + 5 : 0
+    const targetResist = target
+      ? effectiveOfficer(state, target.officerId).intelligence + target.level + 5
+      : 0
     const [ok, rng2] = rollSkillSuccess(castAbility, targetResist, rng)
     rng = rng2
     if (ok) {
@@ -457,9 +570,20 @@ function applyAct(
  * （刷新天气/状态判定/重置行动/日界与即时胜负）。
  */
 function advanceDay(state: GameState, battle: BattleState): GameState {
-  const playerProvisions = Math.max(0, battle.playerProvisions - dailyFoodCost(sideTroops(battle, 'player')))
-  const opponentProvisions = Math.max(0, battle.opponentProvisions - dailyFoodCost(sideTroops(battle, 'opponent')))
-  const advanced: BattleState = { ...battle, day: battle.day + 1, playerProvisions, opponentProvisions }
+  const playerProvisions = Math.max(
+    0,
+    battle.playerProvisions - dailyFoodCost(sideTroops(battle, 'player'))
+  )
+  const opponentProvisions = Math.max(
+    0,
+    battle.opponentProvisions - dailyFoodCost(sideTroops(battle, 'opponent'))
+  )
+  const advanced: BattleState = {
+    ...battle,
+    day: battle.day + 1,
+    playerProvisions,
+    opponentProvisions,
+  }
   return startDay({ ...state, activeBattle: advanced })
 }
 
@@ -479,7 +603,8 @@ export function reduceBattle(state: GameState, action: BattleAction): GameState 
 
 /**
  * 分胜负后写回（不 import turn）：每单位 troops/experience/level 写回 Officer；
- * 据 mode+outcome 求 attackerWins，复用 resolveCampaignOutcome 做占城/俘虏/重选君主；清空 activeBattle。
+ * 从 BattleState 组装 CampaignOutcome（attackerWins 由 mode+outcome、defenderIds 由 units.side、
+ * mergedFood=双方剩余战场粮草之和），交 resolveCampaignOutcome 做完整战后处理；清空 activeBattle。
  * 要求 battle.outcome 非空。
  */
 export function concludeBattle(state: GameState): GameState {
@@ -492,7 +617,20 @@ export function concludeBattle(state: GameState): GameState {
     if (!o) continue
     officers[u.officerId] = { ...o, troops: u.troops, experience: u.experience, level: u.level }
   }
-  const attackerWins = battle.mode === 'attack' ? battle.outcome === 'playerWin' : battle.outcome === 'playerLose'
+  const attackerWins =
+    battle.mode === 'attack' ? battle.outcome === 'playerWin' : battle.outcome === 'playerLose'
+  const defenderSide: BattleSide = battle.mode === 'attack' ? 'opponent' : 'player'
+  const defenderIds = Object.values(battle.units)
+    .filter((u) => u.side === defenderSide)
+    .map((u) => u.officerId)
   const withTroops: GameState = { ...state, officers, activeBattle: null }
-  return resolveCampaignOutcome(withTroops, battle.officerIds, battle.targetCityId, battle.provisions, attackerWins)
+  return resolveCampaignOutcome(withTroops, {
+    attackerWins,
+    attackerLord: battle.attackerLord,
+    defenderLord: battle.defenderLord,
+    targetCityId: battle.targetCityId,
+    attackerIds: battle.officerIds,
+    defenderIds,
+    mergedFood: battle.playerProvisions + battle.opponentProvisions,
+  })
 }

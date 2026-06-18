@@ -1,12 +1,37 @@
 import { describe, it, expect } from 'vitest'
 import type { City } from './city'
-import { attributeCap, raiseAttribute, spendGold, addFood, addGold, addReserveTroops, ravage, gainLoyalty, addPopulation, setStatus, raisePrevention, applyDisasterDamage } from './city'
+import {
+  attributeCap,
+  raiseAttribute,
+  spendGold,
+  addFood,
+  addGold,
+  addReserveTroops,
+  ravage,
+  gainLoyalty,
+  addPopulation,
+  setStatus,
+  raisePrevention,
+  applyDisasterDamage,
+  applyBattleDamage,
+} from './city'
 
 const base: City = {
-  id: 'c1', name: '成都', lordId: 'o1',
-  agriculture: 300, commerce: 200, agricultureCap: 1000, commerceCap: 1000,
-  gold: 500, food: 400, loyalty: 50, reserveTroops: 0, population: 30000,
-  status: 'normal', disasterPrevention: 50, battleMapId: 'plains',
+  id: 'c1',
+  name: '成都',
+  lordId: 'o1',
+  agriculture: 300,
+  commerce: 200,
+  agricultureCap: 1000,
+  commerceCap: 1000,
+  gold: 500,
+  food: 400,
+  loyalty: 50,
+  reserveTroops: 0,
+  population: 30000,
+  status: 'normal',
+  disasterPrevention: 50,
+  battleMapId: 'plains',
 }
 
 describe('city 聚合', () => {
@@ -83,7 +108,14 @@ describe('city 聚合', () => {
   })
 
   it('applyDisasterDamage 饥荒：商业-5% 民忠-5% 后备兵减半 人口-25% 农业-5%，不碰粮/金', () => {
-    const c = { ...base, commerce: 201, loyalty: 51, reserveTroops: 101, population: 30001, agriculture: 301 }
+    const c = {
+      ...base,
+      commerce: 201,
+      loyalty: 51,
+      reserveTroops: 101,
+      population: 30001,
+      agriculture: 301,
+    }
     const r = applyDisasterDamage(c, 'famine')
     expect(r.commerce).toBe(Math.floor(201 * 0.95))
     expect(r.loyalty).toBe(Math.floor(51 * 0.95))
@@ -107,7 +139,15 @@ describe('city 聚合', () => {
   })
 
   it('applyDisasterDamage 水灾：粮-5% 商业-10% 金-10% 后备兵-25% 人口-25% 农业-5%，不碰民忠', () => {
-    const c = { ...base, food: 401, commerce: 201, gold: 501, reserveTroops: 101, population: 30001, agriculture: 301 }
+    const c = {
+      ...base,
+      food: 401,
+      commerce: 201,
+      gold: 501,
+      reserveTroops: 101,
+      population: 30001,
+      agriculture: 301,
+    }
     const r = applyDisasterDamage(c, 'flood')
     expect(r.food).toBe(Math.floor(401 * 0.95))
     expect(r.commerce).toBe(Math.floor(201 * 0.9))
@@ -119,7 +159,15 @@ describe('city 聚合', () => {
   })
 
   it('applyDisasterDamage 暴动：粮-5% 商业-5% 金-5% 民忠-10% 后备兵减半 农业-5%，不碰人口', () => {
-    const c = { ...base, food: 401, commerce: 201, gold: 501, loyalty: 51, reserveTroops: 101, agriculture: 301 }
+    const c = {
+      ...base,
+      food: 401,
+      commerce: 201,
+      gold: 501,
+      loyalty: 51,
+      reserveTroops: 101,
+      agriculture: 301,
+    }
     const r = applyDisasterDamage(c, 'riot')
     expect(r.food).toBe(Math.floor(401 * 0.95))
     expect(r.commerce).toBe(Math.floor(201 * 0.95))
@@ -127,6 +175,27 @@ describe('city 聚合', () => {
     expect(r.loyalty).toBe(Math.floor(51 * 0.9))
     expect(r.reserveTroops).toBe(50)
     expect(r.agriculture).toBe(Math.floor(301 * 0.95))
+    expect(r.population).toBe(c.population)
+  })
+
+  it('applyBattleDamage 战损：农/商/金 -5%、民忠 -10%，不碰粮/后备兵/人口', () => {
+    const c = {
+      ...base,
+      agriculture: 301,
+      commerce: 201,
+      gold: 501,
+      loyalty: 51,
+      food: 401,
+      reserveTroops: 101,
+      population: 30001,
+    }
+    const r = applyBattleDamage(c)
+    expect(r.agriculture).toBe(Math.floor(301 * 0.95))
+    expect(r.commerce).toBe(Math.floor(201 * 0.95))
+    expect(r.gold).toBe(Math.floor(501 * 0.95))
+    expect(r.loyalty).toBe(Math.floor(51 * 0.9))
+    expect(r.food).toBe(c.food)
+    expect(r.reserveTroops).toBe(c.reserveTroops)
     expect(r.population).toBe(c.population)
   })
 })

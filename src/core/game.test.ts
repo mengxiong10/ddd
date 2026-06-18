@@ -26,7 +26,12 @@ describe('game apply 分派', () => {
   })
 
   it('战斗端到端：出征→endMonth 挂起→battle 撤退→resumeMonth 续月末', () => {
-    const ordered = apply(createInitialState(1), { type: 'campaign', officerIds: ['guanyu', 'zhangfei'], targetCityId: 'xuchang', provisions: 120 })
+    const ordered = apply(createInitialState(1), {
+      type: 'campaign',
+      officerIds: ['guanyu', 'zhangfei'],
+      targetCityId: 'xuchang',
+      provisions: 120,
+    })
     const suspended = apply(ordered, { type: 'endMonth' })
     expect(suspended.activeBattle).not.toBeNull()
     // 战斗进行中不可 endMonth
@@ -40,8 +45,43 @@ describe('game apply 分派', () => {
     expect(next.cities.xuchang!.lordId).toBe('caocao') // 败，未占城
   })
 
+  it('玩家君主出征被俘：resumeMonth 挂起待选新君→endMonth 被拒→chooseSuccessor 续跑', () => {
+    // 刘备(智力设0→必被俘)单独从江陵出征许昌
+    let s = createInitialState(1)
+    s = {
+      ...s,
+      officers: {
+        ...s.officers,
+        liubei: { ...s.officers.liubei!, cityId: 'jiangling', intelligence: 0 },
+      },
+    }
+    const ordered = apply(s, {
+      type: 'campaign',
+      officerIds: ['liubei'],
+      targetCityId: 'xuchang',
+      provisions: 50,
+    })
+    const suspended = apply(ordered, { type: 'endMonth' })
+    const lost = apply(suspended, { type: 'battle', action: { type: 'retreat' } }) // 撤退判败
+    const paused = apply(lost, { type: 'resumeMonth' })
+
+    expect(paused.pendingSuccession).toEqual({ lordId: 'liubei' })
+    expect(canApply(paused, { type: 'endMonth' }).ok).toBe(false) // 待选新君期间拒绝推进
+    expect(canApply(paused, { type: 'chooseSuccessor', officerId: 'caocao' }).ok).toBe(false) // 非候选
+
+    const done = apply(paused, { type: 'chooseSuccessor', officerId: 'guanyu' })
+    expect(done.pendingSuccession).toBeNull()
+    expect(done.playerLordId).toBe('guanyu')
+    expect(done.month).toBe(2)
+  })
+
   it('战斗挂起即初始化技能系统：天气/MP/状态（initBattle+startDay 全链接线）', () => {
-    const ordered = apply(createInitialState(1), { type: 'campaign', officerIds: ['guanyu', 'zhangfei'], targetCityId: 'xuchang', provisions: 120 })
+    const ordered = apply(createInitialState(1), {
+      type: 'campaign',
+      officerIds: ['guanyu', 'zhangfei'],
+      targetCityId: 'xuchang',
+      provisions: 120,
+    })
     const b = apply(ordered, { type: 'endMonth' }).activeBattle!
     expect(WEATHER_ORDER).toContain(b.weather) // startDay 已刷新天气
     expect(b.units.guanyu!.mp).toBeGreaterThan(0) // initBattle 派生 MP
@@ -103,7 +143,11 @@ describe('掠夺 / 侦察 端到端', () => {
   })
 
   it('侦察占人、即时扣金扣体力，月末回城', () => {
-    let s = apply(createInitialState(1), { type: 'scout', officerId: 'zhugeliang', targetCityId: 'xuchang' })
+    let s = apply(createInitialState(1), {
+      type: 'scout',
+      officerId: 'zhugeliang',
+      targetCityId: 'xuchang',
+    })
     expect(s.officers.zhugeliang!.busy).toBe(true)
     expect(s.cities.chengdu!.gold).toBe(500 - 20)
     s = apply(s, { type: 'endMonth' })
@@ -113,15 +157,27 @@ describe('掠夺 / 侦察 端到端', () => {
   it('canApply 反映 canPlunder / canScout 校验', () => {
     const s = createInitialState(1)
     expect(canApply(s, { type: 'plunder', officerId: 'zhugeliang' }).ok).toBe(true)
-    expect(canApply(s, { type: 'scout', officerId: 'zhugeliang', targetCityId: 'jiangling' }).ok).toBe(false)
-    expect(canApply(s, { type: 'scout', officerId: 'zhugeliang', targetCityId: 'xuchang' }).ok).toBe(true)
+    expect(
+      canApply(s, { type: 'scout', officerId: 'zhugeliang', targetCityId: 'jiangling' }).ok
+    ).toBe(false)
+    expect(
+      canApply(s, { type: 'scout', officerId: 'zhugeliang', targetCityId: 'xuchang' }).ok
+    ).toBe(true)
   })
 })
 
 describe('赏赐 / 没收 端到端', () => {
   it('赏赐：道具转给武将、忠诚+8、不占人（同月可再下令）', () => {
-    let s = apply(createInitialState(1), { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' })
-    expect(s.items.cixiongshuanggujian!.holder).toEqual({ kind: 'officer', officerId: 'zhugeliang', equipSeq: 0 })
+    let s = apply(createInitialState(1), {
+      type: 'reward',
+      officerId: 'zhugeliang',
+      itemId: 'cixiongshuanggujian',
+    })
+    expect(s.items.cixiongshuanggujian!.holder).toEqual({
+      kind: 'officer',
+      officerId: 'zhugeliang',
+      equipSeq: 0,
+    })
     expect(s.officers.zhugeliang!.loyalty).toBe(58)
     expect(s.officers.zhugeliang!.busy).toBe(false)
     s = apply(s, { type: 'reclaim', officerId: 'zhugeliang' }) // 不占人 -> 仍可下令
@@ -129,7 +185,11 @@ describe('赏赐 / 没收 端到端', () => {
   })
 
   it('没收：道具收回城、忠诚−20', () => {
-    let s = apply(createInitialState(1), { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' })
+    let s = apply(createInitialState(1), {
+      type: 'reward',
+      officerId: 'zhugeliang',
+      itemId: 'cixiongshuanggujian',
+    })
     s = apply(s, { type: 'confiscate', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' })
     expect(s.items.cixiongshuanggujian!.holder).toEqual({ kind: 'city', cityId: 'chengdu' })
     expect(s.officers.zhugeliang!.loyalty).toBe(38) // 50 +8(赏) −20(没) = 38
@@ -137,9 +197,15 @@ describe('赏赐 / 没收 端到端', () => {
 
   it('canApply 反映 canReward / canConfiscate 校验', () => {
     const s = createInitialState(1)
-    expect(canApply(s, { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' }).ok).toBe(true)
-    expect(canApply(s, { type: 'reward', officerId: 'zhugeliang', itemId: 'mengde-xinshu' }).ok).toBe(false)
-    expect(canApply(s, { type: 'confiscate', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' }).ok).toBe(false)
+    expect(
+      canApply(s, { type: 'reward', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' }).ok
+    ).toBe(true)
+    expect(
+      canApply(s, { type: 'reward', officerId: 'zhugeliang', itemId: 'mengde-xinshu' }).ok
+    ).toBe(false)
+    expect(
+      canApply(s, { type: 'confiscate', officerId: 'zhugeliang', itemId: 'cixiongshuanggujian' }).ok
+    ).toBe(false)
   })
 })
 
@@ -164,7 +230,12 @@ describe('出巡 / 宴请 / 交易 端到端', () => {
   })
 
   it('交易买入即时结算并占人', () => {
-    const s = apply(createInitialState(1), { type: 'trade', officerId: 'zhugeliang', mode: 'buy', amount: 50 })
+    const s = apply(createInitialState(1), {
+      type: 'trade',
+      officerId: 'zhugeliang',
+      mode: 'buy',
+      amount: 50,
+    })
     expect(s.cities.chengdu!.food).toBe(450)
     expect(s.cities.chengdu!.gold).toBe(250)
     expect(s.officers.zhugeliang!.busy).toBe(true)
@@ -174,13 +245,19 @@ describe('出巡 / 宴请 / 交易 端到端', () => {
     const s = createInitialState(1)
     expect(canApply(s, { type: 'patrol', officerId: 'zhugeliang' }).ok).toBe(true)
     expect(canApply(s, { type: 'banquet', officerId: 'nobody' }).ok).toBe(false)
-    expect(canApply(s, { type: 'trade', officerId: 'zhugeliang', mode: 'buy', amount: 99999 }).ok).toBe(false)
+    expect(
+      canApply(s, { type: 'trade', officerId: 'zhugeliang', mode: 'buy', amount: 99999 }).ok
+    ).toBe(false)
   })
 })
 
 describe('移动 / 输送 端到端', () => {
   it('移动占人、月末落到目标己方城（不回出发城）、队列清空', () => {
-    let s = apply(createInitialState(1), { type: 'move', officerId: 'zhugeliang', targetCityId: 'jiangling' })
+    let s = apply(createInitialState(1), {
+      type: 'move',
+      officerId: 'zhugeliang',
+      targetCityId: 'jiangling',
+    })
     expect(s.officers.zhugeliang!.busy).toBe(true)
     expect(s.officers.zhugeliang!.cityId).toBe('chengdu') // 下令当下未移动
     expect(s.pendingCommands).toHaveLength(1)
@@ -194,7 +271,14 @@ describe('移动 / 输送 端到端', () => {
     let s0 = createInitialState(1)
     s0 = { ...s0, cities: { ...s0.cities, chengdu: { ...s0.cities.chengdu!, reserveTroops: 100 } } }
     const beforeJL = s0.cities.jiangling!
-    let s = apply(s0, { type: 'transport', officerId: 'zhugeliang', targetCityId: 'jiangling', food: 100, gold: 50, troops: 30 })
+    let s = apply(s0, {
+      type: 'transport',
+      officerId: 'zhugeliang',
+      targetCityId: 'jiangling',
+      food: 100,
+      gold: 50,
+      troops: 30,
+    })
     expect(s.cities.chengdu!.food).toBe(400 - 100)
     expect(s.cities.chengdu!.reserveTroops).toBe(100 - 30)
     expect(s.pendingCommands).toHaveLength(1)
@@ -210,10 +294,32 @@ describe('移动 / 输送 端到端', () => {
 
   it('canApply 反映 canMove / canTransport 校验', () => {
     const s = createInitialState(1)
-    expect(canApply(s, { type: 'move', officerId: 'zhugeliang', targetCityId: 'jiangling' }).ok).toBe(true)
-    expect(canApply(s, { type: 'move', officerId: 'zhugeliang', targetCityId: 'xuchang' }).ok).toBe(false)
-    expect(canApply(s, { type: 'transport', officerId: 'zhugeliang', targetCityId: 'jiangling', food: 0, gold: 0, troops: 0 }).ok).toBe(true)
-    expect(canApply(s, { type: 'transport', officerId: 'zhugeliang', targetCityId: 'xuchang', food: 0, gold: 0, troops: 0 }).ok).toBe(false)
+    expect(
+      canApply(s, { type: 'move', officerId: 'zhugeliang', targetCityId: 'jiangling' }).ok
+    ).toBe(true)
+    expect(canApply(s, { type: 'move', officerId: 'zhugeliang', targetCityId: 'xuchang' }).ok).toBe(
+      false
+    )
+    expect(
+      canApply(s, {
+        type: 'transport',
+        officerId: 'zhugeliang',
+        targetCityId: 'jiangling',
+        food: 0,
+        gold: 0,
+        troops: 0,
+      }).ok
+    ).toBe(true)
+    expect(
+      canApply(s, {
+        type: 'transport',
+        officerId: 'zhugeliang',
+        targetCityId: 'xuchang',
+        food: 0,
+        gold: 0,
+        troops: 0,
+      }).ok
+    ).toBe(false)
   })
 })
 
@@ -222,8 +328,17 @@ describe('招降 / 处斩 / 流放 端到端', () => {
   function conquered(seed: number) {
     let s = createInitialState(seed)
     s = { ...s, cities: { ...s.cities, xuchang: { ...s.cities.xuchang!, lordId: 'liubei' } } }
-    s = { ...s, officers: { ...s.officers, guanyu: { ...s.officers.guanyu!, cityId: 'xuchang', intelligence: 100 } } }
-    s = { ...s, officers: { ...s.officers, caocao: { ...s.officers.caocao!, intelligence: 1, loyalty: 0 } } }
+    s = {
+      ...s,
+      officers: {
+        ...s.officers,
+        guanyu: { ...s.officers.guanyu!, cityId: 'xuchang', intelligence: 100 },
+      },
+    }
+    s = {
+      ...s,
+      officers: { ...s.officers, caocao: { ...s.officers.caocao!, intelligence: 1, loyalty: 0 } },
+    }
     return s
   }
 
@@ -240,7 +355,13 @@ describe('招降 / 处斩 / 流放 端到端', () => {
 
   it('同城两招降同一俘虏：先成者归己，后者守卫跳过（不报错）', () => {
     let s = conquered(1)
-    s = { ...s, officers: { ...s.officers, zhangfei: { ...s.officers.zhangfei!, cityId: 'xuchang', intelligence: 100 } } }
+    s = {
+      ...s,
+      officers: {
+        ...s.officers,
+        zhangfei: { ...s.officers.zhangfei!, cityId: 'xuchang', intelligence: 100 },
+      },
+    }
     s = apply(s, { type: 'suborn', officerId: 'guanyu', captiveId: 'caocao' })
     s = apply(s, { type: 'suborn', officerId: 'zhangfei', captiveId: 'caocao' })
     expect(s.pendingCommands).toHaveLength(2)
@@ -288,7 +409,7 @@ describe('端到端确定性', () => {
     let s: GameState = {
       ...init,
       cities: Object.fromEntries(
-        Object.entries(init.cities).map(([id, c]) => [id, { ...c, disasterPrevention: 100 }]),
+        Object.entries(init.cities).map(([id, c]) => [id, { ...c, disasterPrevention: 100 }])
       ),
     }
     for (let i = 0; i < 5; i++) s = apply(s, { type: 'endMonth' })
