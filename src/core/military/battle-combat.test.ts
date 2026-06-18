@@ -1,8 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import {
-  TROOP_ATTACK_PCT, TROOP_DEFENSE_PCT, COUNTER_PCT, ATTACK_MASK,
-  baseAttack, baseDefense, terrainAttack, terrainDefense,
-  attackDamage, experienceGain, applyLevelUp, dailyFoodCost,
+  TROOP_ATTACK_PCT,
+  TROOP_DEFENSE_PCT,
+  COUNTER_PCT,
+  ATTACK_MASK,
+  baseAttack,
+  baseDefense,
+  terrainAttack,
+  terrainDefense,
+  attackDamage,
+  experienceGain,
+  applyLevelUp,
+  dailyFoodCost,
 } from './battle-combat'
 
 describe('battle-combat 系数表', () => {

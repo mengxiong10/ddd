@@ -8,7 +8,10 @@ import { randInt } from '../shared/rng'
  * debut（登场随机落城）与 banish（流放随机落城）共用此唯一选城处。
  * 确定性依赖 Object.keys(state.cities) 插入序稳定（fixture 按 CITY_SEEDS 序插入）。
  */
-export function pickRandomCityWithRng(state: GameState, rng: Rng): readonly [cityId: CityId, next: Rng] {
+export function pickRandomCityWithRng(
+  state: GameState,
+  rng: Rng
+): readonly [cityId: CityId, next: Rng] {
   const cityIds = Object.keys(state.cities)
   const [idx, next] = randInt(rng, 0, cityIds.length - 1)
   return [cityIds[idx]!, next]

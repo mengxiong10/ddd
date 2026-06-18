@@ -1,6 +1,7 @@
 # campaign（出征）开发文档
 
 ## 方案概述
+
 出征是第二条"效果延到月末"的指令，复用既有"占人 = `Officer.busy` + `pendingCommands` 月末分派"的范式，但有三处首次引入：
 
 - **城邻接**：在 `GameState` 增 `adjacency`（值对象，fixture 播种），`canCampaign` 据其校验"相邻=可达"。放进 state 而非全局常量/参数，使 `apply/canApply` 签名不变、可注入不同拓扑测试、可随存档序列化。
@@ -14,6 +15,7 @@
 ## 接口设计
 
 ### world/adjacency.ts（新建·值对象）
+
 ```ts
 export type Adjacency = Readonly<Record<CityId, readonly CityId[]>>
 // 由无向边对构造对称邻接表
@@ -23,6 +25,7 @@ export function areAdjacent(adj: Adjacency, a: CityId, b: CityId): boolean
 ```
 
 ### world/queries.ts（修改）
+
 ```ts
 // 派生俘虏判定：武将自身归属 ≠ 所在城归属
 export function isCaptive(state: GameState, officerId: OfficerId): boolean
@@ -31,6 +34,7 @@ export function officersInCity(state, cityId, opts?: { onlyAvailable?: boolean }
 ```
 
 ### economy/campaign.ts（新建·下令阶段）
+
 ```ts
 // 单次出征武将上限（量纲上限，规则身份，内联常量）
 const MAX_CAMPAIGN_OFFICERS = 10
@@ -40,7 +44,7 @@ export function canCampaign(
   state: GameState,
   officerIds: readonly OfficerId[],
   targetCityId: CityId,
-  provisions: number,
+  provisions: number
 ): CommandCheck
 
 // 下令阶段（立即）：扣本城城粮 provisions、选中武将全部 busy、入队 campaign；非法 no-op
@@ -48,11 +52,12 @@ export function campaign(
   state: GameState,
   officerIds: readonly OfficerId[],
   targetCityId: CityId,
-  provisions: number,
+  provisions: number
 ): GameState
 ```
 
 ### military/campaign.ts（新建·战斗结算）
+
 ```ts
 // 月末阶段：结算战斗（攻 > 守 才胜），移动攻方武将 cityId→目标城，
 // 胜则目标城 lordId→攻方且城粮 += provisions，末了对攻/守两方君主各跑一次 resolveSuccession
@@ -60,7 +65,7 @@ export function executeCampaign(
   state: GameState,
   officerIds: readonly OfficerId[],
   targetCityId: CityId,
-  provisions: number,
+  provisions: number
 ): GameState
 // 内部纯助手（不导出，经 executeCampaign 端到端测）：
 //   attackerStrength = Σ 出征武将.troops
@@ -68,6 +73,7 @@ export function executeCampaign(
 ```
 
 ### world/succession.ts（新建）
+
 ```ts
 // 若 lordId 这位君主当前为俘虏（君主所在城归属 ≠ 自身）：
 //   - 该势力仍有城 → 从其「剩余未被俘武将」取智力最高者(平局取 id 字典序最小，保确定性)为新君主，
@@ -78,21 +84,25 @@ export function resolveSuccession(state: GameState, lordId: OfficerId): GameStat
 ```
 
 ### game-state.ts（修改）
+
 ```ts
 export type PendingCommand =
   | { readonly type: 'plunder'; readonly officerId: OfficerId }
-  | { readonly type: 'campaign'
+  | {
+      readonly type: 'campaign'
       readonly officerIds: readonly OfficerId[]
       readonly targetCityId: CityId
-      readonly provisions: number }
+      readonly provisions: number
+    }
 
 export interface GameState {
   // …既有字段…
-  readonly adjacency: Adjacency   // 新增：城邻接拓扑（静态，fixture 播种）
+  readonly adjacency: Adjacency // 新增：城邻接拓扑（静态，fixture 播种）
 }
 ```
 
 ### game.ts（修改）
+
 ```ts
 export type Action =
   | /* …既有… */
@@ -101,6 +111,7 @@ export type Action =
 ```
 
 ## 模块职责
+
 - `world/adjacency.ts`：城邻接值对象与对称查询；不依赖 state 以外的领域逻辑。
 - `world/queries.ts`：世界读模型；新增 `isCaptive` 派生判定，并让 `officersInCity(onlyAvailable)` 排除俘虏。
 - `economy/campaign.ts`：出征**下令阶段**（`canCampaign`/`campaign`）——与其它经营指令形态一致：校验、扣本城粮、占人、入队。依赖 world（city/officer/queries/adjacency）；不依赖 military。
@@ -110,6 +121,7 @@ export type Action =
 - `turn/end-month.ts`：无需为出征开特例——既有"回城"步仅 `busy:=false`+体力恢复，cityId 由 executeCampaign 决定，自动成立。
 
 ## 要测的行为
+
 - [x] `canCampaign` 逐项前置：武将数 1~10、全在同一本城且在任(非 busy/非俘虏)、本城城粮 ≥1、provisions∈[1,城粮]整数、目标城存在且非本城非己方、目标与本城相邻——任一不满足返回 `{ok:false}` 且 reason 合理。
 - [x] `campaign` 下令：本城城粮 -= provisions、选中武将全部 busy、入队 `campaign`；目标城/武将 cityId/lordId **不变**；非法时 no-op。
 - [x] 攻方胜（攻 > 守）：目标城 lordId→攻方、城粮 += provisions、后备兵随城易主；出征武将 cityId=目标城；原守军就地成俘虏。
@@ -123,6 +135,7 @@ export type Action =
 - [x] `endMonth` 整段推进：出征武将月末 busy→false 且体力恢复但 cityId=结算后城；既有经营/掠夺/侦察/收粮收税/跨年不受影响；同种子可复现（不耗 RNG）。
 
 ## 新建文件
+
 - `src/core/world/adjacency.ts`：城邻接值对象 + `areAdjacent`。
 - `src/core/economy/campaign.ts`：出征下令阶段（`canCampaign`/`campaign`）。
 - `src/core/military/campaign.ts`：出征战斗结算（`executeCampaign`）+ 内联战斗 + 兵力统计助手。
@@ -130,6 +143,7 @@ export type Action =
 - 对应 `*.test.ts`（同级）：`world/adjacency.test.ts`、`economy/campaign.test.ts`、`military/campaign.test.ts`、`world/succession.test.ts`。
 
 ## 修改文件
+
 - `src/core/game-state.ts`：`GameState` 增 `adjacency`；`PendingCommand` 并集加 `campaign` 分支。
 - `src/core/game.ts`：`Action` 加 `campaign`；`canApply/apply` 分派到 `economy/campaign` 的 `canCampaign`/`campaign`。
 - `src/core/world/queries.ts`：加 `isCaptive`；`officersInCity(onlyAvailable)` 排除俘虏。
@@ -138,6 +152,7 @@ export type Action =
 - `src/core/world/city.ts`：加 `spendFood`（镜像 `spendGold`，供出征下令扣本城粮）。
 
 ## 任务清单
+
 - [x] `world/adjacency.ts`：值对象 + `buildAdjacency`/`areAdjacent`（红绿）。
 - [x] `game-state.ts` 加 `adjacency` 字段、`fixture.ts` 播种边，既有测试与构造编译通过。
 - [x] `world/queries.ts` 加 `isCaptive` 并改 `officersInCity`（红绿，含俘虏排除）。
@@ -151,6 +166,7 @@ export type Action =
 ## TDD：是
 
 ## 风险 / 待定
+
 - **同月多支出征打同一目标城**：月末按入队序逐条基于当时状态结算，连锁结果（如第二支打的城已被第一支占领）不专门处理，仅保证不崩——留边界。
 - **同一出征里 officerIds 重复**：`canCampaign` 需去重/查重，重复即判非法。
 - **重选君主平局**：同智力取 id 字典序最小，保确定性。

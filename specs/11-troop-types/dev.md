@@ -1,6 +1,7 @@
 # troop-types（兵种系统）开发文档
 
 ## 方案概述
+
 三块新东西，全部贴既有「基础存储 + 派生收敛」范式，把改动收敛到少数点：
 
 - **兵种 = 基础存储 + 有效派生**。`Officer` 加**基础兵种** `troopType`（存储字段，fixture 播种、可信、不跑门槛）。`queries.effectiveTroopType(state, id)` 派生「有效兵种」——以基础兵种为起点，按所持道具的装备先后依次应用其改兵种结果、合法的后者覆盖前者。**不写回 Officer**，与 `effectiveOfficer`（有效武力/智力）完全同构；战斗等下游临场读取。
@@ -13,6 +14,7 @@
 ## 接口设计
 
 ### world/troop-type.ts（新建·兵种值对象 + 纯规则）
+
 ```ts
 export type TroopType = 'cavalry' | 'infantry' | 'archer' | 'navy' | 'elite' | 'mystic'
 
@@ -23,19 +25,20 @@ export type TroopTypeOverride = 0 | 1 | 2 | 3
 export const BASE_MOVEMENT: Record<TroopType, number>
 
 // 玄兵/极兵装备门槛（规则身份，内联常量），严格 > 105
-export const ELITE_FORCE_REQUIREMENT = 105   // override=3 极兵：有效武力 > 105
-export const MYSTIC_INTEL_REQUIREMENT = 105   // override=2 玄兵：有效智力 > 105
+export const ELITE_FORCE_REQUIREMENT = 105 // override=3 极兵：有效武力 > 105
+export const MYSTIC_INTEL_REQUIREMENT = 105 // override=2 玄兵：有效智力 > 105
 
 // 解析一件道具的改兵种结果（纯函数，不读 state）：
 // override=0 → null（不改）；1 → 'navy'；2 → 智力门槛满足返 'mystic' 否则 null；3 → 武力门槛满足返 'elite' 否则 null。
 export function resolveOverride(
   override: TroopTypeOverride,
   effForce: number,
-  effIntel: number,
+  effIntel: number
 ): TroopType | null
 ```
 
 ### world/item.ts（修改·holder 加序号 + 两新字段）
+
 ```ts
 export type ItemHolder =
   | { readonly kind: 'city'; readonly cityId: CityId }
@@ -43,8 +46,8 @@ export type ItemHolder =
 
 export interface Item {
   // …既有：id/name/forceBonus/intelBonus/holder/discovered/recruiterId…
-  readonly movementBonus: number          // 新增：移动力加成（整数）
-  readonly troopTypeOverride: TroopTypeOverride  // 新增：改兵种字段 0..3
+  readonly movementBonus: number // 新增：移动力加成（整数）
+  readonly troopTypeOverride: TroopTypeOverride // 新增：改兵种字段 0..3
 }
 
 // 归属改到某武将，带装备序号（默认 0，仅测试便利；reward 总传显式 nextEquipSeq）
@@ -53,14 +56,16 @@ export function holdByOfficer(item: Item, officerId: OfficerId, equipSeq?: numbe
 ```
 
 ### world/officer.ts（修改）
+
 ```ts
 export interface Officer {
   // …既有字段…
-  readonly troopType: TroopType   // 新增：基础兵种（fixture 播种，可信、不跑门槛）
+  readonly troopType: TroopType // 新增：基础兵种（fixture 播种，可信、不跑门槛）
 }
 ```
 
 ### world/queries.ts（修改·新增两派生只读）
+
 ```ts
 // itemsOfOfficer：在既有 holder 过滤后，按 holder.equipSeq 升序返回（装备先后）
 export function itemsOfOfficer(state: GameState, officerId: OfficerId): Item[]
@@ -74,12 +79,14 @@ export function officerMovement(state: GameState, officerId: OfficerId): number
 ```
 
 ### economy/reward.ts（修改·赏赐装备时算序号）
+
 ```ts
 // 计算某武将下一个装备序号（私有助手）：1 + 现有 officer-held 道具最大 equipSeq（无则 -1 ⇒ 首件为 0）
 // reward 的 holdByOfficer 调用改为传 nextEquipSeq(state, officerId)；canReward 不变（仍校验 holder=城、未满 2 件）
 ```
 
 ## 模块职责
+
 - `world/troop-type.ts`：兵种枚举 + 基础移动力表 + 门槛常量 + `resolveOverride` 纯规则；不依赖 state，纯数据与判定。
 - `world/item.ts`：`ItemHolder` officer 分支加 `equipSeq`；`Item` 加 `movementBonus`/`troopTypeOverride`；`holdByOfficer` 带序号入参。
 - `world/officer.ts`：`Officer` 加 `troopType` 基础兵种字段（无新函数，门槛/派生不在聚合内）。
@@ -88,6 +95,7 @@ export function officerMovement(state: GameState, officerId: OfficerId): number
 - `world/fixture.ts`：播种武将 `troopType`、道具 `movementBonus`/`troopTypeOverride`（含待登场池条目）。
 
 ## 要测的行为
+
 - [x] `resolveOverride`：0→null；1→navy；2→智力>105 才 mystic，否则 null（=105 不通过，严格大于）；3→武力>105 才 elite，否则 null。
 - [x] `BASE_MOVEMENT`：六种兵种移动力 = 5/4/4/5/6/3。
 - [x] `effectiveTroopType`：无改兵种道具时 = 基础兵种；override=1 必改水军。
@@ -100,10 +108,12 @@ export function officerMovement(state: GameState, officerId: OfficerId): number
 - [x] 既有全部测试编译通过、不回归（新增 Item/Officer 字段后构造体补齐）。
 
 ## 新建文件
+
 - `src/core/world/troop-type.ts`：兵种值对象 + 基础移动力表 + 门槛常量 + `resolveOverride`。
 - `src/core/world/troop-type.test.ts`：`resolveOverride` 与移动力表的关键路径。
 
 ## 修改文件
+
 - `src/core/world/item.ts`：`ItemHolder` officer 分支加 `equipSeq`；`Item` 加 `movementBonus`/`troopTypeOverride`；`holdByOfficer` 带 `equipSeq?`。
 - `src/core/world/officer.ts`：`Officer` 加 `troopType`。
 - `src/core/world/queries.ts`：`itemsOfOfficer` 按 `equipSeq` 排序；加 `effectiveTroopType`/`officerMovement`。
@@ -112,6 +122,7 @@ export function officerMovement(state: GameState, officerId: OfficerId): number
 - `src/core/**/*.test.ts`：补齐新字段的 Item/Officer 构造体与含 officer-holder 的 `equipSeq`（`world/item.test.ts`、`economy/reward.test.ts`、`world/queries.test.ts`、`economy/search.test.ts`、`world/succession.test.ts`、`economy/plunder.test.ts` 等）。
 
 ## 任务清单
+
 - [x] `world/troop-type.ts`：`TroopType`/`TroopTypeOverride`/`BASE_MOVEMENT`/门槛常量/`resolveOverride`（红绿）。
 - [x] `world/item.ts` 加 `equipSeq`/`movementBonus`/`troopTypeOverride`、`holdByOfficer` 带序号；`world/officer.ts` 加 `troopType`；`fixture.ts` 播种，使既有测试与构造编译通过（红绿）。
 - [x] `world/queries.ts`：`itemsOfOfficer` 排序 + `effectiveTroopType`（含门槛、顺序覆盖、回退）（红绿）。
@@ -121,6 +132,7 @@ export function officerMovement(state: GameState, officerId: OfficerId): number
 ## TDD：是
 
 ## 质量自检
+
 - 接口最小自解释：`effectiveTroopType`/`officerMovement` 与既有 `effectiveOfficer`/`officerLoyalty` 同构命名；`resolveOverride` 单一职责、纯函数。✅
 - 深模块、职责单一：兵种规则收敛在 `troop-type.ts`（纯）+ `queries`（派生编排），不散落。✅
 - 低改动放大：未来「再加一种改兵种道具/调门槛/调移动力」只动 `troop-type.ts`；归属模型零改动，officer-holder 写入只 `reward` 一处。✅
@@ -131,6 +143,7 @@ export function officerMovement(state: GameState, officerId: OfficerId): number
 - 依赖方向健康：`troop-type.ts` 零依赖；`officer.ts`/`item.ts` 仅引其类型；`queries` 编排；无循环、不涉 UI。✅
 
 ## 风险 / 待定
+
 - **门槛只能靠道具突破**：基础武力 mock=50、智力≤100，无人天然 > 105，故极兵/玄兵在当前 fixture 下必须靠加成道具才能装备——符合「精英兵种」定位；具体平衡（基础兵种分布、道具加成/移动力数值）留待平衡阶段。
 - **有效兵种用全量有效值判门槛**：门槛吃 `effectiveOfficer`（含该武将所持全部道具，不止当前这件）的有效武力/智力，与 PRD「含该道具自身加成」一致，但意味着「另一件加成道具」也会助推门槛——可接受的涌现。
 - **战斗读取时机**：本切片无下游消费；后续战棋接入时在战斗开始前读 `effectiveTroopType`（派生、临场真值），不在本切片预埋。

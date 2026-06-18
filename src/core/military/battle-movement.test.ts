@@ -10,15 +10,35 @@ const state = createInitialState(1)
 const map = BATTLE_MAPS[DEFAULT_MAP_ID]!
 
 function unit(officerId: string, side: BattleSide, pos: Position): BattleUnit {
-  return { officerId, side, pos, troops: 100, experience: 0, level: 1, acted: false, mp: 100, maxMp: 100, status: 'normal' }
+  return {
+    officerId,
+    side,
+    pos,
+    troops: 100,
+    experience: 0,
+    level: 1,
+    acted: false,
+    mp: 100,
+    maxMp: 100,
+    status: 'normal',
+  }
 }
 function makeBattle(units: BattleUnit[]): BattleState {
   return {
-    mode: 'attack', mapId: DEFAULT_MAP_ID, weather: 'wind', day: 1,
+    mode: 'attack',
+    mapId: DEFAULT_MAP_ID,
+    weather: 'wind',
+    day: 1,
     units: Object.fromEntries(units.map((u) => [u.officerId, u])),
-    playerProvisions: 100, opponentProvisions: 100, commanderId: 'caocao',
-    outcome: null, attackerLord: 'liubei', defenderLord: 'caocao',
-    targetCityId: 'xuchang', provisions: 50, officerIds: ['guanyu'],
+    playerProvisions: 100,
+    opponentProvisions: 100,
+    commanderId: 'caocao',
+    outcome: null,
+    attackerLord: 'liubei',
+    defenderLord: 'caocao',
+    targetCityId: 'xuchang',
+    provisions: 50,
+    officerIds: ['guanyu'],
   }
 }
 const has = (ps: Position[], p: Position) => ps.some((q) => samePos(q, p))
@@ -77,7 +97,10 @@ describe('reachableTiles 状态影响', () => {
     const enemy = unit('caocao', 'opponent', { x: 6, y: 3 })
     const normal = makeBattle([unit('guanyu', 'player', { x: 3, y: 3 }), enemy])
     expect(has(reachableTiles(state, normal, 'guanyu'), { x: 7, y: 2 })).toBe(false)
-    const qimen = makeBattle([{ ...unit('guanyu', 'player', { x: 3, y: 3 }), status: 'qimen' }, enemy])
+    const qimen = makeBattle([
+      { ...unit('guanyu', 'player', { x: 3, y: 3 }), status: 'qimen' },
+      enemy,
+    ])
     expect(has(reachableTiles(state, qimen, 'guanyu'), { x: 7, y: 2 })).toBe(true)
   })
 })

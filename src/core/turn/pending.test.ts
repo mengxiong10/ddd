@@ -8,7 +8,11 @@ import { runNonCampaignPending } from './pending'
 
 const cfg = DEFAULT_CONFIG
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
@@ -41,8 +45,14 @@ describe('runNonCampaignPending 月末非 campaign 分派', () => {
 
   it('结果与下令顺序无关', () => {
     const base = createInitialState(1)
-    const ab = runNonCampaignPending(plunder(plunder(base, 'zhugeliang', cfg), 'pangtong', cfg), cfg)
-    const ba = runNonCampaignPending(plunder(plunder(base, 'pangtong', cfg), 'zhugeliang', cfg), cfg)
+    const ab = runNonCampaignPending(
+      plunder(plunder(base, 'zhugeliang', cfg), 'pangtong', cfg),
+      cfg
+    )
+    const ba = runNonCampaignPending(
+      plunder(plunder(base, 'pangtong', cfg), 'zhugeliang', cfg),
+      cfg
+    )
     expect(ab.cities.chengdu).toEqual(ba.cities.chengdu)
   })
 

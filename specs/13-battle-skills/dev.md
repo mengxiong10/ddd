@@ -1,6 +1,7 @@
 # battle-skills 战斗技能 开发文档
 
 ## 方案概述
+
 在 `12-battle` 的 `military/battle` 状态机上**纯增量**加技能：新增三个纯规则叶模块（`battle-weather` / `battle-status` / `battle-skill`），`battle.ts` 仅多编排「施法终结动作 + 每日开头刷天气/状态」。关键取舍：
 
 - **三个深叶模块，零反向依赖**：技能/天气/状态全部纯函数、不读 state，`battle.ts` 编排时把值传进去（同 `battle-combat` 范式）。依赖方向 `battle → {battle-skill, battle-weather, battle-status, battle-movement, battle-combat, battle-map}`，叶子之间只单向 import 类型。
@@ -13,25 +14,32 @@
 ## 接口设计
 
 ### military/battle-weather.ts（新建·纯）
+
 ```ts
 export type Weather = 'clear' | 'overcast' | 'wind' | 'rain' | 'hail' // 晴/阴/风/雨/雹
 export const WEATHER_ORDER: readonly Weather[] // 倍率表第 0..4 维序：晴阴风雨雹
-export function refreshWeather(rng: Rng): readonly [Weather, Rng]      // 均匀 randInt(0,4)→WEATHER_ORDER
+export function refreshWeather(rng: Rng): readonly [Weather, Rng] // 均匀 randInt(0,4)→WEATHER_ORDER
 ```
 
 ### military/battle-status.ts（新建·纯）
+
 ```ts
 // 含死亡的全状态（死亡=唯一真相，troops===0 ↔ 'dead'）
 export type BattleStatus = 'normal' | 'confused' | 'sealed' | 'rooted' | 'qimen' | 'stone' | 'dead'
-export function canActWithStatus(s: BattleStatus): boolean   // 混乱/石阵/死亡 → false
-export function canCastWithStatus(s: BattleStatus): boolean  // 禁咒/死亡 → false
-export function stoneDamage(troops: number): number          // 石阵每日损 = floor(troops/8)
+export function canActWithStatus(s: BattleStatus): boolean // 混乱/石阵/死亡 → false
+export function canCastWithStatus(s: BattleStatus): boolean // 禁咒/死亡 → false
+export function stoneDamage(troops: number): number // 石阵每日损 = floor(troops/8)
 // 每日开头判定（§6.6.2）：成功=randInt(0,59)<floor(有效智力/2)
 //  混乱/禁咒/定身/石阵：成功→normal；奇门：失败→normal；normal/dead：不变（dead 跳过、不耗 rng）。返回新状态 + rng。
-export function dailyStatusCheck(s: BattleStatus, effIntel: number, rng: Rng): readonly [BattleStatus, Rng]
+export function dailyStatusCheck(
+  s: BattleStatus,
+  effIntel: number,
+  rng: Rng
+): readonly [BattleStatus, Rng]
 ```
 
 ### military/battle-skill.ts（新建·纯·技能规则唯一收敛处）
+
 ```ts
 export type SkillId = number // 1..30；本作纳入 27 个（去 21/26/28）
 
@@ -40,45 +48,71 @@ export interface SkillDef {
   readonly name: string
   readonly target: 'enemy' | 'ally' | 'self'
   readonly mp: number
-  readonly baseTroops: number               // 兵力效果基数（伤害/恢复），0=无
-  readonly baseFood: number                 // 破粮基数，0=无
-  readonly status?: BattleStatus            // 命中施加的状态（突袭=confused 等）
+  readonly baseTroops: number // 兵力效果基数（伤害/恢复），0=无
+  readonly baseFood: number // 破粮基数，0=无
+  readonly status?: BattleStatus // 命中施加的状态（突袭=confused 等）
   readonly special?: 'weather' | 'intel' | 'siege' // 天变/谍报/围攻
-  readonly weatherMul: readonly number[]    // len5，WEATHER_ORDER 序
+  readonly weatherMul: readonly number[] // len5，WEATHER_ORDER 序
   readonly targetTerrainMul: readonly number[] // len8，TERRAIN_ORDER 序（§6.4.5 目标地形）
   readonly casterTerrainMul: readonly number[] // len8，TERRAIN_ORDER 序（施法者地形）
-  readonly targetTroopMul: readonly number[]   // len6，TROOP_ORDER 序（目标兵种）
+  readonly targetTroopMul: readonly number[] // len6，TROOP_ORDER 序（目标兵种）
 }
 
 export const TERRAIN_ORDER: readonly Terrain[] // 草地/平原/山地/森林/村庄/城池/营寨/河流
 export const TROOP_ORDER: readonly TroopType[] // 骑/步/弓/水/极/玄
-export const SKILL_DEFS: Record<SkillId, SkillDef>      // 27 条，§6.4.1+§6.4.5 录入
+export const SKILL_DEFS: Record<SkillId, SkillDef> // 27 条，§6.4.1+§6.4.5 录入
 export const RANGE_MASK: Record<SkillId, readonly Position[]> // 中心偏移、不含中心；self→[]；附录 A 录入
 
 export const DEFAULT_SKILLS: Record<TroopType, readonly SkillId[]> // 各兵种默认技能（有序）
-export const LORD_SKILLS: readonly SkillId[]                       // 君主技能=[30]
+export const LORD_SKILLS: readonly SkillId[] // 君主技能=[30]
 
 // MP（吃有效武力/智力）：floor((floor(智力*80/100)+floor(sqrt(武力)/2)+等级)*体力/100)
-export function initialMp(effIntel: number, effForce: number, level: number, stamina: number): number
+export function initialMp(
+  effIntel: number,
+  effForce: number,
+  level: number,
+  stamina: number
+): number
 // 解锁数 = min(floor(默认数*等级/21)+1, 默认数)；取 DEFAULT_SKILLS 前 N
 export function unlockedCount(defaultCount: number, level: number): number
 // 当前可用技能集 = 已解锁默认 ∪ 个人技能 ∪（君主则 LORD_SKILLS）
-export function availableSkills(troopType: TroopType, level: number, personal: readonly number[], isLord: boolean): Set<SkillId>
+export function availableSkills(
+  troopType: TroopType,
+  level: number,
+  personal: readonly number[],
+  isLord: boolean
+): Set<SkillId>
 
 // 倍率链（§6.4.4）：每步 floor。base 取 baseTroops 或 baseFood。
-export function effectValue(base: number, mulWeather: number, mulTargetTroop: number, mulTargetTerrain: number, mulCasterTerrain: number): number
+export function effectValue(
+  base: number,
+  mulWeather: number,
+  mulTargetTroop: number,
+  mulTargetTerrain: number,
+  mulCasterTerrain: number
+): number
 // 四关倍率取数助手（按 enum 反查序）
 export function weatherMul(def: SkillDef, w: Weather): number
 export function targetTerrainMul(def: SkillDef, t: Terrain): number
 export function casterTerrainMul(def: SkillDef, t: Terrain): number
 export function targetTroopMul(def: SkillDef, tt: TroopType): number
 // 可用性四关（§6.4.2）：天气≠0 且 施法者地形≠0；target∈{enemy,ally} 时再加 目标地形≠0 且 目标兵种≠0
-export function skillGatesPass(def: SkillDef, weather: Weather, casterTerrain: Terrain, target?: { terrain: Terrain; troop: TroopType }): boolean
+export function skillGatesPass(
+  def: SkillDef,
+  weather: Weather,
+  casterTerrain: Terrain,
+  target?: { terrain: Terrain; troop: TroopType }
+): boolean
 // 成功率（§6.4.3）：施法能力=施法者有效智力+等级+5；目标抗性（self→0）；R=randInt(0,抗性+19)≤floor(能力/2)
-export function rollSkillSuccess(castAbility: number, targetResist: number, rng: Rng): readonly [boolean, Rng]
+export function rollSkillSuccess(
+  castAbility: number,
+  targetResist: number,
+  rng: Rng
+): readonly [boolean, Rng]
 ```
 
 ### military/battle-movement.ts（修改）
+
 ```ts
 // 既有 u.routed 判断改为 u.status==='dead'（unitAt/zocTiles 等）。
 // reachableTiles 内：unit.status==='rooted' → 预算=1；unit.status==='qimen' → 跳过接敌停步压制。
@@ -87,23 +121,28 @@ export function skillTargetTiles(map: BattleMap, from: Position, skillId: SkillI
 ```
 
 ### military/battle.ts（修改）
+
 ```ts
 export interface BattleUnit {
   // …既有 officerId/side/pos/troops/experience/level/acted（去掉 routed）…
   readonly mp: number
   readonly maxMp: number
-  readonly status: BattleStatus  // 'dead'=击溃（替代 routed）
+  readonly status: BattleStatus // 'dead'=击溃（替代 routed）
 }
 export interface BattleState {
   // …既有…
   readonly weather: Weather
 }
 export type BattleAction =
-  | { type: 'act'; officerId: OfficerId; moveTo?: Position
+  | {
+      type: 'act'
+      officerId: OfficerId
+      moveTo?: Position
       terminal:
         | { kind: 'attack'; target: Position }
-        | { kind: 'rest' }                                   // rest 顺带 +1 MP（封顶 maxMp）
-        | { kind: 'cast'; skillId: SkillId; target?: Position } } // 无目标技能省略 target
+        | { kind: 'rest' } // rest 顺带 +1 MP（封顶 maxMp）
+        | { kind: 'cast'; skillId: SkillId; target?: Position }
+    } // 无目标技能省略 target
   | { type: 'endDay' }
   | { type: 'retreat' }
 
@@ -121,6 +160,7 @@ export function startDay(state: GameState): GameState
 ```
 
 ### world/officer.ts（修改）
+
 ```ts
 export interface Officer {
   // …既有…
@@ -129,12 +169,14 @@ export interface Officer {
 ```
 
 ### turn/end-month.ts（修改）
+
 ```ts
 // advanceCampaigns 中玩家 campaign 分支：把 initBattle 结果装入 activeBattle 后立刻跑 startDay（走第 1 天开头）。
 //   return startDay({ ...state, activeBattle: initBattle(state, c.officerIds, c.targetCityId, c.provisions) })
 ```
 
 ## 模块职责
+
 - `military/battle-weather.ts`：天气枚举 + 倍率维序 + 刷新（耗 rng）。叶子、纯。
 - `military/battle-status.ts`：全状态枚举（含 'dead'）+ 行动/施法许可谓词 + 石阵损兵 + 每日判定（耗 rng）。叶子、纯；死亡=唯一真相、替代 routed。
 - `military/battle-skill.ts`：技能定义表 + 30 掩码 + 维序常量 + 默认/君主技能表 + MP/解锁/倍率链/四关/成功率纯公式。技能规则唯一收敛处；不读 state、入参传值。
@@ -144,6 +186,7 @@ export interface Officer {
 - `world/officer.ts` / `world/fixture.ts`：`personalSkills` 字段与播种。
 
 ## 要测的行为
+
 - [ ] `battle-weather`：refreshWeather 均匀映射、确定性推进 rng。
 - [ ] `battle-status`：canAct（混乱/石阵/死亡 false）、canCast（禁咒/死亡 false）、stoneDamage=floor(/8)、dailyStatusCheck 各状态组按 `randInt(0,59)<floor(智力/2)` 恢复/不变、死亡跳过不耗 rng。
 - [ ] `battle-skill`：initialMp 公式（吃有效武力/智力）、unlockedCount（封顶默认数、按序取）、availableSkills（默认∪个人∪君主）、effectValue 五步逐 floor、四关 skillGatesPass（self 只看天气+施法者地形；enemy/ally 加目标地形+兵种；任一 0 即 false）、rollSkillSuccess（self 抗性=0；阈值 floor(能力/2)；失败也推进 rng）。
@@ -157,12 +200,14 @@ export interface Officer {
 - [ ] 回归：同 seed 整局可复现；无技能旧 battle/turn/game 测试经补字段后全绿。
 
 ## 新建文件
+
 - `src/core/military/battle-weather.ts`：天气类型/维序/刷新。
 - `src/core/military/battle-status.ts`：可控状态/谓词/石阵损兵/每日判定。
 - `src/core/military/battle-skill.ts`：技能表/掩码/维序/默认·君主技能/MP·解锁·倍率链·四关·成功率公式。
 - 对应 `*.test.ts`（同级）：`battle-weather`/`battle-status`/`battle-skill` + `battle`/`battle-movement` 增补。
 
 ## 修改文件
+
 - `src/core/military/battle.ts`：`BattleUnit` 去 `routed`、加 `{mp,maxMp,status}`（'dead'=击溃）、`BattleState{weather}`、`act` 加 `cast` 终结、`initBattle` 补字段、既有 `routed` 写/读改 `status==='dead'`、新增 `startDay`、`canBattle`/`applyAct` cast 与状态门、`advanceDay` 串 startDay。
 - `src/core/military/battle-movement.ts`：`u.routed`→`u.status==='dead'`、定身/奇门对可达的影响、`skillTargetTiles`。
 - `src/core/world/officer.ts`：加 `personalSkills: readonly number[]`。
@@ -171,6 +216,7 @@ export interface Officer {
 - 既有 `*.test.ts` / 构造助手：`BattleUnit` 去 `routed`、补 `mp/maxMp/status`，补 `BattleState.weather`、`Officer.personalSkills`。
 
 ## 任务清单
+
 - [x] `battle-weather.ts` + `battle-status.ts`（类型/谓词/损兵/刷新/每日判定，红绿）。
 - [x] `battle-skill.ts` 数据与公式：SKILL_DEFS(27)+RANGE_MASK(附录A 录入)+维序+默认/君主表 + initialMp/unlockedCount/availableSkills/effectValue/四关/rollSkillSuccess（红绿）。
 - [x] `Officer.personalSkills` + `BattleUnit` 去 `routed` 加 `{mp,maxMp,status}` + `BattleState.weather` + 既有 `routed` 用例改 `status==='dead'` + fixture/构造补字段，使既有测试编译通过。
@@ -182,6 +228,7 @@ export interface Officer {
 ## TDD：是
 
 ## 风险 / 待定
+
 - **每日刷天气恒耗 rng**：无技能战斗的 `endDay` 也会推进 rng（天气是核心机制）。既有 battle 测试不断言 rng/weather，应不回归；同 seed 仍可复现。
 - **个人技能 fixture 体量**：22/23/24/25 等非默认技能须经个人技能播种才可用，具体给谁留平衡期；默认 []。
 - **掩码录入**：27 张掩码从根目录 `appendix-a-skill-ranges.md` 逐张转为偏移数组，build 阶段核对（self 技能忽略）。

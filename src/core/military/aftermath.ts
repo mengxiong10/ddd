@@ -139,7 +139,6 @@ function processDefeatedArmy(
       for (const item of itemsOfOfficer(next, id)) {
         items[item.id] = discover(holdByCity(item, targetCityId))
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [id]: _removed, ...officers } = next.officers
       next = { ...next, items, officers }
       if (isLord) strickenLords.add(id)

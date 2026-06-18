@@ -5,7 +5,11 @@ import { canBehead, behead, canBanish, banish } from './captive'
 import { itemsOfOfficer, itemsInCity } from '../world/queries'
 import { holdByOfficer } from '../world/item'
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 function setCityLord(s: GameState, cityId: string, lordId: string): GameState {
@@ -66,7 +70,11 @@ describe('流放 banish', () => {
     let s = conquered(1)
     s = giveItem(s, 'mengde-xinshu', 'caocao')
     const next = banish(s, 'caocao')
-    expect(next.items['mengde-xinshu']!.holder).toEqual({ kind: 'officer', officerId: 'caocao', equipSeq: 0 })
+    expect(next.items['mengde-xinshu']!.holder).toEqual({
+      kind: 'officer',
+      officerId: 'caocao',
+      equipSeq: 0,
+    })
     expect(itemsOfOfficer(next, 'caocao').map((i) => i.id)).toContain('mengde-xinshu')
   })
 

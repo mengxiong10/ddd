@@ -18,7 +18,11 @@ const PATROL_POPULATION_GAIN = 100
  * 校验出巡前置条件（不修改状态）。作用城 = 武将所在城（officer.cityId）。
  * 武将存在、未占用、非俘虏 → 本城金 ≥ patrolGoldCost → 体力 ≥ patrolStaminaCost。
  */
-export function canPatrol(state: GameState, officerId: OfficerId, config: GameConfig): CommandCheck {
+export function canPatrol(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
@@ -39,9 +43,16 @@ export function patrol(state: GameState, officerId: OfficerId, config: GameConfi
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
-  const [loyaltyGain, nextRng] = randInt(state.rng, PATROL_LOYALTY_RAND_MIN, PATROL_LOYALTY_RAND_MAX)
+  const [loyaltyGain, nextRng] = randInt(
+    state.rng,
+    PATROL_LOYALTY_RAND_MIN,
+    PATROL_LOYALTY_RAND_MAX
+  )
 
-  const nextCity = spendGold(addPopulation(gainLoyalty(city, loyaltyGain), PATROL_POPULATION_GAIN), config.patrolGoldCost)
+  const nextCity = spendGold(
+    addPopulation(gainLoyalty(city, loyaltyGain), PATROL_POPULATION_GAIN),
+    config.patrolGoldCost
+  )
   const nextOfficer = setBusy(spendStamina(officer, config.patrolStaminaCost), true)
 
   return {

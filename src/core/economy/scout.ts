@@ -14,7 +14,7 @@ export function canScout(
   state: GameState,
   officerId: OfficerId,
   targetCityId: CityId,
-  config: GameConfig,
+  config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
@@ -39,7 +39,7 @@ export function scout(
   state: GameState,
   officerId: OfficerId,
   targetCityId: CityId,
-  config: GameConfig,
+  config: GameConfig
 ): GameState {
   if (!canScout(state, officerId, targetCityId, config).ok) return state
 

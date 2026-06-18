@@ -1,6 +1,7 @@
 # items（道具系统）开发文档
 
 ## 方案概述
+
 三块新东西，都贴既有范式、把改动收敛到少数点：
 
 - **道具归属单一真相源**：新增 `GameState.items`（按 id 索引），每件道具自带判别式 `holder`（属某城 **或** 某武将，二选一）。城/武将的道具列表全用 selector 派生（`itemsInCity`/`itemsOfOfficer`），杜绝双向冗余。
@@ -14,11 +15,13 @@
 ## 接口设计
 
 ### shared/ids.ts（修改）
+
 ```ts
 export type ItemId = string
 ```
 
 ### world/item.ts（新建·聚合 Item + 值对象 ItemHolder）
+
 ```ts
 // 道具归属（判别式值对象）：属某城 或 某武将，二选一——单一真相源
 export type ItemHolder =
@@ -28,8 +31,8 @@ export type ItemHolder =
 export interface Item {
   readonly id: ItemId
   readonly name: string
-  readonly forceBonus: number   // 武力加成，≥0
-  readonly intelBonus: number   // 智力加成，≥0
+  readonly forceBonus: number // 武力加成，≥0
+  readonly intelBonus: number // 智力加成，≥0
   readonly holder: ItemHolder
 }
 
@@ -42,13 +45,14 @@ export function holdByCity(item: Item, cityId: CityId): Item
 ```
 
 ### world/officer.ts（修改）
+
 ```ts
 // 忠诚量纲上限（百分制，规则身份，内联常量）
 export const LOYALTY_MAX = 100
 
 export interface Officer {
   // …既有字段…
-  readonly loyalty: number   // 新增：武将忠诚，取值 [0, LOYALTY_MAX]
+  readonly loyalty: number // 新增：武将忠诚，取值 [0, LOYALTY_MAX]
 }
 
 // 增减忠诚，钳制 [0, LOYALTY_MAX]（不变量）。调用方负责跳过君主。
@@ -56,6 +60,7 @@ export function adjustLoyalty(o: Officer, delta: number): Officer
 ```
 
 ### world/queries.ts（修改·派生只读模型）
+
 ```ts
 // 城/武将各自持有的道具（按 holder 派生，无第二份存储）
 export function itemsInCity(state: GameState, cityId: CityId): Item[]
@@ -69,15 +74,17 @@ export function officerLoyalty(state: GameState, officerId: OfficerId): number
 ```
 
 ### game-state.ts（修改）
+
 ```ts
 export interface GameState {
   // …既有字段…
-  readonly items: Readonly<Record<ItemId, Item>>   // 新增：全部道具，按 id 索引
+  readonly items: Readonly<Record<ItemId, Item>> // 新增：全部道具，按 id 索引
 }
 // PendingCommand 并集不变——赏赐/没收即时，不入队
 ```
 
 ### economy/reward.ts（新建·赏赐 + 没收，镜像对同文件）
+
 ```ts
 // 忠诚增减幅度（规则身份，内联常量）
 const REWARD_LOYALTY_GAIN = 8
@@ -98,6 +105,7 @@ export function confiscate(state: GameState, officerId: OfficerId, itemId: ItemI
 ```
 
 ### game.ts（修改）
+
 ```ts
 export type Action =
   | /* …既有… */
@@ -107,6 +115,7 @@ export type Action =
 ```
 
 ## 模块职责
+
 - `world/item.ts`：道具聚合 + `ItemHolder` 判别式值对象 + 归属变更纯函数；不依赖 state，纯粹的数据与不变量。
 - `world/officer.ts`：新增 `loyalty` 字段与 `adjustLoyalty`（钳制 `[0,100]`）；君主豁免由调用方负责，聚合本身不判君主。
 - `world/queries.ts`：新增 `itemsInCity`/`itemsOfOfficer`（按 holder 派生）、`effectiveOfficer`（道具加成唯一收敛处）、`officerLoyalty`（君主恒 100 的派生）。
@@ -116,6 +125,7 @@ export type Action =
 - **改吃有效值的既有调用点**（仅把入参 `officer`→`effectiveOfficer(...)`，逻辑不动）：`economy/allocate.ts`（带兵量）、`economy/develop.ts`（开垦/招商增量）、`economy/plunder.ts`（掠夺产出 `智+力`）、`world/succession.ts`（重选君主取智力最高）。
 
 ## 要测的行为
+
 - [x] `holdByOfficer`/`holdByCity`：正确改写 `holder` 判别式，其余字段不变。
 - [x] `itemsInCity`/`itemsOfOfficer`：按 `holder` 正确归类；同一道具只出现在一处。
 - [x] `effectiveOfficer`：force/intel = 基础 + 所持道具加成之和；无道具时原样；level/troops/stamina/busy 等其余字段不被改写。
@@ -130,11 +140,13 @@ export type Action =
 - [x] `fixture` 播种道具与忠诚后，既有构造与全部既有测试编译通过、不回归。
 
 ## 新建文件
+
 - `src/core/world/item.ts`：道具聚合 + `ItemHolder` + 归属变更纯函数。
 - `src/core/economy/reward.ts`：赏赐/没收下令即结算（含 `canReward`/`reward`/`canConfiscate`/`confiscate`）。
 - 对应 `*.test.ts`（同级）：`world/item.test.ts`、`economy/reward.test.ts`；并在 `world/queries.test.ts`、`world/officer.test.ts` 补测新派生/聚合函数。
 
 ## 修改文件
+
 - `src/core/shared/ids.ts`：加 `ItemId`。
 - `src/core/world/officer.ts`：`Officer` 加 `loyalty`；加 `LOYALTY_MAX`、`adjustLoyalty`。
 - `src/core/world/queries.ts`：加 `itemsInCity`/`itemsOfOfficer`/`effectiveOfficer`/`officerLoyalty`。
@@ -144,6 +156,7 @@ export type Action =
 - `src/core/world/fixture.ts`：播种 `items`（holder=城）与武将 `loyalty`（君主 100、其余 50）。
 
 ## 任务清单
+
 - [x] `shared/ids.ts` 加 `ItemId`；`world/item.ts` 聚合 + `holdByOfficer`/`holdByCity`（红绿）。
 - [x] `world/officer.ts` 加 `loyalty` + `adjustLoyalty`/`LOYALTY_MAX`（红绿）；`game-state.ts` 加 `items`；`fixture.ts` 播种道具与忠诚，既有测试与构造编译通过。
 - [x] `world/queries.ts` 加 `itemsInCity`/`itemsOfOfficer`/`effectiveOfficer`/`officerLoyalty`（红绿）。
@@ -155,6 +168,7 @@ export type Action =
 ## TDD：是
 
 ## 风险 / 待定
+
 - **重选君主吃有效智力**（已决策）：赏赐道具可能改变被俘后的继承顺位——可接受，但属"装备影响继承"的隐式联动，留意。
 - **store/ui 层尚不存在**：本切片仅 core；玩家归属校验（`officer.lordId === playerLordId`，赏赐/没收只能对己方）与城/武将道具、忠诚的面板展示留待 UI 层落地，与既有 campaign 等切片处理一致。
 - **AI 本切片不主动赏赐/没收**（YAGNI）：AI 接入留待后续。

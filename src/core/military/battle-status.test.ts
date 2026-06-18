@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createRng } from '../shared/rng'
-import {
-  canActWithStatus, canCastWithStatus, stoneDamage, dailyStatusCheck,
-} from './battle-status'
+import { canActWithStatus, canCastWithStatus, stoneDamage, dailyStatusCheck } from './battle-status'
 
 describe('battle-status 谓词', () => {
   it('canAct：混乱/石阵/死亡不能行动', () => {

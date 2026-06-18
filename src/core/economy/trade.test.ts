@@ -6,10 +6,18 @@ import { canTrade, trade } from './trade'
 
 const cfg = DEFAULT_CONFIG
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 
@@ -26,7 +34,15 @@ describe('canTrade 前置校验', () => {
     expect(canTrade(s, 'zhugeliang', 'sell', 401, cfg).ok).toBe(false)
   })
   it('体力 < 12 -> 拒绝', () => {
-    expect(canTrade(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 11 }), 'zhugeliang', 'buy', 1, cfg).ok).toBe(false)
+    expect(
+      canTrade(
+        withOfficer(createInitialState(1), 'zhugeliang', { stamina: 11 }),
+        'zhugeliang',
+        'buy',
+        1,
+        cfg
+      ).ok
+    ).toBe(false)
   })
   it('负数 / 非整数 -> 拒绝', () => {
     const s = createInitialState(1)
@@ -34,7 +50,15 @@ describe('canTrade 前置校验', () => {
     expect(canTrade(s, 'zhugeliang', 'buy', 1.5, cfg).ok).toBe(false)
   })
   it('武将已占用 -> 拒绝', () => {
-    expect(canTrade(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', 'buy', 1, cfg).ok).toBe(false)
+    expect(
+      canTrade(
+        withOfficer(createInitialState(1), 'zhugeliang', { busy: true }),
+        'zhugeliang',
+        'buy',
+        1,
+        cfg
+      ).ok
+    ).toBe(false)
   })
 })
 

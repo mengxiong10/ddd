@@ -1,13 +1,23 @@
 import { describe, it, expect } from 'vitest'
 import { createRng } from '../shared/rng'
 import {
-  SKILL_DEFS, RANGE_MASK, DEFAULT_SKILLS, LORD_SKILLS,
-  initialMp, unlockedCount, availableSkills, effectValue, skillGatesPass, rollSkillSuccess,
+  SKILL_DEFS,
+  RANGE_MASK,
+  DEFAULT_SKILLS,
+  LORD_SKILLS,
+  initialMp,
+  unlockedCount,
+  availableSkills,
+  effectValue,
+  skillGatesPass,
+  rollSkillSuccess,
 } from './battle-skill'
 
 describe('battle-skill 数据完整性', () => {
   it('纳入 27 技、不含 21/26/28', () => {
-    const ids = Object.keys(SKILL_DEFS).map(Number).sort((a, b) => a - b)
+    const ids = Object.keys(SKILL_DEFS)
+      .map(Number)
+      .sort((a, b) => a - b)
     expect(ids).toHaveLength(27)
     expect(ids).not.toContain(21)
     expect(ids).not.toContain(26)
@@ -60,12 +70,20 @@ describe('battle-skill 公式', () => {
 
 describe('battle-skill 四关与成功率', () => {
   it('冰雹下火箭不可用、目标山地践踏不可用', () => {
-    expect(skillGatesPass(SKILL_DEFS[11]!, 'hail', 'plain', { terrain: 'village', troop: 'infantry' })).toBe(false)
-    expect(skillGatesPass(SKILL_DEFS[1]!, 'clear', 'plain', { terrain: 'mountain', troop: 'infantry' })).toBe(false)
+    expect(
+      skillGatesPass(SKILL_DEFS[11]!, 'hail', 'plain', { terrain: 'village', troop: 'infantry' })
+    ).toBe(false)
+    expect(
+      skillGatesPass(SKILL_DEFS[1]!, 'clear', 'plain', { terrain: 'mountain', troop: 'infantry' })
+    ).toBe(false)
   })
   it('滚木须施法者在山地/城池', () => {
-    expect(skillGatesPass(SKILL_DEFS[6]!, 'clear', 'plain', { terrain: 'plain', troop: 'infantry' })).toBe(false)
-    expect(skillGatesPass(SKILL_DEFS[6]!, 'clear', 'mountain', { terrain: 'plain', troop: 'infantry' })).toBe(true)
+    expect(
+      skillGatesPass(SKILL_DEFS[6]!, 'clear', 'plain', { terrain: 'plain', troop: 'infantry' })
+    ).toBe(false)
+    expect(
+      skillGatesPass(SKILL_DEFS[6]!, 'clear', 'mountain', { terrain: 'plain', troop: 'infantry' })
+    ).toBe(true)
   })
   it('self 技能（谍报）忽略目标维度、所有天气可用', () => {
     expect(skillGatesPass(SKILL_DEFS[30]!, 'hail', 'river')).toBe(true)

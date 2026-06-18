@@ -32,7 +32,7 @@ export function canRecruit(
   state: GameState,
   officerId: OfficerId,
   amount: number,
-  config: GameConfig,
+  config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
@@ -55,7 +55,7 @@ export function recruit(
   state: GameState,
   officerId: OfficerId,
   amount: number,
-  config: GameConfig,
+  config: GameConfig
 ): GameState {
   if (!canRecruit(state, officerId, amount, config).ok) return state
 

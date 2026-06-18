@@ -5,7 +5,12 @@ import { executeMove } from '../economy/move'
 import { executeTransport } from '../economy/transport'
 import { executeSearch } from '../economy/search'
 import { executeSuborn } from '../economy/suborn'
-import { executeEntice, executeAlienate, executeInstigate, executeInduce } from '../economy/diplomacy'
+import {
+  executeEntice,
+  executeAlienate,
+  executeInstigate,
+  executeInduce,
+} from '../economy/diplomacy'
 
 /**
  * 月末执行「非 campaign」待执行指令（掠夺/移动/输送/搜寻/招降/外交），按入队序分派到领域服务，
@@ -29,7 +34,14 @@ export function runNonCampaignPending(state: GameState, _config: GameConfig): Ga
         next = executeMove(next, cmd.officerId, cmd.targetCityId)
         break
       case 'transport':
-        next = executeTransport(next, cmd.officerId, cmd.targetCityId, cmd.food, cmd.gold, cmd.troops)
+        next = executeTransport(
+          next,
+          cmd.officerId,
+          cmd.targetCityId,
+          cmd.food,
+          cmd.gold,
+          cmd.troops
+        )
         break
       case 'search':
         next = executeSearch(next, cmd.officerId)

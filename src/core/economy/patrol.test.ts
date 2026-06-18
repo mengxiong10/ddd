@@ -7,10 +7,18 @@ import { canPatrol, patrol } from './patrol'
 
 const cfg = DEFAULT_CONFIG
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 
@@ -19,13 +27,21 @@ describe('canPatrol 前置校验', () => {
     expect(canPatrol(createInitialState(1), 'zhugeliang', cfg).ok).toBe(true)
   })
   it('武将已占用 -> 拒绝', () => {
-    expect(canPatrol(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canPatrol(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg)
+        .ok
+    ).toBe(false)
   })
   it('本城金 < 50 -> 拒绝', () => {
-    expect(canPatrol(withCity(createInitialState(1), 'chengdu', { gold: 49 }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canPatrol(withCity(createInitialState(1), 'chengdu', { gold: 49 }), 'zhugeliang', cfg).ok
+    ).toBe(false)
   })
   it('体力 < 8 -> 拒绝', () => {
-    expect(canPatrol(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canPatrol(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }), 'zhugeliang', cfg)
+        .ok
+    ).toBe(false)
   })
 })
 

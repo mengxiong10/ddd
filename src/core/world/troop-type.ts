@@ -38,7 +38,7 @@ export const MYSTIC_INTEL_REQUIREMENT = 105
 export function resolveOverride(
   override: TroopTypeOverride,
   effForce: number,
-  effIntel: number,
+  effIntel: number
 ): TroopType | null {
   switch (override) {
     case 1:

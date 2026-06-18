@@ -28,13 +28,13 @@ export function isCaptive(state: GameState, officerId: OfficerId): boolean {
 export function officersInCity(
   state: GameState,
   cityId: CityId,
-  opts?: { onlyAvailable?: boolean },
+  opts?: { onlyAvailable?: boolean }
 ): Officer[] {
   const onlyAvailable = opts?.onlyAvailable ?? false
   return Object.values(state.officers).filter(
     (o) =>
       o.cityId === cityId &&
-      (!onlyAvailable || (!o.busy && o.lordId !== null && !isCaptive(state, o.id))),
+      (!onlyAvailable || (!o.busy && o.lordId !== null && !isCaptive(state, o.id)))
   )
 }
 
@@ -51,7 +51,7 @@ export function captivesInCity(state: GameState, cityId: CityId): Officer[] {
 /** 本城未发现道具（holder=本城 且 discovered=false）：搜寻发现的候选。 */
 export function undiscoveredItemsInCity(state: GameState, cityId: CityId): Item[] {
   return Object.values(state.items).filter(
-    (i) => i.holder.kind === 'city' && i.holder.cityId === cityId && !i.discovered,
+    (i) => i.holder.kind === 'city' && i.holder.cityId === cityId && !i.discovered
   )
 }
 
@@ -62,7 +62,9 @@ export function citiesOfLord(state: GameState, lordId: OfficerId): City[] {
 
 /** 取归属某城的道具（按 holder 派生，无第二份存储）。 */
 export function itemsInCity(state: GameState, cityId: CityId): Item[] {
-  return Object.values(state.items).filter((i) => i.holder.kind === 'city' && i.holder.cityId === cityId)
+  return Object.values(state.items).filter(
+    (i) => i.holder.kind === 'city' && i.holder.cityId === cityId
+  )
 }
 
 /** 取归属某武将的道具（按 holder 派生），按装备先后 equipSeq 升序返回。 */
@@ -129,7 +131,9 @@ export function governorOf(state: GameState, cityId: CityId): Officer | null {
   if (!city) return null
   const lord = state.officers[city.lordId]
   if (lord && lord.cityId === cityId) return lord
-  const serving = Object.values(state.officers).filter((o) => o.cityId === cityId && o.lordId === city.lordId)
+  const serving = Object.values(state.officers).filter(
+    (o) => o.cityId === cityId && o.lordId === city.lordId
+  )
   if (serving.length === 0) return null
   return serving.reduce((best, o) => {
     const oi = effectiveOfficer(state, o.id).intelligence

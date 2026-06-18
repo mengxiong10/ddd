@@ -22,7 +22,7 @@ export function canTransport(
   food: number,
   gold: number,
   troops: number,
-  config: GameConfig,
+  config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
@@ -55,7 +55,7 @@ export function transport(
   food: number,
   gold: number,
   troops: number,
-  config: GameConfig,
+  config: GameConfig
 ): GameState {
   if (!canTransport(state, officerId, targetCityId, food, gold, troops, config).ok) return state
 
@@ -68,7 +68,10 @@ export function transport(
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
-    pendingCommands: [...state.pendingCommands, { type: 'transport', officerId, targetCityId, food, gold, troops }],
+    pendingCommands: [
+      ...state.pendingCommands,
+      { type: 'transport', officerId, targetCityId, food, gold, troops },
+    ],
   }
 }
 
@@ -83,7 +86,7 @@ export function executeTransport(
   targetCityId: CityId,
   food: number,
   gold: number,
-  troops: number,
+  troops: number
 ): GameState {
   const [roll, nextRng] = randInt(state.rng, 1, 100)
   if (roll > TRANSPORT_SUCCESS_PERCENT) return { ...state, rng: nextRng }

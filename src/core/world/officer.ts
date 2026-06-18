@@ -65,7 +65,11 @@ const TROOP_CAP_PER_INTEL = 10
 
 /** 带兵量上限（派生）= 等级×100 + 武力×10 + 智力×10。 */
 export function troopCapacity(o: Officer): number {
-  return o.level * TROOP_CAP_PER_LEVEL + o.force * TROOP_CAP_PER_FORCE + o.intelligence * TROOP_CAP_PER_INTEL
+  return (
+    o.level * TROOP_CAP_PER_LEVEL +
+    o.force * TROOP_CAP_PER_FORCE +
+    o.intelligence * TROOP_CAP_PER_INTEL
+  )
 }
 
 /** 设置武将兵，不低于 0（不变量）。调用方应已校验不超带兵量上限。 */

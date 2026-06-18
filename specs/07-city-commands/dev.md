@@ -1,6 +1,7 @@
 # city-commands 开发文档
 
 ## 方案概述
+
 5 条指令全部复用既有范式：`economy/<cmd>.ts` 写 `can<Cmd>`/`<cmd>` 两段纯函数，经 `game.ts` 的 `Action` + `canApply/apply` 分派；占人用 `Officer.busy`，月末由 `endMonth` 统一回城。按「效果时机」分两类：
 
 - **即时类（不入 `pendingCommands`）**：出巡、宴请、交易——效果在下令瞬间结算（与开垦/侦察/赏赐同构）。
@@ -18,22 +19,26 @@
 - **扁平成本逐指令独立 key**（用户定）：出巡值与开垦巧合相等，仍各设 key，避免平衡耦合。
 
 ## 接口设计
+
 > 仅签名，不含实现体。
 
 ### shared/config.ts（修改：新增 5 个扁平成本）
+
 ```ts
 export interface GameConfig {
   // …既有…
-  readonly patrolStaminaCost: number    // 8
-  readonly patrolGoldCost: number       // 50
-  readonly banquetGoldCost: number      // 100
+  readonly patrolStaminaCost: number // 8
+  readonly patrolGoldCost: number // 50
+  readonly banquetGoldCost: number // 100
   readonly transportStaminaCost: number // 8
-  readonly tradeStaminaCost: number     // 12
+  readonly tradeStaminaCost: number // 12
 }
 ```
+
 不进 config（内联规则身份）：出巡民忠随机幅度 `RandInt(1,4)`、人口增量 100（`patrol.ts`）；宴请体力回 50、忠诚 +1（`banquet.ts`）；输送送达概率 80%（`transport.ts`）；交易买价 5、卖价 2（`trade.ts`）；民忠量纲上限 100（`city.ts`）。
 
 ### world/city.ts（修改：新增字段 + 两个聚合操作）
+
 ```ts
 /** 民忠量纲上限（百分制，固定值；规则身份，不入 config）。 */
 export const CITY_LOYALTY_MAX = 100
@@ -49,27 +54,33 @@ export function gainLoyalty(c: City, delta: number): City
 /** 增加人口（delta ≥ 0）。出巡用。 */
 export function addPopulation(c: City, delta: number): City
 ```
+
 > 输送两端的金/粮/后备兵复用既有 `addGold/spendGold/addFood/spendFood/addReserveTroops`，不新增。
 
 ### economy/patrol.ts（新建·即时·占人·消费 RNG）
+
 ```ts
 // 内联规则身份：PATROL_LOYALTY_RAND_MIN=1, PATROL_LOYALTY_RAND_MAX=4, PATROL_POPULATION_GAIN=100
 export function canPatrol(state: GameState, officerId: OfficerId, config: GameConfig): CommandCheck
 // 即时：民忠 += randInt(1,4)（封顶100）、人口 +=100、扣体力 patrolStaminaCost、扣本城金 patrolGoldCost、busy、推进 RNG；不入队。非法 no-op。
 export function patrol(state: GameState, officerId: OfficerId, config: GameConfig): GameState
 ```
+
 `canPatrol` 校验：武将存在、未占用、非俘虏 → 本城存在 → 本城金 ≥ `patrolGoldCost` → 体力 ≥ `patrolStaminaCost`。
 
 ### economy/banquet.ts（新建·即时·不占人）
+
 ```ts
 // 内联规则身份：BANQUET_STAMINA_GAIN=50, BANQUET_LOYALTY_GAIN=1
 export function canBanquet(state: GameState, officerId: OfficerId, config: GameConfig): CommandCheck
 // 即时：扣本城金 banquetGoldCost、目标体力 +50（封顶 STAMINA_MAX）、非君主忠诚 +1（封顶 LOYALTY_MAX）；不动 busy、不入队、不耗 RNG。非法 no-op。
 export function banquet(state: GameState, officerId: OfficerId, config: GameConfig): GameState
 ```
+
 `canBanquet` 校验：目标武将存在、**未占用且非俘虏（在任）** → 本城存在 → 本城金 ≥ `banquetGoldCost`。君主跳过忠诚写入（`officer.lordId === officer.id`），与赏赐/没收一致。
 
 ### economy/move.ts（新建·月末·占人例外）
+
 ```ts
 export function canMove(state: GameState, officerId: OfficerId, targetCityId: CityId): CommandCheck
 // 下令：busy、入队 {type:'move', officerId, targetCityId}；不扣体力/金、不耗 RNG。非法 no-op。
@@ -77,49 +88,88 @@ export function move(state: GameState, officerId: OfficerId, targetCityId: CityI
 // 月末（turn/pending 分派，非 campaign 趟）：officer.cityId = targetCityId（占人例外，不回出发城；busy 由 endMonth 翻回）。
 export function executeMove(state: GameState, officerId: OfficerId, targetCityId: CityId): GameState
 ```
+
 `canMove` 校验：武将存在、未占用、非俘虏 → 本城存在 → 目标城存在、`targetCityId !== officer.cityId`、`target.lordId === officer.lordId`（己方城）。
 
 ### economy/transport.ts（新建·月末·占人·月末消费 RNG）
+
 ```ts
 // 内联规则身份：TRANSPORT_SUCCESS_PERCENT=80
 export function canTransport(
-  state: GameState, officerId: OfficerId, targetCityId: CityId,
-  food: number, gold: number, troops: number, config: GameConfig,
+  state: GameState,
+  officerId: OfficerId,
+  targetCityId: CityId,
+  food: number,
+  gold: number,
+  troops: number,
+  config: GameConfig
 ): CommandCheck
 // 下令：扣体力 transportStaminaCost、从出发城扣 food/gold/troops（后备兵）、busy、入队 transport；不耗 RNG。非法 no-op。
 export function transport(
-  state: GameState, officerId: OfficerId, targetCityId: CityId,
-  food: number, gold: number, troops: number, config: GameConfig,
+  state: GameState,
+  officerId: OfficerId,
+  targetCityId: CityId,
+  food: number,
+  gold: number,
+  troops: number,
+  config: GameConfig
 ): GameState
 // 月末（turn/pending 分派，非 campaign 趟）：randInt 判 80% 送达→目标城 +food/+gold/+后备兵；20% 永损（不退回）。执行人 cityId 不变（busy 由 endMonth 翻回）。推进 RNG。
 export function executeTransport(
-  state: GameState, officerId: OfficerId, targetCityId: CityId,
-  food: number, gold: number, troops: number,
+  state: GameState,
+  officerId: OfficerId,
+  targetCityId: CityId,
+  food: number,
+  gold: number,
+  troops: number
 ): GameState
 ```
+
 `canTransport` 校验：武将存在、未占用、非俘虏 → 本城存在 → 体力 ≥ `transportStaminaCost` → 目标城存在、`!== 本城`、`target.lordId === officer.lordId` → food/gold/troops 均为整数且 `≥0`、`food ≤ 本城粮`、`gold ≤ 本城金`、`troops ≤ 本城后备兵`。
 
 ### economy/trade.ts（新建·即时·占人）
+
 ```ts
 export type TradeMode = 'buy' | 'sell'
 // 内联规则身份：TRADE_BUY_GOLD_PER_FOOD=5, TRADE_SELL_GOLD_PER_FOOD=2
-export function canTrade(state: GameState, officerId: OfficerId, mode: TradeMode, amount: number, config: GameConfig): CommandCheck
+export function canTrade(
+  state: GameState,
+  officerId: OfficerId,
+  mode: TradeMode,
+  amount: number,
+  config: GameConfig
+): CommandCheck
 // 即时：buy → 粮 +=amount、金 -=amount×5；sell → 粮 -=amount、金 +=amount×2；扣体力 tradeStaminaCost、busy；不入队、不耗 RNG。非法 no-op。
-export function trade(state: GameState, officerId: OfficerId, mode: TradeMode, amount: number, config: GameConfig): GameState
+export function trade(
+  state: GameState,
+  officerId: OfficerId,
+  mode: TradeMode,
+  amount: number,
+  config: GameConfig
+): GameState
 ```
+
 `canTrade` 校验：武将存在、未占用、非俘虏 → 本城存在 → 体力 ≥ `tradeStaminaCost` → `amount` 整数且 `≥0` → buy 时 `amount ≤ floor(本城金/5)`；sell 时 `amount ≤ 本城粮`。
 
 ### game-state.ts（修改：PendingCommand 增两分支）
+
 ```ts
 export type PendingCommand =
   | { readonly type: 'plunder'; readonly officerId: OfficerId }
-  | { readonly type: 'campaign'; /* …既有… */ }
+  | { readonly type: 'campaign' /* …既有… */ }
   | { readonly type: 'move'; readonly officerId: OfficerId; readonly targetCityId: CityId }
-  | { readonly type: 'transport'; readonly officerId: OfficerId; readonly targetCityId: CityId
-      readonly food: number; readonly gold: number; readonly troops: number }
+  | {
+      readonly type: 'transport'
+      readonly officerId: OfficerId
+      readonly targetCityId: CityId
+      readonly food: number
+      readonly gold: number
+      readonly troops: number
+    }
 ```
 
 ### game.ts（修改：Action 增 5 条）
+
 ```ts
 export type Action =
   | /* …既有… */
@@ -132,14 +182,17 @@ export type Action =
 ```
 
 ### turn/pending.ts（修改：增两分派分支）
+
 ```ts
 // switch 增 case 'move' → executeMove、case 'transport' → executeTransport；二者非 campaign，落第一趟（两趟逻辑不变）。
 ```
 
 ### world/fixture.ts（修改）
+
 `CitySeed` + `createInitialState` 增 `population`（各城播种一个 mock 值，凸显占位、展示用）。
 
 ## 模块职责
+
 - `shared/config.ts`：新增 5 个扁平成本旋钮，仅数值。
 - `world/city.ts`：`City` 加 `population`；新增 `gainLoyalty`（民忠回升，钳 [0,100]）、`addPopulation`。城级不变量收敛处。
 - `economy/patrol.ts`：出巡规则——`canPatrol`/`patrol`（即时、占人、消费 RNG）。
@@ -154,6 +207,7 @@ export type Action =
 - 依赖方向：`economy/* → {world, shared}`；`turn/pending → economy`；`game → economy`。无新增循环。
 
 ## 要测的行为
+
 - [ ] `canPatrol` 拒绝：无在任武将 / 本城金 < 50 / 体力 < 8。
 - [ ] `patrol`：民忠 `+=randInt(1,4)`（封顶 100）、人口 +100、扣体力 8、扣城金 50、busy=true、RNG 推进；不入队；非法 no-op。民忠原已 100 时不超顶。
 - [ ] `gainLoyalty`/`addPopulation`：钳 [0,100] / 累加，不碰其它字段。
@@ -172,6 +226,7 @@ export type Action =
 - [ ] 确定性：相同 seed + 相同动作序列结果一致（端到端 game.test）。
 
 ## 新建文件
+
 - `src/core/economy/patrol.ts` + `patrol.test.ts`
 - `src/core/economy/banquet.ts` + `banquet.test.ts`
 - `src/core/economy/move.ts` + `move.test.ts`
@@ -179,6 +234,7 @@ export type Action =
 - `src/core/economy/trade.ts` + `trade.test.ts`
 
 ## 修改文件
+
 - `src/core/shared/config.ts`：加 5 个扁平成本 + 默认值。
 - `src/core/world/city.ts`：`City` 加 `population`；加 `gainLoyalty`/`addPopulation`/`CITY_LOYALTY_MAX`。
 - `src/core/world/fixture.ts`：播种 `population`。
@@ -188,6 +244,7 @@ export type Action =
 - 既有 `*.test.ts` / fixture 构造：补 `population` 字段使编译通过。
 
 ## 任务清单
+
 - [x] config + city（`population` 字段、`gainLoyalty`/`addPopulation`/`CITY_LOYALTY_MAX`）+ fixture 播种；既有测试编译通过、保持绿。
 - [x] economy/patrol：`canPatrol`/`patrol`（红绿，含 RNG/封顶/no-op）+ 接 game `patrol` Action。
 - [x] economy/banquet：`canBanquet`/`banquet`（红绿，含君主跳忠诚/不占人）+ 接 game `banquet`。
@@ -197,9 +254,11 @@ export type Action =
 - [x] 端到端：endMonth 整段推进（move 落目标城、transport 送达/永损、月末顺序、可复现、既有流程不回归）。
 
 ## TDD：是
+
 core 全程红绿循环（CONSTITUTION 默认）；UI/store（出巡入口、宴请目标选择、移动选城、输送多步表单、交易买卖切换）不在本切片。
 
 ## 质量自检
+
 - 接口最小自解释：5 条均沿用 `can*`/`*`（+ 月末 `execute*`）既有签名约定，officerId 作用城派生自 `officer.cityId`。✅
 - 模块深、职责单一：每指令一文件，城级不变量（民忠回升/人口）收敛 `city.ts`；无 god 模块。✅
 - 低改动放大：月末类只新增两个 PendingCommand 分支 + 两个 `execute*` + `turn/pending` 两分派，不动 busy/两趟逻辑/既有指令。✅
@@ -211,10 +270,12 @@ core 全程红绿循环（CONSTITUTION 默认）；UI/store（出巡入口、宴
 - 依赖方向健康：economy→world/shared、turn→economy，无循环；UI 不涉及。✅
 
 ## 决策升级
+
 - **架构红线（升级 `AGENTS.md`）**：占人例外再添一类——「移动」月末由 `executeMove` 改写 `officer.cityId` 落到目标己方城、不回出发城（与出征同构，turn 层无特例）；`pendingCommands` 非 campaign 趟新增 move/transport。
 - **术语（已于 spec-prd 入 `CONTEXT.md`）**：出巡/宴请/移动/输送/交易/人口；本阶段补充人口为「展示状态」语义。
 
 ## 风险 / 待定
+
 - **人口无消费方**：本切片纯展示，违反「无冗余状态/字段须有消费方」，经用户确认保留，待后续切片（征兵/收粮收税是否吃人口）再赋规则；届时 `population` 才进公式。
 - **输送月末消费 RNG 的顺序**：与掠夺同在第一趟、按入队序，决定 RNG 推进序；端到端测以固定 seed 锁定命中/失败，保证可复现。
 - **交易无城金上限**：sell 可无限堆金（PRD 决定不封顶）；若后续平衡需要再加全局上限（届时收税等加金路径一并处理）。

@@ -7,10 +7,18 @@ import { canCampaign, campaign } from './campaign'
 const ATTACKERS = ['guanyu', 'zhangfei']
 const TARGET = 'xuchang'
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 

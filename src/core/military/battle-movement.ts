@@ -11,7 +11,12 @@ import { ATTACK_MASK } from './battle-combat'
 import type { SkillId } from './battle-skill'
 import { RANGE_MASK } from './battle-skill'
 
-const STEPS: readonly Position[] = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }]
+const STEPS: readonly Position[] = [
+  { x: 0, y: -1 },
+  { x: 0, y: 1 },
+  { x: -1, y: 0 },
+  { x: 1, y: 0 },
+]
 const key = (p: Position): string => `${p.x},${p.y}`
 
 /** 某格存活单位（非击溃）；无则 undefined。 */
@@ -36,13 +41,18 @@ function zocTiles(battle: BattleState, mySide: BattleState['units'][string]['sid
  * - 接敌停步区：进入即停（该格不再向外扩展），兑现「不能继续穿越」。
  * 返回含起点（原地不动）在内的全部合法落点。
  */
-export function reachableTiles(state: GameState, battle: BattleState, officerId: OfficerId): Position[] {
+export function reachableTiles(
+  state: GameState,
+  battle: BattleState,
+  officerId: OfficerId
+): Position[] {
   const unit = battle.units[officerId]
   if (!unit || unit.status === 'dead') return []
   const map: BattleMap = BATTLE_MAPS[battle.mapId]!
   const troopType: TroopType = effectiveTroopType(state, officerId)
   // 定身：移动力降为 1；其余按派生移动力封顶 8。
-  const budget = unit.status === 'rooted' ? 1 : Math.min(officerMovement(state, officerId), MAX_MOVEMENT)
+  const budget =
+    unit.status === 'rooted' ? 1 : Math.min(officerMovement(state, officerId), MAX_MOVEMENT)
   const start = unit.pos
   // 奇门：可穿越敌方接敌停步区 → 不受 ZoC 压制。
   const zoc = unit.status === 'qimen' ? new Set<string>() : zocTiles(battle, unit.side)

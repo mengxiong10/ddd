@@ -16,11 +16,7 @@ export function allocateMaxTroops(officer: Officer, city: City): number {
  * 校验分配前置条件（不修改状态）。分配不占人，作用城 = 武将所在城（officer.cityId）。
  * 武将存在且未占用 → 0 ≤ amount ≤ 可分配上限。
  */
-export function canAllocate(
-  state: GameState,
-  officerId: OfficerId,
-  amount: number,
-): CommandCheck {
+export function canAllocate(state: GameState, officerId: OfficerId, amount: number): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
@@ -28,7 +24,8 @@ export function canAllocate(
   if (!city) return { ok: false, reason: '城不存在' }
 
   if (amount < 0) return { ok: false, reason: '目标兵力不可为负' }
-  if (amount > allocateMaxTroops(effectiveOfficer(state, officerId), city)) return { ok: false, reason: '超过可分配上限' }
+  if (amount > allocateMaxTroops(effectiveOfficer(state, officerId), city))
+    return { ok: false, reason: '超过可分配上限' }
   return { ok: true }
 }
 
@@ -37,11 +34,7 @@ export function canAllocate(
  * 后备兵 += (武将原兵 − N)；武将兵 = N。不占人、不扣体力/金、不动 RNG。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
-export function allocate(
-  state: GameState,
-  officerId: OfficerId,
-  amount: number,
-): GameState {
+export function allocate(state: GameState, officerId: OfficerId, amount: number): GameState {
   if (!canAllocate(state, officerId, amount).ok) return state
 
   const officer = state.officers[officerId]!

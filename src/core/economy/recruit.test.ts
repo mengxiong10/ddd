@@ -6,10 +6,18 @@ import { canRecruit, recruit, recruitMaxTroops, recruitGoldCost } from './recrui
 
 const cfg = DEFAULT_CONFIG
 
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
@@ -76,7 +84,10 @@ describe('recruit 征兵', () => {
   })
 
   it('配置注入：改 recruitStaminaCost 改变体力消耗', () => {
-    const next = recruit(createInitialState(1), 'zhugeliang', 100, { ...cfg, recruitStaminaCost: 20 })
+    const next = recruit(createInitialState(1), 'zhugeliang', 100, {
+      ...cfg,
+      recruitStaminaCost: 20,
+    })
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 20)
   })
 

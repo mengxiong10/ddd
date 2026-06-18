@@ -17,7 +17,11 @@ const BANQUET_LOYALTY_GAIN = 1
  * 校验宴请前置（不改状态）。作用城 = 目标武将所在城。不占人。
  * 目标武将存在、未占用且非俘虏（在任）→ 本城存在 → 本城金 ≥ banquetGoldCost。
  */
-export function canBanquet(state: GameState, officerId: OfficerId, config: GameConfig): CommandCheck {
+export function canBanquet(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }

@@ -8,10 +8,18 @@ import { randInt } from '../shared/rng'
 
 const cfg = DEFAULT_CONFIG
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 function setCityLord(s: GameState, cityId: string, lordId: string): GameState {
@@ -32,20 +40,30 @@ describe('canSuborn', () => {
   })
   it('目标不是俘虏 -> 拒绝', () => {
     const s = createInitialState(1) // 未占领，曹操非俘虏
-    expect(canSuborn(withOfficer(s, 'guanyu', { cityId: 'xuchang' }), 'guanyu', 'caocao', cfg).ok).toBe(false)
+    expect(
+      canSuborn(withOfficer(s, 'guanyu', { cityId: 'xuchang' }), 'guanyu', 'caocao', cfg).ok
+    ).toBe(false)
   })
   it('执行人已占用 -> 拒绝', () => {
-    expect(canSuborn(withOfficer(setup(1), 'guanyu', { busy: true }), 'guanyu', 'caocao', cfg).ok).toBe(false)
+    expect(
+      canSuborn(withOfficer(setup(1), 'guanyu', { busy: true }), 'guanyu', 'caocao', cfg).ok
+    ).toBe(false)
   })
   it('执行人体力不足 -> 拒绝', () => {
-    expect(canSuborn(withOfficer(setup(1), 'guanyu', { stamina: 10 }), 'guanyu', 'caocao', cfg).ok).toBe(false)
+    expect(
+      canSuborn(withOfficer(setup(1), 'guanyu', { stamina: 10 }), 'guanyu', 'caocao', cfg).ok
+    ).toBe(false)
   })
   it('城金不足 -> 拒绝', () => {
-    expect(canSuborn(withCity(setup(1), 'xuchang', { gold: 50 }), 'guanyu', 'caocao', cfg).ok).toBe(false)
+    expect(canSuborn(withCity(setup(1), 'xuchang', { gold: 50 }), 'guanyu', 'caocao', cfg).ok).toBe(
+      false
+    )
   })
   it('俘虏不在执行人所在城 -> 拒绝', () => {
     const s = setup(1) // 关羽在许昌，把关羽移回江陵则俘虏不同城
-    expect(canSuborn(withOfficer(s, 'guanyu', { cityId: 'jiangling' }), 'guanyu', 'caocao', cfg).ok).toBe(false)
+    expect(
+      canSuborn(withOfficer(s, 'guanyu', { cityId: 'jiangling' }), 'guanyu', 'caocao', cfg).ok
+    ).toBe(false)
   })
 })
 
@@ -56,7 +74,11 @@ describe('suborn 下令', () => {
     expect(next.officers.guanyu!.stamina).toBe(s.officers.guanyu!.stamina - 15)
     expect(next.officers.guanyu!.busy).toBe(true)
     expect(next.cities.xuchang!.gold).toBe(s.cities.xuchang!.gold - 100)
-    expect(next.pendingCommands).toContainEqual({ type: 'suborn', officerId: 'guanyu', captiveId: 'caocao' })
+    expect(next.pendingCommands).toContainEqual({
+      type: 'suborn',
+      officerId: 'guanyu',
+      captiveId: 'caocao',
+    })
     expect(next.rng).toEqual(s.rng)
   })
   it('前置不满足 -> no-op', () => {

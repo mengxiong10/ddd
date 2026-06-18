@@ -5,7 +5,11 @@ import { canReward, reward, canConfiscate, confiscate } from './reward'
 import { holdByOfficer } from '../world/item'
 import { itemsOfOfficer, itemsInCity, officerLoyalty } from '../world/queries'
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 function giveItem(s: GameState, itemId: string, officerId: string): GameState {
@@ -26,11 +30,34 @@ describe('canReward 前置校验', () => {
   it('武将已持 2 件 -> 拒绝', () => {
     let s = createInitialState(1)
     // 注入两件归属诸葛亮的道具
-    s = { ...s, items: {
-      ...s.items,
-      a: { id: 'a', name: 'A', forceBonus: 1, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0, holder: { kind: 'officer', officerId: 'zhugeliang', equipSeq: 0 }, discovered: true, recruiterId: null },
-      b: { id: 'b', name: 'B', forceBonus: 1, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0, holder: { kind: 'officer', officerId: 'zhugeliang', equipSeq: 1 }, discovered: true, recruiterId: null },
-    } }
+    s = {
+      ...s,
+      items: {
+        ...s.items,
+        a: {
+          id: 'a',
+          name: 'A',
+          forceBonus: 1,
+          intelBonus: 0,
+          movementBonus: 0,
+          troopTypeOverride: 0,
+          holder: { kind: 'officer', officerId: 'zhugeliang', equipSeq: 0 },
+          discovered: true,
+          recruiterId: null,
+        },
+        b: {
+          id: 'b',
+          name: 'B',
+          forceBonus: 1,
+          intelBonus: 0,
+          movementBonus: 0,
+          troopTypeOverride: 0,
+          holder: { kind: 'officer', officerId: 'zhugeliang', equipSeq: 1 },
+          discovered: true,
+          recruiterId: null,
+        },
+      },
+    }
     expect(canReward(s, 'zhugeliang', 'cixiongshuanggujian').ok).toBe(false)
   })
   it('目标为俘虏 -> 拒绝', () => {
@@ -45,7 +72,13 @@ describe('canReward 前置校验', () => {
   })
   it('道具未被发现 -> 拒绝（搜寻发现前不可赏赐）', () => {
     const s = createInitialState(1)
-    const hidden = { ...s, items: { ...s.items, cixiongshuanggujian: { ...s.items.cixiongshuanggujian!, discovered: false } } }
+    const hidden = {
+      ...s,
+      items: {
+        ...s.items,
+        cixiongshuanggujian: { ...s.items.cixiongshuanggujian!, discovered: false },
+      },
+    }
     expect(canReward(hidden, 'zhugeliang', 'cixiongshuanggujian').ok).toBe(false)
   })
 })
@@ -82,10 +115,23 @@ describe('reward 赏赐', () => {
   it('连赏两件：equipSeq 递增（首件 0、次件 1），表达装备先后', () => {
     // 成都再放一件道具，使同城可连赏两件给诸葛亮
     let s = createInitialState(1)
-    s = { ...s, items: { ...s.items, gem: {
-      id: 'gem', name: '玉', forceBonus: 0, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0 as const,
-      holder: { kind: 'city', cityId: 'chengdu' } as const, discovered: true, recruiterId: null,
-    } } }
+    s = {
+      ...s,
+      items: {
+        ...s.items,
+        gem: {
+          id: 'gem',
+          name: '玉',
+          forceBonus: 0,
+          intelBonus: 0,
+          movementBonus: 0,
+          troopTypeOverride: 0 as const,
+          holder: { kind: 'city', cityId: 'chengdu' } as const,
+          discovered: true,
+          recruiterId: null,
+        },
+      },
+    }
     s = reward(s, 'zhugeliang', 'cixiongshuanggujian')
     s = reward(s, 'zhugeliang', 'gem')
     const seqOf = (id: string) => {
@@ -111,7 +157,11 @@ describe('canConfiscate / confiscate 没收', () => {
     expect(canConfiscate(s, 'zhugeliang', 'cixiongshuanggujian').ok).toBe(false)
   })
   it('道具收回所在城、非君主忠诚 −20、即时不占人', () => {
-    const s = withOfficer(giveItem(createInitialState(1), 'cixiongshuanggujian', 'zhugeliang'), 'zhugeliang', { loyalty: 50 })
+    const s = withOfficer(
+      giveItem(createInitialState(1), 'cixiongshuanggujian', 'zhugeliang'),
+      'zhugeliang',
+      { loyalty: 50 }
+    )
     const next = confiscate(s, 'zhugeliang', 'cixiongshuanggujian')
     expect(itemsInCity(next, 'chengdu').map((i) => i.id)).toEqual(['cixiongshuanggujian'])
     expect(itemsOfOfficer(next, 'zhugeliang')).toHaveLength(0)
@@ -119,7 +169,11 @@ describe('canConfiscate / confiscate 没收', () => {
     expect(next.officers.zhugeliang!.busy).toBe(false)
   })
   it('忠诚下限 0', () => {
-    const s = withOfficer(giveItem(createInitialState(1), 'cixiongshuanggujian', 'zhugeliang'), 'zhugeliang', { loyalty: 10 })
+    const s = withOfficer(
+      giveItem(createInitialState(1), 'cixiongshuanggujian', 'zhugeliang'),
+      'zhugeliang',
+      { loyalty: 10 }
+    )
     expect(confiscate(s, 'zhugeliang', 'cixiongshuanggujian').officers.zhugeliang!.loyalty).toBe(0)
   })
   it('没收君主道具：照常收回、忠诚派生仍 100', () => {

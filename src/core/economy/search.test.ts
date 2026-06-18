@@ -9,25 +9,52 @@ import { apply } from '../game'
 const cfg = DEFAULT_CONFIG
 // 成都(chengdu)：金500 粮400；诸葛亮(zhugeliang) 智力100、无道具 -> 有效智力 100。
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 /** 在成都放一名在野武将（lordId=null），指定伯乐。 */
 function withWanderer(s: GameState, id: string, recruiterId: string | null): GameState {
-  const o = { ...s.officers.zhugeliang!, id, name: id, lordId: null, cityId: 'chengdu', busy: false, troops: 0, recruiterId }
+  const o = {
+    ...s.officers.zhugeliang!,
+    id,
+    name: id,
+    lordId: null,
+    cityId: 'chengdu',
+    busy: false,
+    troops: 0,
+    recruiterId,
+  }
   return { ...s, officers: { ...s.officers, [id]: o } }
 }
 /** 在成都放一件未发现道具，指定伯乐。 */
 function withHiddenItem(s: GameState, id: string, recruiterId: string | null): GameState {
   return {
     ...s,
-    items: { ...s.items, [id]: {
-      id, name: id, forceBonus: 1, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0,
-      holder: { kind: 'city', cityId: 'chengdu' } as const, discovered: false, recruiterId,
-    } },
+    items: {
+      ...s.items,
+      [id]: {
+        id,
+        name: id,
+        forceBonus: 1,
+        intelBonus: 0,
+        movementBonus: 0,
+        troopTypeOverride: 0,
+        holder: { kind: 'city', cityId: 'chengdu' } as const,
+        discovered: false,
+        recruiterId,
+      },
+    },
   }
 }
 
@@ -45,14 +72,20 @@ describe('canSearch 前置校验', () => {
     expect(canSearch(createInitialState(1), 'nobody', cfg).ok).toBe(false)
   })
   it('已占用 -> 拒绝', () => {
-    expect(canSearch(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canSearch(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg)
+        .ok
+    ).toBe(false)
   })
   it('俘虏 -> 拒绝', () => {
     const s = withCity(createInitialState(1), 'chengdu', { lordId: 'caocao' }) // 成都易主，诸葛亮成俘虏
     expect(canSearch(s, 'zhugeliang', cfg).ok).toBe(false)
   })
   it('体力 < 8 -> 拒绝', () => {
-    expect(canSearch(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canSearch(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }), 'zhugeliang', cfg)
+        .ok
+    ).toBe(false)
   })
 })
 
@@ -113,7 +146,11 @@ describe('executeSearch 四分支', () => {
 describe('executeSearch 发现武将（招募）', () => {
   it('伯乐=null：存在能招募成功的种子；成功后归执行人君主、忠诚∈[70,99]', () => {
     const base = withWanderer(createInitialState(1), 'zhao', null)
-    const seed = findSeed((sd) => executeSearch({ ...base, rng: { seed: sd } }, 'zhugeliang').officers.zhao!.lordId === 'liubei')
+    const seed = findSeed(
+      (sd) =>
+        executeSearch({ ...base, rng: { seed: sd } }, 'zhugeliang').officers.zhao!.lordId ===
+        'liubei'
+    )
     const next = executeSearch({ ...base, rng: { seed } }, 'zhugeliang')
     expect(next.officers.zhao!.lordId).toBe('liubei')
     expect(next.officers.zhao!.cityId).toBe('chengdu')
@@ -124,8 +161,14 @@ describe('executeSearch 发现武将（招募）', () => {
 
   it('伯乐=执行人本人：到达武将分支即必中', () => {
     const base = withWanderer(createInitialState(1), 'zhao', 'zhugeliang')
-    const seed = findSeed((sd) => executeSearch({ ...base, rng: { seed: sd } }, 'zhugeliang').officers.zhao!.lordId === 'liubei')
-    expect(executeSearch({ ...base, rng: { seed } }, 'zhugeliang').officers.zhao!.lordId).toBe('liubei')
+    const seed = findSeed(
+      (sd) =>
+        executeSearch({ ...base, rng: { seed: sd } }, 'zhugeliang').officers.zhao!.lordId ===
+        'liubei'
+    )
+    expect(executeSearch({ ...base, rng: { seed } }, 'zhugeliang').officers.zhao!.lordId).toBe(
+      'liubei'
+    )
   })
 
   it('伯乐=他人：必败（路径可达但从不成功）', () => {
@@ -134,8 +177,12 @@ describe('executeSearch 发现武将（招募）', () => {
     let reachable = false
     let everRecruited = false
     for (let seed = 1; seed < 3000; seed++) {
-      if (executeSearch({ ...sNull, rng: { seed } }, 'zhugeliang').officers.zhao!.lordId === 'liubei') reachable = true
-      if (executeSearch({ ...sOther, rng: { seed } }, 'zhugeliang').officers.zhao!.lordId !== null) everRecruited = true
+      if (
+        executeSearch({ ...sNull, rng: { seed } }, 'zhugeliang').officers.zhao!.lordId === 'liubei'
+      )
+        reachable = true
+      if (executeSearch({ ...sOther, rng: { seed } }, 'zhugeliang').officers.zhao!.lordId !== null)
+        everRecruited = true
     }
     expect(reachable).toBe(true)
     expect(everRecruited).toBe(false)
@@ -159,7 +206,10 @@ describe('executeSearch 发现武将（招募）', () => {
   })
 
   it('已招募后不被重复获得：在野武将归属后退出候选', () => {
-    const recruited = withOfficer(withWanderer(createInitialState(1), 'zhao', null), 'zhao', { lordId: 'liubei', cityId: 'chengdu' })
+    const recruited = withOfficer(withWanderer(createInitialState(1), 'zhao', null), 'zhao', {
+      lordId: 'liubei',
+      cityId: 'chengdu',
+    })
     // 任何种子下该武将都不再是候选 -> 武将分支命中也不会再改其归属
     for (let seed = 1; seed < 500; seed++) {
       const r = executeSearch({ ...recruited, rng: { seed } }, 'zhugeliang')
@@ -171,7 +221,9 @@ describe('executeSearch 发现武将（招募）', () => {
 describe('executeSearch 发现道具', () => {
   it('伯乐=null：存在发现成功的种子；成功后 discovered=true', () => {
     const base = withHiddenItem(createInitialState(1), 'gem', null)
-    const seed = findSeed((sd) => executeSearch({ ...base, rng: { seed: sd } }, 'zhugeliang').items.gem!.discovered)
+    const seed = findSeed(
+      (sd) => executeSearch({ ...base, rng: { seed: sd } }, 'zhugeliang').items.gem!.discovered
+    )
     expect(executeSearch({ ...base, rng: { seed } }, 'zhugeliang').items.gem!.discovered).toBe(true)
   })
 
@@ -181,8 +233,10 @@ describe('executeSearch 发现道具', () => {
     let reachable = false
     let everFound = false
     for (let seed = 1; seed < 3000; seed++) {
-      if (executeSearch({ ...sNull, rng: { seed } }, 'zhugeliang').items.gem!.discovered) reachable = true
-      if (executeSearch({ ...sOther, rng: { seed } }, 'zhugeliang').items.gem!.discovered) everFound = true
+      if (executeSearch({ ...sNull, rng: { seed } }, 'zhugeliang').items.gem!.discovered)
+        reachable = true
+      if (executeSearch({ ...sOther, rng: { seed } }, 'zhugeliang').items.gem!.discovered)
+        everFound = true
     }
     expect(reachable).toBe(true)
     expect(everFound).toBe(false)

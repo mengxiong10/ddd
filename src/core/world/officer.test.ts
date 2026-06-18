@@ -1,10 +1,31 @@
 import { describe, it, expect } from 'vitest'
 import type { Officer } from './officer'
-import { spendStamina, recoverStamina, setBusy, troopCapacity, setTroops, adjustLoyalty } from './officer'
+import {
+  spendStamina,
+  recoverStamina,
+  setBusy,
+  troopCapacity,
+  setTroops,
+  adjustLoyalty,
+} from './officer'
 
 const base: Officer = {
-  id: 'o1', name: '测试', intelligence: 50, lordId: 'o1', cityId: 'c1', stamina: 100, busy: false,
-  troops: 100, level: 1, force: 50, loyalty: 50, recruiterId: null, personality: 0, troopType: 'infantry', experience: 0, personalSkills: [],
+  id: 'o1',
+  name: '测试',
+  intelligence: 50,
+  lordId: 'o1',
+  cityId: 'c1',
+  stamina: 100,
+  busy: false,
+  troops: 100,
+  level: 1,
+  force: 50,
+  loyalty: 50,
+  recruiterId: null,
+  personality: 0,
+  troopType: 'infantry',
+  experience: 0,
+  personalSkills: [],
 }
 
 describe('officer 聚合', () => {

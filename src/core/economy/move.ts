@@ -8,7 +8,11 @@ import { isCaptive } from '../world/queries'
  * 校验移动前置（不改状态）。被移动者即被占用者本人；不扣体力/金。
  * 武将存在、未占用、非俘虏 → 目标城存在、非本城、与本城同势力（己方城）。
  */
-export function canMove(state: GameState, officerId: OfficerId, targetCityId: CityId): CommandCheck {
+export function canMove(
+  state: GameState,
+  officerId: OfficerId,
+  targetCityId: CityId
+): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
@@ -39,7 +43,11 @@ export function move(state: GameState, officerId: OfficerId, targetCityId: CityI
  * 月末执行移动（供 turn 分派，非 campaign 趟）：把武将 cityId 改为目标城。
  * 占人例外：武将不回出发城；busy 由 endMonth 统一翻回。
  */
-export function executeMove(state: GameState, officerId: OfficerId, targetCityId: CityId): GameState {
+export function executeMove(
+  state: GameState,
+  officerId: OfficerId,
+  targetCityId: CityId
+): GameState {
   const officer = { ...state.officers[officerId]!, cityId: targetCityId }
   return { ...state, officers: { ...state.officers, [officerId]: officer } }
 }

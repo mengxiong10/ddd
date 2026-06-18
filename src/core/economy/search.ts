@@ -33,7 +33,11 @@ const SEARCH_RESOURCE_CAP = 30000
  * 校验搜寻前置（不改状态）：作用城 = 执行人所在城。
  * 武将存在、未占用、非俘虏（须在任）→ 体力 ≥ searchStaminaCost；不需金钱。
  */
-export function canSearch(state: GameState, officerId: OfficerId, config: GameConfig): CommandCheck {
+export function canSearch(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
@@ -98,7 +102,7 @@ function discoverOfficer(
   officerId: OfficerId,
   cityId: CityId,
   intel: number,
-  rng: Rng,
+  rng: Rng
 ): GameState {
   const candidates = wanderingOfficersInCity(state, cityId)
   if (candidates.length === 0) return { ...state, rng }
@@ -116,7 +120,12 @@ function discoverOfficer(
 }
 
 /** 招募成功：目标归执行人君主、忠诚 RandInt(70,99)，cityId/troops 不变。 */
-function recruit(state: GameState, targetId: OfficerId, lordId: OfficerId | null, rng: Rng): GameState {
+function recruit(
+  state: GameState,
+  targetId: OfficerId,
+  lordId: OfficerId | null,
+  rng: Rng
+): GameState {
   const [loyalty, nextRng] = randInt(rng, RECRUIT_LOYALTY_MIN, RECRUIT_LOYALTY_MAX)
   const target = { ...state.officers[targetId]!, lordId, loyalty }
   return { ...state, rng: nextRng, officers: { ...state.officers, [targetId]: target } }

@@ -22,7 +22,7 @@ function isLord(state: GameState, officerId: OfficerId): boolean {
 function nextEquipSeq(state: GameState, officerId: OfficerId): number {
   const max = itemsOfOfficer(state, officerId).reduce(
     (m, i) => (i.holder.kind === 'officer' ? Math.max(m, i.holder.equipSeq) : m),
-    -1,
+    -1
   )
   return max + 1
 }
@@ -55,7 +55,10 @@ export function canReward(state: GameState, officerId: OfficerId, itemId: ItemId
 export function reward(state: GameState, officerId: OfficerId, itemId: ItemId): GameState {
   if (!canReward(state, officerId, itemId).ok) return state
 
-  const items = { ...state.items, [itemId]: holdByOfficer(state.items[itemId]!, officerId, nextEquipSeq(state, officerId)) }
+  const items = {
+    ...state.items,
+    [itemId]: holdByOfficer(state.items[itemId]!, officerId, nextEquipSeq(state, officerId)),
+  }
   if (isLord(state, officerId)) return { ...state, items }
 
   const officer = adjustLoyalty(state.officers[officerId]!, REWARD_LOYALTY_GAIN)
@@ -65,7 +68,11 @@ export function reward(state: GameState, officerId: OfficerId, itemId: ItemId): 
 /**
  * 校验没收前置（不改状态）：武将存在且非俘虏；道具存在且 holder 为该武将。
  */
-export function canConfiscate(state: GameState, officerId: OfficerId, itemId: ItemId): CommandCheck {
+export function canConfiscate(
+  state: GameState,
+  officerId: OfficerId,
+  itemId: ItemId
+): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可没收' }

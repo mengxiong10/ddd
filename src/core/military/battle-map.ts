@@ -3,7 +3,15 @@ import { samePos } from '../shared/position'
 import type { TroopType } from '../world/troop-type'
 
 /** 8 种战斗地形。 */
-export type Terrain = 'grass' | 'plain' | 'mountain' | 'forest' | 'village' | 'city' | 'camp' | 'river'
+export type Terrain =
+  | 'grass'
+  | 'plain'
+  | 'mountain'
+  | 'forest'
+  | 'village'
+  | 'city'
+  | 'camp'
+  | 'river'
 
 export type MapId = string
 

@@ -21,7 +21,7 @@ const PLUNDER_GOLD_PER_POWER = 2
 export function canPlunder(
   state: GameState,
   officerId: OfficerId,
-  config: GameConfig,
+  config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
@@ -34,11 +34,7 @@ export function canPlunder(
  * 下令掠夺：效果延到月末（见 executePlunder）。下令当下仅扣体力、占用武将、入队，不改城、不动 RNG。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
-export function plunder(
-  state: GameState,
-  officerId: OfficerId,
-  config: GameConfig,
-): GameState {
+export function plunder(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
   if (!canPlunder(state, officerId, config).ok) return state
 
   const officer = state.officers[officerId]!
@@ -61,7 +57,10 @@ export function executePlunder(state: GameState, officerId: OfficerId): GameStat
   const eff = effectiveOfficer(state, officerId)
   const power = eff.intelligence + eff.force
   const ravaged = ravage(state.cities[cityId]!)
-  const nextCity = addGold(addFood(ravaged, power * PLUNDER_FOOD_PER_POWER), power * PLUNDER_GOLD_PER_POWER)
+  const nextCity = addGold(
+    addFood(ravaged, power * PLUNDER_FOOD_PER_POWER),
+    power * PLUNDER_GOLD_PER_POWER
+  )
 
   return { ...state, cities: { ...state.cities, [cityId]: nextCity } }
 }

@@ -6,10 +6,18 @@ import { canBanquet, banquet } from './banquet'
 
 const cfg = DEFAULT_CONFIG
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 
@@ -18,10 +26,18 @@ describe('canBanquet 前置校验', () => {
     expect(canBanquet(createInitialState(1), 'zhugeliang', cfg).ok).toBe(true)
   })
   it('目标已占用（非在任）-> 拒绝', () => {
-    expect(canBanquet(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canBanquet(
+        withOfficer(createInitialState(1), 'zhugeliang', { busy: true }),
+        'zhugeliang',
+        cfg
+      ).ok
+    ).toBe(false)
   })
   it('本城金 < 100 -> 拒绝', () => {
-    expect(canBanquet(withCity(createInitialState(1), 'chengdu', { gold: 99 }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canBanquet(withCity(createInitialState(1), 'chengdu', { gold: 99 }), 'zhugeliang', cfg).ok
+    ).toBe(false)
   })
 })
 

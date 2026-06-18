@@ -7,10 +7,18 @@ import { canGovern, govern } from './govern'
 
 const cfg = DEFAULT_CONFIG
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 
@@ -19,27 +27,44 @@ describe('canGovern 前置校验', () => {
     expect(canGovern(createInitialState(1), 'zhugeliang', cfg).ok).toBe(true)
   })
   it('武将已占用 -> 拒绝', () => {
-    expect(canGovern(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canGovern(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg)
+        .ok
+    ).toBe(false)
   })
   it('本城金 < 50 -> 拒绝', () => {
-    expect(canGovern(withCity(createInitialState(1), 'chengdu', { gold: 49 }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canGovern(withCity(createInitialState(1), 'chengdu', { gold: 49 }), 'zhugeliang', cfg).ok
+    ).toBe(false)
   })
   it('体力 < 8 -> 拒绝', () => {
-    expect(canGovern(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }), 'zhugeliang', cfg).ok).toBe(false)
+    expect(
+      canGovern(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }), 'zhugeliang', cfg)
+        .ok
+    ).toBe(false)
   })
   it('已正常且防灾=100 -> 拒绝（避免浪费）', () => {
-    const s = withCity(createInitialState(1), 'chengdu', { status: 'normal', disasterPrevention: 100 })
+    const s = withCity(createInitialState(1), 'chengdu', {
+      status: 'normal',
+      disasterPrevention: 100,
+    })
     expect(canGovern(s, 'zhugeliang', cfg).ok).toBe(false)
   })
   it('异常城即使防灾=100 仍可下令（治理清灾）', () => {
-    const s = withCity(createInitialState(1), 'chengdu', { status: 'famine', disasterPrevention: 100 })
+    const s = withCity(createInitialState(1), 'chengdu', {
+      status: 'famine',
+      disasterPrevention: 100,
+    })
     expect(canGovern(s, 'zhugeliang', cfg).ok).toBe(true)
   })
 })
 
 describe('govern 下令（即时）', () => {
   it('状态→normal、防灾+=RandInt(1,4)封顶100、扣体力8、扣城金50、busy、推进RNG、不入队', () => {
-    const s = withCity(createInitialState(1), 'chengdu', { status: 'flood', disasterPrevention: 30 })
+    const s = withCity(createInitialState(1), 'chengdu', {
+      status: 'flood',
+      disasterPrevention: 30,
+    })
     const [expectedGain] = randInt(s.rng, 1, 4)
     const next = govern(s, 'zhugeliang', cfg)
     expect(next.cities.chengdu!.status).toBe('normal')

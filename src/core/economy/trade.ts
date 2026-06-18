@@ -29,7 +29,7 @@ export function canTrade(
   officerId: OfficerId,
   mode: TradeMode,
   amount: number,
-  config: GameConfig,
+  config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
@@ -54,7 +54,7 @@ export function trade(
   officerId: OfficerId,
   mode: TradeMode,
   amount: number,
-  config: GameConfig,
+  config: GameConfig
 ): GameState {
   if (!canTrade(state, officerId, mode, amount, config).ok) return state
 

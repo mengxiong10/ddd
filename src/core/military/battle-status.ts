@@ -44,7 +44,7 @@ const CHECK_MAX = 59
 export function dailyStatusCheck(
   s: BattleStatus,
   effIntel: number,
-  rng: Rng,
+  rng: Rng
 ): readonly [BattleStatus, Rng] {
   if (s === 'normal' || s === 'dead') return [s, rng]
   const [r, next] = randInt(rng, CHECK_MIN, CHECK_MAX)

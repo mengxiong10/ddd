@@ -7,10 +7,18 @@ import { holdByOfficer } from '../world/item'
 
 const cfg = DEFAULT_CONFIG
 
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
@@ -83,7 +91,13 @@ describe('develop 开垦/招商', () => {
   it('开垦增量吃道具加成（有效智力）', () => {
     const s = createInitialState(7)
     // 孟德新书 智力+10 给诸葛亮：floor(110/5) − floor(100/5) = 22 − 20 = 2，RNG 同种子抵消
-    const withItem = { ...s, items: { ...s.items, 'mengde-xinshu': holdByOfficer(s.items['mengde-xinshu']!, 'zhugeliang') } }
+    const withItem = {
+      ...s,
+      items: {
+        ...s.items,
+        'mengde-xinshu': holdByOfficer(s.items['mengde-xinshu']!, 'zhugeliang'),
+      },
+    }
     const a = develop(s, 'zhugeliang', 'agriculture', cfg).cities.chengdu!.agriculture
     const b = develop(withItem, 'zhugeliang', 'agriculture', cfg).cities.chengdu!.agriculture
     expect(b - a).toBe(2)

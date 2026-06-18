@@ -33,7 +33,7 @@ export function canSuborn(
   state: GameState,
   officerId: OfficerId,
   captiveId: OfficerId,
-  config: GameConfig,
+  config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
@@ -57,7 +57,7 @@ export function suborn(
   state: GameState,
   officerId: OfficerId,
   captiveId: OfficerId,
-  config: GameConfig,
+  config: GameConfig
 ): GameState {
   if (!canSuborn(state, officerId, captiveId, config).ok) return state
 
@@ -85,7 +85,11 @@ export function suborn(
  * 3. R2 = RandInt(0,99) 终判；R2 < floor((L0−drop)/S) → 失败，否则成功。
  * 4. 成功：captive.lordId = 执行人君主；R3 = RandInt(40,79) 写 loyalty。
  */
-export function executeSuborn(state: GameState, officerId: OfficerId, captiveId: OfficerId): GameState {
+export function executeSuborn(
+  state: GameState,
+  officerId: OfficerId,
+  captiveId: OfficerId
+): GameState {
   const officer = state.officers[officerId]
   if (!officer || !state.officers[captiveId] || !isCaptive(state, captiveId)) return state
 
@@ -103,7 +107,11 @@ export function executeSuborn(state: GameState, officerId: OfficerId, captiveId:
   const drop = Math.floor(l0 / SUBORN_LOYALTY_DROP_DIV)
   const loweredLoyalty = l0 - drop
   const lowered = { ...captive, loyalty: loweredLoyalty }
-  const afterDrop: GameState = { ...state, rng: rng1, officers: { ...state.officers, [captiveId]: lowered } }
+  const afterDrop: GameState = {
+    ...state,
+    rng: rng1,
+    officers: { ...state.officers, [captiveId]: lowered },
+  }
   if (l0 > SUBORN_LOYALTY_GATE) return afterDrop
 
   // 3. 终判

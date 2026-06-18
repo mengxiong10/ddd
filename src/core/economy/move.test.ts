@@ -3,7 +3,11 @@ import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import { canMove, move, executeMove } from './move'
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
@@ -22,7 +26,13 @@ describe('canMove 前置校验', () => {
     expect(canMove(createInitialState(1), 'zhugeliang', 'nowhere').ok).toBe(false)
   })
   it('武将已占用 -> 拒绝', () => {
-    expect(canMove(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', 'jiangling').ok).toBe(false)
+    expect(
+      canMove(
+        withOfficer(createInitialState(1), 'zhugeliang', { busy: true }),
+        'zhugeliang',
+        'jiangling'
+      ).ok
+    ).toBe(false)
   })
 })
 
@@ -33,7 +43,9 @@ describe('move 下令（月末执行）', () => {
     expect(next.officers.zhugeliang!.busy).toBe(true)
     expect(next.officers.zhugeliang!.cityId).toBe('chengdu')
     expect(next.officers.zhugeliang!.stamina).toBe(100)
-    expect(next.pendingCommands).toEqual([{ type: 'move', officerId: 'zhugeliang', targetCityId: 'jiangling' }])
+    expect(next.pendingCommands).toEqual([
+      { type: 'move', officerId: 'zhugeliang', targetCityId: 'jiangling' },
+    ])
   })
 
   it('非法下令 no-op（返回原状态）', () => {

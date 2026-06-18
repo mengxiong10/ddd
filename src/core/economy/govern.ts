@@ -18,7 +18,11 @@ const GOVERN_PREVENTION_RAND_MAX = 4
  * 武将存在、未占用、非俘虏 → 本城金 ≥ governGoldCost → 体力 ≥ governStaminaCost
  * → 非「已正常且防灾已满」（避免浪费；异常城即使防灾满仍可治理清灾）。
  */
-export function canGovern(state: GameState, officerId: OfficerId, config: GameConfig): CommandCheck {
+export function canGovern(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
@@ -42,9 +46,16 @@ export function govern(state: GameState, officerId: OfficerId, config: GameConfi
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
-  const [preventionGain, nextRng] = randInt(state.rng, GOVERN_PREVENTION_RAND_MIN, GOVERN_PREVENTION_RAND_MAX)
+  const [preventionGain, nextRng] = randInt(
+    state.rng,
+    GOVERN_PREVENTION_RAND_MIN,
+    GOVERN_PREVENTION_RAND_MAX
+  )
 
-  const nextCity = spendGold(raisePrevention(setStatus(city, 'normal'), preventionGain), config.governGoldCost)
+  const nextCity = spendGold(
+    raisePrevention(setStatus(city, 'normal'), preventionGain),
+    config.governGoldCost
+  )
   const nextOfficer = setBusy(spendStamina(officer, config.governStaminaCost), true)
 
   return {

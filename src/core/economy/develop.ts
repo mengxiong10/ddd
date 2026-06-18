@@ -23,7 +23,7 @@ export function canDevelop(
   state: GameState,
   officerId: OfficerId,
   kind: DevelopKind,
-  config: GameConfig,
+  config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
@@ -48,7 +48,7 @@ export function develop(
   state: GameState,
   officerId: OfficerId,
   kind: DevelopKind,
-  config: GameConfig,
+  config: GameConfig
 ): GameState {
   if (!canDevelop(state, officerId, kind, config).ok) return state
 
@@ -56,7 +56,8 @@ export function develop(
   const city = state.cities[officer.cityId]!
   // 增量 = floor(有效智力 / 除数) + RandInt(0, 随机上限)；有效智力含道具加成
   const [rand, nextRng] = randInt(state.rng, 0, DEVELOP_RAND_MAX)
-  const delta = Math.floor(effectiveOfficer(state, officerId).intelligence / DEVELOP_INTEL_DIVISOR) + rand
+  const delta =
+    Math.floor(effectiveOfficer(state, officerId).intelligence / DEVELOP_INTEL_DIVISOR) + rand
 
   const nextCity = spendGold(raiseAttribute(city, kind, delta), config.commandGoldCost)
   const nextOfficer = setBusy(spendStamina(officer, config.commandStaminaCost), true)

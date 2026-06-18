@@ -7,7 +7,7 @@ description: Bootstrap a project for spec-driven solo development. Grill the use
 
 这套 spec 驱动流程的第一步。面向**单人开发**，先和用户聊清项目基调，再生成根级 `CONSTITUTION.md`（总纲）和 `AGENTS.md`（文档地图），并建立 `specs/` 目录。
 
-## 第一原则（所有 spec-* skill 共用）
+## 第一原则（所有 spec-\* skill 共用）
 
 - 面向单人开发，不为多人协作做让步。**可维护性第一、文件最少、抽象最少。**
 - 代码简单直白胜过聪明抽象；除非真有重复或复杂度，否则不提前抽象（YAGNI）。
@@ -49,29 +49,36 @@ description: Bootstrap a project for spec-driven solo development. Grill the use
 # 项目总纲（CONSTITUTION）
 
 ## 最高原则
+
 单人开发；可维护性第一；文件与抽象最少；低改动放大；不提前抽象（YAGNI）。
 
 ## 项目目标
+
 [一两句：解决什么问题，给谁用]
 
 ## 技术栈
+
 - 语言/框架：
 - 构建/包管理：
 - 关键库：
 
 ## 开发原则
+
 - [少量、强约束的规则，例如：组件无副作用、状态集中管理…]
 
 ## 代码与目录约定
+
 - 目录结构：
 - 命名：
 - 模块/组件组织：
 
 ## 测试与质量线
+
 - 默认 TDD：是/否
 - 测什么：关键行为/核心逻辑（少而精，不追覆盖率）
 
 ## 范围边界
+
 - 不做：
 ```
 
@@ -84,12 +91,13 @@ description: Bootstrap a project for spec-driven solo development. Grill the use
 所有开发按 specs/NN-<feature>/ 下的 prd.md 与 dev.md 约束进行，不要绕过文档直接堆代码。
 
 ## 流程
+
 spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ spec-build（实现）→ spec-refactor（重构）
 
 ## 功能列表
 
-| 功能 | PRD | 开发文档 | 状态 |
-|------|-----|---------|------|
+| 功能   | PRD                  | 开发文档             | 状态  |
+| ------ | -------------------- | -------------------- | ----- |
 | (示例) | specs/01-示例/prd.md | specs/01-示例/dev.md | draft |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）

@@ -1,8 +1,16 @@
 import { describe, it, expect } from 'vitest'
 import {
-  BATTLE_MAPS, DEFAULT_MAP_ID, GRID_SIZE, MAX_MOVEMENT, MAX_DAYS,
-  MOVE_COST, REDUCTION_TIER, DEFENSE_COEF_PCT,
-  inBounds, terrainAt, isCityTile,
+  BATTLE_MAPS,
+  DEFAULT_MAP_ID,
+  GRID_SIZE,
+  MAX_MOVEMENT,
+  MAX_DAYS,
+  MOVE_COST,
+  REDUCTION_TIER,
+  DEFENSE_COEF_PCT,
+  inBounds,
+  terrainAt,
+  isCityTile,
 } from './battle-map'
 
 describe('battle-map 常量', () => {

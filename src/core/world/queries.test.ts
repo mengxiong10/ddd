@@ -1,10 +1,19 @@
 import { describe, it, expect } from 'vitest'
 import { createInitialState } from './fixture'
 import {
-  officersInCity, citiesOfLord, isCaptive,
-  itemsInCity, itemsOfOfficer, effectiveOfficer, officerLoyalty,
-  wanderingOfficersInCity, undiscoveredItemsInCity, captivesInCity,
-  governorOf, effectiveTroopType, officerMovement,
+  officersInCity,
+  citiesOfLord,
+  isCaptive,
+  itemsInCity,
+  itemsOfOfficer,
+  effectiveOfficer,
+  officerLoyalty,
+  wanderingOfficersInCity,
+  undiscoveredItemsInCity,
+  captivesInCity,
+  governorOf,
+  effectiveTroopType,
+  officerMovement,
 } from './queries'
 import { setBusy } from './officer'
 import { holdByOfficer } from './item'
@@ -31,7 +40,11 @@ describe('world queries（基于初始 fixture）', () => {
 
   it('citiesOfLord 返回该君主的城', () => {
     const s = createInitialState(1)
-    expect(citiesOfLord(s, 'liubei').map((c) => c.id).sort()).toEqual(['chengdu', 'jiangling'])
+    expect(
+      citiesOfLord(s, 'liubei')
+        .map((c) => c.id)
+        .sort()
+    ).toEqual(['chengdu', 'jiangling'])
     expect(citiesOfLord(s, 'caocao')).toHaveLength(2)
   })
 
@@ -42,7 +55,10 @@ describe('world queries（基于初始 fixture）', () => {
 
   it('onlyAvailable 排除已占用武将', () => {
     const s = createInitialState(1)
-    const busy = { ...s, officers: { ...s.officers, zhugeliang: setBusy(s.officers.zhugeliang!, true) } }
+    const busy = {
+      ...s,
+      officers: { ...s.officers, zhugeliang: setBusy(s.officers.zhugeliang!, true) },
+    }
     expect(officersInCity(busy, 'chengdu', { onlyAvailable: true })).toHaveLength(2)
     expect(officersInCity(busy, 'chengdu')).toHaveLength(3)
   })
@@ -88,7 +104,10 @@ describe('world queries（基于初始 fixture）', () => {
     const s = createInitialState(1)
     expect(officerLoyalty(s, 'zhugeliang')).toBe(50)
     // 刻意把君主存储值改脏，仍应派生 100
-    const dirty = { ...s, officers: { ...s.officers, liubei: { ...s.officers.liubei!, loyalty: 13 } } }
+    const dirty = {
+      ...s,
+      officers: { ...s.officers, liubei: { ...s.officers.liubei!, loyalty: 13 } },
+    }
     expect(officerLoyalty(dirty, 'liubei')).toBe(100)
   })
 })
@@ -123,13 +142,27 @@ describe('在野/未发现（登场与搜寻）', () => {
     expect(undiscoveredItemsInCity(s, 'chengdu')).toHaveLength(0)
     const hidden = {
       ...s,
-      items: { ...s.items, gem: {
-        id: 'gem', name: '隐宝', forceBonus: 1, intelBonus: 0, movementBonus: 0, troopTypeOverride: 0 as const,
-        holder: { kind: 'city', cityId: 'chengdu' } as const, discovered: false, recruiterId: null,
-      } },
+      items: {
+        ...s.items,
+        gem: {
+          id: 'gem',
+          name: '隐宝',
+          forceBonus: 1,
+          intelBonus: 0,
+          movementBonus: 0,
+          troopTypeOverride: 0 as const,
+          holder: { kind: 'city', cityId: 'chengdu' } as const,
+          discovered: false,
+          recruiterId: null,
+        },
+      },
     }
     expect(undiscoveredItemsInCity(hidden, 'chengdu').map((i) => i.id)).toEqual(['gem'])
-    expect(itemsInCity(hidden, 'chengdu').map((i) => i.id).sort()).toEqual(['cixiongshuanggujian', 'gem'])
+    expect(
+      itemsInCity(hidden, 'chengdu')
+        .map((i) => i.id)
+        .sort()
+    ).toEqual(['cixiongshuanggujian', 'gem'])
   })
 
   it('governorOf：君主驻城则太守=君主（即便他人智力更高）', () => {
@@ -148,10 +181,20 @@ describe('在野/未发现（登场与搜寻）', () => {
     const s = createInitialState(1)
     const boosted: GameState = {
       ...s,
-      items: { ...s.items, boost: {
-        id: 'boost', name: '智珠', forceBonus: 0, intelBonus: 20, movementBonus: 0, troopTypeOverride: 0,
-        holder: { kind: 'officer', officerId: 'zhangfei', equipSeq: 0 } as const, discovered: true, recruiterId: null,
-      } },
+      items: {
+        ...s.items,
+        boost: {
+          id: 'boost',
+          name: '智珠',
+          forceBonus: 0,
+          intelBonus: 20,
+          movementBonus: 0,
+          troopTypeOverride: 0,
+          holder: { kind: 'officer', officerId: 'zhangfei', equipSeq: 0 } as const,
+          discovered: true,
+          recruiterId: null,
+        },
+      },
     }
     // 张飞 60+20=80 > 关羽 75 -> 太守=张飞
     expect(governorOf(boosted, 'jiangling')!.id).toBe('zhangfei')
@@ -159,7 +202,10 @@ describe('在野/未发现（登场与搜寻）', () => {
 
   it('governorOf：平局取 id 字典序最小', () => {
     const s = createInitialState(1)
-    const tied = { ...s, officers: { ...s.officers, zhangfei: { ...s.officers.zhangfei!, intelligence: 75 } } }
+    const tied = {
+      ...s,
+      officers: { ...s.officers, zhangfei: { ...s.officers.zhangfei!, intelligence: 75 } },
+    }
     // 关羽/张飞均 75 -> 'guanyu' < 'zhangfei'
     expect(governorOf(tied, 'jiangling')!.id).toBe('guanyu')
   })
@@ -175,13 +221,23 @@ describe('在野/未发现（登场与搜寻）', () => {
     expect(captivesInCity(s, 'xuchang')).toHaveLength(0) // 初始无俘虏
     // 许昌被刘备占 -> 城内曹操/荀彧/郭嘉成俘虏
     const conquered = setCityLord(s, 'xuchang', 'liubei')
-    expect(captivesInCity(conquered, 'xuchang').map((o) => o.id).sort()).toEqual(['caocao', 'guojia', 'xunyu'])
+    expect(
+      captivesInCity(conquered, 'xuchang')
+        .map((o) => o.id)
+        .sort()
+    ).toEqual(['caocao', 'guojia', 'xunyu'])
     // 在野武将（lordId=null）不算俘虏
     const wandering = {
       ...conquered,
-      officers: { ...conquered.officers, ronin: {
-        ...conquered.officers.caocao!, id: 'ronin', lordId: null, cityId: 'xuchang',
-      } },
+      officers: {
+        ...conquered.officers,
+        ronin: {
+          ...conquered.officers.caocao!,
+          id: 'ronin',
+          lordId: null,
+          cityId: 'xuchang',
+        },
+      },
     }
     expect(captivesInCity(wandering, 'xuchang').map((o) => o.id)).not.toContain('ronin')
   })
@@ -194,15 +250,24 @@ function equip(
   officerId: string,
   equipSeq: number,
   troopTypeOverride: 0 | 1 | 2 | 3,
-  bonus?: { force?: number; intel?: number; movement?: number },
+  bonus?: { force?: number; intel?: number; movement?: number }
 ): GameState {
   return {
     ...s,
-    items: { ...s.items, [id]: {
-      id, name: id, forceBonus: bonus?.force ?? 0, intelBonus: bonus?.intel ?? 0,
-      movementBonus: bonus?.movement ?? 0, troopTypeOverride,
-      holder: { kind: 'officer', officerId, equipSeq } as const, discovered: true, recruiterId: null,
-    } },
+    items: {
+      ...s.items,
+      [id]: {
+        id,
+        name: id,
+        forceBonus: bonus?.force ?? 0,
+        intelBonus: bonus?.intel ?? 0,
+        movementBonus: bonus?.movement ?? 0,
+        troopTypeOverride,
+        holder: { kind: 'officer', officerId, equipSeq } as const,
+        discovered: true,
+        recruiterId: null,
+      },
+    },
   }
 }
 
@@ -252,7 +317,14 @@ describe('effectiveTroopType / officerMovement / itemsOfOfficer 排序', () => {
     const wLast = equip(base, 'w', 'zhugeliang', 1, 1)
     expect(effectiveTroopType(wLast, 'zhugeliang')).toBe('navy')
     // m(seq2,玄), w(seq1,水) → 后者玄兵覆盖
-    const mLast = equip(equip(createInitialState(1), 'w', 'zhugeliang', 1, 1), 'm', 'zhugeliang', 2, 2, { intel: 6 })
+    const mLast = equip(
+      equip(createInitialState(1), 'w', 'zhugeliang', 1, 1),
+      'm',
+      'zhugeliang',
+      2,
+      2,
+      { intel: 6 }
+    )
     expect(effectiveTroopType(mLast, 'zhugeliang')).toBe('mystic')
   })
 

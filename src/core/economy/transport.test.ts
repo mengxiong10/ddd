@@ -7,10 +7,18 @@ import { canTransport, transport, executeTransport } from './transport'
 
 const cfg = DEFAULT_CONFIG
 
-function withOfficer(s: GameState, id: string, patch: Partial<GameState['officers'][string]>): GameState {
+function withOfficer(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['officers'][string]>
+): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
-function withCity(s: GameState, id: string, patch: Partial<GameState['cities'][string]>): GameState {
+function withCity(
+  s: GameState,
+  id: string,
+  patch: Partial<GameState['cities'][string]>
+): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 
@@ -21,13 +29,27 @@ describe('canTransport 前置校验', () => {
     expect(canTransport(s, 'zhugeliang', 'jiangling', 100, 100, 50, cfg).ok).toBe(true)
   })
   it('目标非己方城 -> 拒绝', () => {
-    expect(canTransport(createInitialState(1), 'zhugeliang', 'xuchang', 0, 0, 0, cfg).ok).toBe(false)
+    expect(canTransport(createInitialState(1), 'zhugeliang', 'xuchang', 0, 0, 0, cfg).ok).toBe(
+      false
+    )
   })
   it('目标 = 本城 -> 拒绝', () => {
-    expect(canTransport(createInitialState(1), 'zhugeliang', 'chengdu', 0, 0, 0, cfg).ok).toBe(false)
+    expect(canTransport(createInitialState(1), 'zhugeliang', 'chengdu', 0, 0, 0, cfg).ok).toBe(
+      false
+    )
   })
   it('体力 < 8 -> 拒绝', () => {
-    expect(canTransport(withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }), 'zhugeliang', 'jiangling', 0, 0, 0, cfg).ok).toBe(false)
+    expect(
+      canTransport(
+        withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 }),
+        'zhugeliang',
+        'jiangling',
+        0,
+        0,
+        0,
+        cfg
+      ).ok
+    ).toBe(false)
   })
   it('超出发城资源 -> 拒绝', () => {
     const s = createInitialState(1)
@@ -48,7 +70,14 @@ describe('transport 下令', () => {
     expect(next.officers.zhugeliang!.busy).toBe(true)
     expect(next.rng.seed).toBe(s.rng.seed)
     expect(next.pendingCommands).toEqual([
-      { type: 'transport', officerId: 'zhugeliang', targetCityId: 'jiangling', food: 100, gold: 50, troops: 30 },
+      {
+        type: 'transport',
+        officerId: 'zhugeliang',
+        targetCityId: 'jiangling',
+        food: 100,
+        gold: 50,
+        troops: 30,
+      },
     ])
   })
 
@@ -60,7 +89,11 @@ describe('transport 下令', () => {
 
 describe('executeTransport 月末执行（80/20）', () => {
   it('命中 80% 时目标城接收资源；否则永损；均推进 RNG', () => {
-    const s = withCity(createInitialState(1), 'jiangling', { food: 300, gold: 400, reserveTroops: 0 })
+    const s = withCity(createInitialState(1), 'jiangling', {
+      food: 300,
+      gold: 400,
+      reserveTroops: 0,
+    })
     const [roll] = randInt(s.rng, 1, 100)
     const next = executeTransport(s, 'zhugeliang', 'jiangling', 100, 50, 30)
     expect(next.rng.seed).not.toBe(s.rng.seed)
@@ -84,7 +117,11 @@ describe('executeTransport 月末执行（80/20）', () => {
       seed++
     }
     const s0 = createInitialState(1)
-    const s = { ...s0, rng: { seed }, cities: { ...s0.cities, jiangling: { ...s0.cities.jiangling!, food: 300 } } }
+    const s = {
+      ...s0,
+      rng: { seed },
+      cities: { ...s0.cities, jiangling: { ...s0.cities.jiangling!, food: 300 } },
+    }
     const next = executeTransport(s, 'zhugeliang', 'jiangling', 100, 0, 0)
     expect(next.cities.jiangling!.food).toBe(300)
   })

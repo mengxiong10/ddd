@@ -16,8 +16,13 @@ function oneCity(seed: number, patch: Partial<City>): GameState {
 describe('runDisasters · 破坏（异常城）', () => {
   it('旱灾城按破坏表扣减（防灾=0 不恢复，破坏后仍 drought）', () => {
     const s = oneCity(1, {
-      status: 'drought', disasterPrevention: 0,
-      food: 401, reserveTroops: 101, population: 30001, agriculture: 301, commerce: 200,
+      status: 'drought',
+      disasterPrevention: 0,
+      food: 401,
+      reserveTroops: 101,
+      population: 30001,
+      agriculture: 301,
+      commerce: 200,
     })
     const expected = applyDisasterDamage(s.cities.only!, 'drought')
     const c = runDisasters(s).cities.only!
@@ -75,13 +80,21 @@ describe('runDisasters · 恢复（异常城）', () => {
   })
 
   it('旱灾：防灾=100 必恢复 / 防灾=0 不恢复', () => {
-    expect(runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 100 })).cities.only!.status).toBe('normal')
-    expect(runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 0 })).cities.only!.status).toBe('drought')
+    expect(
+      runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 100 })).cities.only!.status
+    ).toBe('normal')
+    expect(
+      runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 0 })).cities.only!.status
+    ).toBe('drought')
   })
 
   it('水灾：防灾=100 必恢复 / 防灾=0 不恢复', () => {
-    expect(runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 100 })).cities.only!.status).toBe('normal')
-    expect(runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 0 })).cities.only!.status).toBe('flood')
+    expect(
+      runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 100 })).cities.only!.status
+    ).toBe('normal')
+    expect(
+      runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 0 })).cities.only!.status
+    ).toBe('flood')
   })
 
   it('暴动：randInt < 破坏后民忠 则恢复（边界 <，用破坏后民忠）', () => {

@@ -53,27 +53,36 @@ description: Grill the technical approach for a feature that already has a PRD, 
 # <feature> 开发文档
 
 ## 方案概述
+
 [几句话 + 关键设计取舍]
 
 ## 接口设计
+
 [核心函数/组件的签名：名字、入参、返回类型；关键 type/状态形状；依赖方向。只写签名不写实现体]
 
 ## 模块职责
+
 - <模块/文件>：负责什么、边界在哪、依赖谁
 
 ## 要测的行为
+
 [关键行为清单（不是实现步骤）。TDD 时作为红绿循环的驱动清单]
+
 - [ ] 行为 1
 - [ ] 行为 2
 
 ## 新建文件
+
 - `path/to/file`：一句话用途
 
 ## 修改文件
+
 - `path/to/file`：改什么
 
 ## 任务清单
+
 [纵切（tracer bullet）的可勾选清单，每条端到端可验证]
+
 - [ ] 任务 1
 - [ ] 任务 2
 

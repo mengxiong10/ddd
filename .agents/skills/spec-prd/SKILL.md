@@ -52,24 +52,31 @@ description: Grill the user about a feature's requirements, then write a lightwe
 # <feature> PRD
 
 ## 问题
+
 [从用户视角，要解决什么问题]
 
 ## 目标
+
 [做成什么样算成功，一两句]
 
 ## 关键行为 / 用户故事
+
 [3-7 条短清单，够用就停，不强求超长]
+
 1. 作为 <角色>，我要 <能力>，以便 <收益>
 
 ## 范围 & 不做
+
 - 做：
 - 不做：
 
 ## 验收标准
+
 - [ ] 标准 1
 - [ ] 标准 2
 
 ## 待定决策
+
 [grill 中保留的分歧或未定项；没有就写"暂无"]
 ```
 

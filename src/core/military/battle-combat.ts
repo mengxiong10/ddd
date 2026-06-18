@@ -8,12 +8,22 @@ import type { TroopType } from '../world/troop-type'
 
 /** 兵种攻击系数（百分比；§6.3.2）。骑100 步80 弓90 水80 极130 玄40。 */
 export const TROOP_ATTACK_PCT: Record<TroopType, number> = {
-  cavalry: 100, infantry: 80, archer: 90, navy: 80, elite: 130, mystic: 40,
+  cavalry: 100,
+  infantry: 80,
+  archer: 90,
+  navy: 80,
+  elite: 130,
+  mystic: 40,
 }
 
 /** 兵种防御系数（百分比；§6.3.2）。骑70 步120 弓100 水110 极120 玄60。 */
 export const TROOP_DEFENSE_PCT: Record<TroopType, number> = {
-  cavalry: 70, infantry: 120, archer: 100, navy: 110, elite: 120, mystic: 60,
+  cavalry: 70,
+  infantry: 120,
+  archer: 100,
+  navy: 110,
+  elite: 120,
+  mystic: 60,
 }
 
 /** 兵种相克倍率 [攻][防]（百分比；§6.3.3）。 */
@@ -27,21 +37,39 @@ export const COUNTER_PCT: Record<TroopType, Record<TroopType, number>> = {
 }
 
 /** 默认普攻范围掩码（相对中心偏移，不含中心；§6.3.4）。 */
-const CROSS: readonly Position[] = [{ x: 0, y: -1 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }]
+const CROSS: readonly Position[] = [
+  { x: 0, y: -1 },
+  { x: -1, y: 0 },
+  { x: 1, y: 0 },
+  { x: 0, y: 1 },
+]
 const SURROUND: readonly Position[] = [
-  { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 },
-  { x: -1, y: 0 }, { x: 1, y: 0 },
-  { x: -1, y: 1 }, { x: 0, y: 1 }, { x: 1, y: 1 },
+  { x: -1, y: -1 },
+  { x: 0, y: -1 },
+  { x: 1, y: -1 },
+  { x: -1, y: 0 },
+  { x: 1, y: 0 },
+  { x: -1, y: 1 },
+  { x: 0, y: 1 },
+  { x: 1, y: 1 },
 ]
 const SCATTER: readonly Position[] = [
-  { x: 0, y: -2 }, { x: -1, y: -1 }, { x: 1, y: -1 },
-  { x: -2, y: 0 }, { x: 2, y: 0 },
-  { x: -1, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 2 },
+  { x: 0, y: -2 },
+  { x: -1, y: -1 },
+  { x: 1, y: -1 },
+  { x: -2, y: 0 },
+  { x: 2, y: 0 },
+  { x: -1, y: 1 },
+  { x: 1, y: 1 },
+  { x: 0, y: 2 },
 ]
 /** 骑/水/玄=十字1格；步/极=周身8；弓=散点2格。 */
 export const ATTACK_MASK: Record<TroopType, readonly Position[]> = {
-  cavalry: CROSS, navy: CROSS, mystic: CROSS,
-  infantry: SURROUND, elite: SURROUND,
+  cavalry: CROSS,
+  navy: CROSS,
+  mystic: CROSS,
+  infantry: SURROUND,
+  elite: SURROUND,
   archer: SCATTER,
 }
 
@@ -74,7 +102,11 @@ export function terrainDefense(base: number, tier: number, defCoefPct: number): 
  * 防御力下限钳 1 以防除零（弱兵在河流可被折减到 0）。
  */
 export function attackDamage(
-  atkPower: number, defPower: number, attackerTroops: number, counterPct: number, targetTroops: number,
+  atkPower: number,
+  defPower: number,
+  attackerTroops: number,
+  counterPct: number,
+  targetTroops: number
 ): number {
   const def = Math.max(1, defPower)
   const base = Math.floor((atkPower / def) * Math.floor(attackerTroops / 8))
@@ -87,7 +119,10 @@ export function attackDamage(
  * 伤害经验 = floor(sqrt(troopDelta)/4)；按等级差给基础经验；击溃额外（低24/平16/高8）。
  */
 export function experienceGain(
-  troopDelta: number, attackerLevel: number, targetLevel: number, routed: boolean,
+  troopDelta: number,
+  attackerLevel: number,
+  targetLevel: number,
+  routed: boolean
 ): number {
   const levelDiff = attackerLevel - targetLevel
   const dmgExp = Math.floor(Math.sqrt(troopDelta) / 4)
@@ -98,8 +133,13 @@ export function experienceGain(
 }
 
 /** 升级（§6.7.4）：经验 ≥100 则扣 100、等级 +1，一次只升一级。 */
-export function applyLevelUp(level: number, experience: number): { level: number; experience: number } {
-  return experience >= 100 ? { level: level + 1, experience: experience - 100 } : { level, experience }
+export function applyLevelUp(
+  level: number,
+  experience: number
+): { level: number; experience: number } {
+  return experience >= 100
+    ? { level: level + 1, experience: experience - 100 }
+    : { level, experience }
 }
 
 /** 每日耗粮（§6.7.2）= floor(sqrt(本方未击溃单位兵力和) / 3)。 */
