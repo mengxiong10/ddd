@@ -3,7 +3,6 @@ import type { Officer } from './officer'
 import {
   spendStamina,
   recoverStamina,
-  setBusy,
   troopCapacity,
   setTroops,
   adjustLoyalty,
@@ -17,7 +16,6 @@ const base: Officer = {
   lordId: 'o1',
   cityId: 'c1',
   stamina: 100,
-  busy: false,
   troops: 100,
   level: 1,
   force: 50,
@@ -41,11 +39,6 @@ describe('officer 聚合', () => {
   it('recoverStamina 增加但封顶', () => {
     expect(recoverStamina({ ...base, stamina: 98 }, 4).stamina).toBe(100)
     expect(recoverStamina({ ...base, stamina: 90 }, 4).stamina).toBe(94)
-  })
-
-  it('setBusy 切换占用', () => {
-    expect(setBusy(base, true).busy).toBe(true)
-    expect(setBusy({ ...base, busy: true }, false).busy).toBe(false)
   })
 
   it('troopCapacity = 等级×100 + 武力×10 + 智力×10', () => {

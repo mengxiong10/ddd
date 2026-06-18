@@ -2,18 +2,17 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import { canCampaign, campaign } from './campaign'
+import { isBusy } from '../world/queries'
 
 // 出征场景：江陵（刘备：关羽、张飞）相邻许昌（曹操）。江陵粮 300。
 const ATTACKERS = ['guanyu', 'zhangfei']
 const TARGET = 'xuchang'
 
-function withOfficer(
-  s: GameState,
-  id: string,
-  patch: Partial<GameState['officers'][string]>
-): GameState {
-  return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
 }
+
 function withCity(
   s: GameState,
   id: string,
@@ -45,7 +44,7 @@ describe('canCampaign 前置校验', () => {
   })
 
   it('武将已占用 -> 拒绝', () => {
-    const s = withOfficer(createInitialState(1), 'guanyu', { busy: true })
+    const s = occupy(createInitialState(1), 'guanyu')
     expect(canCampaign(s, ATTACKERS, TARGET, 100).ok).toBe(false)
   })
 
@@ -84,12 +83,12 @@ describe('canCampaign 前置校验', () => {
 })
 
 describe('campaign 下令（效果延后）', () => {
-  it('扣本城粮、武将 busy、入队；目标城/RNG 不变', () => {
+  it('扣本城粮、武将占用(入队 campaign)；目标城/RNG 不变', () => {
     const s = createInitialState(1)
     const next = campaign(s, ATTACKERS, TARGET, 120)
     expect(next.cities.jiangling!.food).toBe(300 - 120)
-    expect(next.officers.guanyu!.busy).toBe(true)
-    expect(next.officers.zhangfei!.busy).toBe(true)
+    expect(isBusy(next, 'guanyu')).toBe(true)
+    expect(isBusy(next, 'zhangfei')).toBe(true)
     expect(next.pendingCommands).toEqual([
       { type: 'campaign', officerIds: ATTACKERS, targetCityId: TARGET, provisions: 120 },
     ])

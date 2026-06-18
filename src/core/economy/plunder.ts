@@ -3,8 +3,8 @@ import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { addFood, addGold, ravage } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
-import { effectiveOfficer } from '../world/queries'
+import { spendStamina } from '../world/officer'
+import { effectiveOfficer, isBusy } from '../world/queries'
 
 /**
  * 掠夺收益转化率（规则身份，内联常量，不入 config）：
@@ -25,20 +25,20 @@ export function canPlunder(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   if (officer.stamina < config.plunderStaminaCost) return { ok: false, reason: '体力不足' }
   return { ok: true }
 }
 
 /**
- * 下令掠夺：效果延到月末（见 executePlunder）。下令当下仅扣体力、占用武将、入队，不改城、不动 RNG。
+ * 下令掠夺：效果延到月末（见 executePlunder）。下令当下仅扣体力、入队（占用由队列派生），不改城、不动 RNG。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
 export function plunder(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
   if (!canPlunder(state, officerId, config).ok) return state
 
   const officer = state.officers[officerId]!
-  const nextOfficer = setBusy(spendStamina(officer, config.plunderStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.plunderStaminaCost)
 
   return {
     ...state,

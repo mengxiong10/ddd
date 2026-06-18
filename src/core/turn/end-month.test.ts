@@ -4,7 +4,7 @@ import { DEFAULT_CONFIG } from '../shared/config'
 import { develop } from '../economy/develop'
 import { plunder } from '../economy/plunder'
 import { campaign } from '../economy/campaign'
-import { isCaptive } from '../world/queries'
+import { isBusy, isCaptive } from '../world/queries'
 import type { GameState } from '../game-state'
 import type { BattleState } from '../military/battle'
 import {
@@ -40,13 +40,13 @@ describe('endMonth 月末编排', () => {
     expect(next.year).toBe(190)
   })
 
-  it('占用武将回城、体力 +4 封顶', () => {
+  it('占用武将月末释放占用、体力 +4 封顶', () => {
     const afterCmd = develop(createInitialState(1), 'zhugeliang', 'agriculture', cfg)
-    expect(afterCmd.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(afterCmd, 'zhugeliang')).toBe(true)
     expect(afterCmd.officers.zhugeliang!.stamina).toBe(92)
 
     const next = endMonth(afterCmd, cfg)
-    expect(next.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(next, 'zhugeliang')).toBe(false)
     expect(next.officers.zhugeliang!.stamina).toBe(96)
   })
 
@@ -73,7 +73,7 @@ describe('endMonth 月末编排', () => {
     expect(c.food).toBe(400 + 750 + 37)
     expect(c.gold).toBe(500 + 300 + 50)
     expect(next.pendingCommands).toEqual([])
-    expect(next.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(next, 'zhugeliang')).toBe(false)
   })
 
   it('玩家出征：endMonth 挂起为交互式战斗，不立即占城/不推进月份', () => {
@@ -88,7 +88,7 @@ describe('endMonth 月末编排', () => {
     expect(next.pendingCommands).toHaveLength(1) // campaign 留队待续战
   })
 
-  it('resumeMonth：战斗玩家胜→占城 + 被俘君主重选 + 续完月末（进驻、busy=false、月份+1、队列清空）', () => {
+  it('resumeMonth：战斗玩家胜→占城 + 被俘君主重选 + 续完月末（进驻、释放占用、月份+1、队列清空）', () => {
     let boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
     boosted = withOfficer(boosted, 'caocao', { intelligence: 0 }) // 战败必被俘（barring r1==0）
     const suspended = endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
@@ -101,7 +101,7 @@ describe('endMonth 月末编排', () => {
     expect(next.activeBattle).toBeNull()
     expect(next.cities.xuchang!.lordId).toBe('liubei')
     expect(next.officers.guanyu!.cityId).toBe('xuchang') // 进驻新城，未回江陵
-    expect(next.officers.guanyu!.busy).toBe(false)
+    expect(isBusy(next, 'guanyu')).toBe(false)
     expect(isCaptive(next, 'caocao')).toBe(true)
     // 曹操被俘 → 自动立新君接管邺城（具体人选取决于败军逃跑后的候选，故只验证已换主、新君归属自身）
     expect(next.cities.ye!.lordId).not.toBe('caocao')

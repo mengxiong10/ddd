@@ -7,7 +7,7 @@
 - **出征命令生成**（`ai-military`）：沿用 `15` 作弊下令口（不走 `canCampaign`、不扣金/体力），仅多一个「批量占人 + 入队 campaign」的口子。
 - **AI vs AI / 无守军占城**：不进地图战，新建 `military/quick-battle.ts` 按胜率表掷骰定胜负，**复用现有 `resolveCampaignOutcome`** 做占城/俘虏/逃跑/重选君主/战损/粮草合并。
 - **AI 进攻玩家城**：复用 `12-battle` 的 `defend` 模式交互式战斗，但开战前**暂停让玩家选守军**——新增窄暂停态 `GameState.pendingDefense` + action `chooseDefenders`，与 `pendingSuccession` 完全同构（纯同步、无 Promise）。AI 进攻方在战中仍不行动（`endDay` no-op，沿用 `12`）。
-- **守军口径统一到 `world/queries.defendingOfficers`**：守军 = 在该城、属本城势力、非俘虏、**且未被派往外出 campaign** 的武将。出征在外者 `cityId` 仍滞留源城直到战斗结算，必须显式排除；其余 busy（本月被即时/返回类命令占用）仍算守军（月末回防）。`initBattle` 自动选守与「无守军」判定共用此查询，消除三处重复。
+- **守军口径统一到 `world/queries.defendingOfficers`**：守军 = 在该城、属本城势力、非俘虏、**未被占用（`isBusy` 为假）** 的武将，即 `officersInCity(onlyAvailable)`。占人一律入队后占用为派生（`isBusy`=被某条 pending command 引用）：外出 campaign 者仍被其 campaign 命令引用 → 占用中 → 自动排除（守军判定均在 `runNonCampaignPending` 之后调用，届时即时/经营类占人已出队、非占用，故仍算守军）。`initBattle` 自动选守与「无守军」判定共用此查询，消除三处重复。
 
 关键取舍：
 
@@ -22,9 +22,9 @@
 ### `world/queries.ts`（新增守军查询，收敛三处重复）
 
 ```ts
-// 城防守军：cityId 在本城、lordId===本城势力、非俘虏，且未被任何待执行 campaign 征调（officerIds 不含之）。
-// 出征在外者 cityId 仍滞留源城直到 concludeBattle/quickResolve 改写，故需显式排除；
-// 其余 busy（即时/返回类命令占用）仍计为守军（月末回防）。
+// 城防守军：在本城、属本城势力、非俘虏、未被占用（isBusy 为假）= officersInCity(onlyAvailable)。
+// 占用为派生（isBusy=被某条 pending command 引用）：外出 campaign 者仍被其 campaign 命令引用 → 自动排除；
+// 即时/经营类占人在 runNonCampaignPending 已出队（守军判定均在其后调用）→ 非占用 → 仍算守军。
 export function defendingOfficers(state: GameState, cityId: CityId): Officer[]
 ```
 

@@ -5,8 +5,8 @@ import type { CommandCheck } from '../shared/command'
 import type { Rng } from '../shared/rng'
 import { randInt } from '../shared/rng'
 import { spendGold } from '../world/city'
-import { setBusy, spendStamina, adjustLoyalty } from '../world/officer'
-import { effectiveOfficer, isCaptive, citiesOfLord, governorOf } from '../world/queries'
+import { spendStamina, adjustLoyalty } from '../world/officer'
+import { effectiveOfficer, isBusy, isCaptive, citiesOfLord, governorOf } from '../world/queries'
 
 /**
  * 外交规则身份（内联常量，不入 config——皆为公式系数/阈值/概率/量纲）：
@@ -64,7 +64,7 @@ function checkExecutor(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可下令' }
   if (officer.stamina < staminaCost) return { ok: false, reason: '体力不足' }
   const city = state.cities[officer.cityId]
@@ -73,7 +73,7 @@ function checkExecutor(
   return { ok: true }
 }
 
-/** 下令通用：扣体力、扣本城金、占人离城、入对应 pending 分支；不动 RNG。调用方已校验。 */
+/** 下令通用：扣体力、扣本城金、入对应 pending 分支（占用由队列派生）；不动 RNG。调用方已校验。 */
 function enqueueDiplomacy(
   state: GameState,
   officerId: OfficerId,
@@ -87,7 +87,7 @@ function enqueueDiplomacy(
   return {
     ...state,
     cities: { ...state.cities, [officer.cityId]: spendGold(city, goldCost) },
-    officers: { ...state.officers, [officerId]: setBusy(spendStamina(officer, staminaCost), true) },
+    officers: { ...state.officers, [officerId]: spendStamina(officer, staminaCost) },
     pendingCommands: [...state.pendingCommands, { type, officerId, targetOfficerId }],
   }
 }

@@ -49,6 +49,14 @@ export type PendingCommand =
       readonly targetOfficerId: OfficerId
     }
   | { readonly type: 'induce'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
+  // 即时生效的占人指令（效果已于下令时结算）。月末无效果、仅作占用标记
+  // （占用中 = 被某条 pending command 引用，见 queries.isBusy）；按各自 type 区分以如实反映占人在做什么。
+  | { readonly type: 'develop'; readonly officerId: OfficerId }
+  | { readonly type: 'patrol'; readonly officerId: OfficerId }
+  | { readonly type: 'govern'; readonly officerId: OfficerId }
+  | { readonly type: 'trade'; readonly officerId: OfficerId }
+  | { readonly type: 'scout'; readonly officerId: OfficerId }
+  | { readonly type: 'recruit'; readonly officerId: OfficerId }
 
 /**
  * 待登场池条目（判别式）：未登场武将/道具的承载，登场前不进 officers/items。
@@ -94,7 +102,8 @@ export interface GameState {
   /**
    * 本月待月末执行的指令，按下令顺序入队；月末由 turn 层处理后清空。
    * 非 campaign 项经 runNonCampaignPending 执行；campaign 项由 end-month 逐条结算/挂起战斗。
-   * 仅「效果延后」指令入队；占人本身仍由 Officer.busy 表达。
+   * 所有占人指令均入队；占用中 = 被某条 pending command 引用（queries.isBusy 派生），不存 Officer.busy。
+   * 即时生效指令的月末分支为空操作（仅作占用标记，出队即释放）。
    */
   readonly pendingCommands: readonly PendingCommand[]
   /**

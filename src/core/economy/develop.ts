@@ -4,8 +4,8 @@ import type { DevelopKind, GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { randInt } from '../shared/rng'
 import { attributeCap, raiseAttribute, spendGold } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
-import { effectiveOfficer } from '../world/queries'
+import { spendStamina } from '../world/officer'
+import { effectiveOfficer, isBusy } from '../world/queries'
 
 /**
  * 开垦/招商增量公式系数（规则身份，内联常量，不入 config）：
@@ -27,7 +27,7 @@ export function canDevelop(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }
 
@@ -41,7 +41,8 @@ export function canDevelop(
 }
 
 /**
- * 执行开垦/招商：效果在下令当下立即结算（属性增长 + 扣金扣体力 + 占用武将 + 推进 RNG）。
+ * 执行开垦/招商：效果在下令当下立即结算（属性增长 + 扣金扣体力 + 推进 RNG）。
+ * 占用武将由入队 develop 命令派生（queries.isBusy），出队即释放；月末分支无效果。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
 export function develop(
@@ -60,12 +61,13 @@ export function develop(
     Math.floor(effectiveOfficer(state, officerId).intelligence / DEVELOP_INTEL_DIVISOR) + rand
 
   const nextCity = spendGold(raiseAttribute(city, kind, delta), config.commandGoldCost)
-  const nextOfficer = setBusy(spendStamina(officer, config.commandStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.commandStaminaCost)
 
   return {
     ...state,
     rng: nextRng,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
+    pendingCommands: [...state.pendingCommands, { type: 'develop', officerId }],
   }
 }

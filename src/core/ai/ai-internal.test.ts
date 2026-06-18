@@ -3,6 +3,7 @@ import { createInitialState } from '../world/fixture'
 import { randInt } from '../shared/rng'
 import type { GameState } from '../game-state'
 import type { City } from '../world/city'
+import { isBusy } from '../world/queries'
 import { runAiInternal, pickMoveTarget } from './ai-internal'
 
 function withCity(s: GameState, id: string, patch: Partial<City>): GameState {
@@ -16,10 +17,10 @@ function withOfficer(
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
-/** ye 城单一在任武将 simayi（zhangliao 置 busy 排除），便于镜像单次 RandInt(0,10)。 */
+/** ye 城单一在任武将 simayi（zhangliao 移出 ye 排除），便于镜像单次 RandInt(0,10)。 */
 function singleServing(seed: number): GameState {
   let s = createInitialState(seed)
-  s = withOfficer(s, 'zhangliao', { busy: true })
+  s = withOfficer(s, 'zhangliao', { cityId: 'xuchang' })
   s = withCity(s, 'ye', {
     status: 'flood',
     disasterPrevention: 50,
@@ -39,29 +40,28 @@ describe('runAiInternal 5.5.1 逐分支', () => {
       const [roll] = randInt(s.rng, 0, 10)
       const out = runAiInternal(s, 'ye')
       const ye = out.cities.ye!
-      const simayi = out.officers.simayi!
       expect(ye.gold).toBe(450) // 任何分支都不扣城金
 
       if (roll === 0) {
         expect(ye.agriculture).toBe(500)
-        expect(simayi.busy).toBe(true)
+        expect(isBusy(out, 'simayi')).toBe(true)
       } else if (roll === 1) {
         expect(ye.commerce).toBe(460)
-        expect(simayi.busy).toBe(true)
+        expect(isBusy(out, 'simayi')).toBe(true)
       } else if (roll === 2) {
         expect(out.pendingCommands).toContainEqual({ type: 'search', officerId: 'simayi' })
-        expect(simayi.busy).toBe(true)
+        expect(isBusy(out, 'simayi')).toBe(true)
       } else if (roll === 3) {
         expect(ye.loyalty).toBe(54)
         expect(ye.population).toBe(35100)
-        expect(simayi.busy).toBe(true)
+        expect(isBusy(out, 'simayi')).toBe(true)
       } else if (roll === 4) {
         expect(ye.status).toBe('normal')
         expect(ye.disasterPrevention).toBe(54)
-        expect(simayi.busy).toBe(true)
+        expect(isBusy(out, 'simayi')).toBe(true)
       } else {
         // 5/6/7/8/10 跳过；9 因 i=0<3 也跳过
-        expect(simayi.busy).toBe(false)
+        expect(isBusy(out, 'simayi')).toBe(false)
         expect(out.pendingCommands).toEqual([])
         expect(ye.agriculture).toBe(300)
         expect(ye.commerce).toBe(260)

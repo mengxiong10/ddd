@@ -4,7 +4,7 @@ import type { OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
 import { settle } from '../economy/settle'
 import { aiTakeTurn } from '../ai/ai'
-import { recoverStamina, setBusy } from '../world/officer'
+import { recoverStamina } from '../world/officer'
 import { runDebuts } from '../world/debut'
 import { runDisasters } from '../world/disaster'
 import { runNonCampaignPending } from './pending'
@@ -149,14 +149,14 @@ function dropFirstCampaign(state: GameState): GameState {
 }
 
 /**
- * 月末尾段（所有 campaign 处理完后）：收粮/收税 → 占用武将回城 + 体力恢复 → 月份 +1（跨年）→ 登场 → 灾害。
- * 清空待执行队列（campaign 均已结算/速算）。
+ * 月末尾段（所有 campaign 处理完后）：收粮/收税 → 体力恢复 → 月份 +1（跨年）→ 登场 → 灾害。
+ * 清空待执行队列（campaign 均已结算/速算）——队列清空即所有派生占用归零，无需显式置位。
  */
 function finishMonthTail(state: GameState, config: GameConfig): GameState {
   const settled = settle({ ...state, pendingCommands: [] })
   const officers: Record<OfficerId, GameState['officers'][OfficerId]> = { ...settled.officers }
   for (const id of Object.keys(officers)) {
-    officers[id] = setBusy(recoverStamina(officers[id]!, config.staminaRecoveryPerMonth), false)
+    officers[id] = recoverStamina(officers[id]!, config.staminaRecoveryPerMonth)
   }
   const month = settled.month === 12 ? 1 : settled.month + 1
   const year = settled.month === 12 ? settled.year + 1 : settled.year

@@ -4,10 +4,16 @@ import { DEFAULT_CONFIG } from '../shared/config'
 import { randInt } from '../shared/rng'
 import type { GameState } from '../game-state'
 import { canSearch, search, executeSearch } from './search'
+import { isBusy } from '../world/queries'
 import { apply } from '../game'
 
 const cfg = DEFAULT_CONFIG
 // 成都(chengdu)：金500 粮400；诸葛亮(zhugeliang) 智力100、无道具 -> 有效智力 100。
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withOfficer(
   s: GameState,
@@ -31,7 +37,6 @@ function withWanderer(s: GameState, id: string, recruiterId: string | null): Gam
     name: id,
     lordId: null,
     cityId: 'chengdu',
-    busy: false,
     troops: 0,
     recruiterId,
   }
@@ -72,10 +77,7 @@ describe('canSearch 前置校验', () => {
     expect(canSearch(createInitialState(1), 'nobody', cfg).ok).toBe(false)
   })
   it('已占用 -> 拒绝', () => {
-    expect(
-      canSearch(withOfficer(createInitialState(1), 'zhugeliang', { busy: true }), 'zhugeliang', cfg)
-        .ok
-    ).toBe(false)
+    expect(canSearch(occupy(createInitialState(1), 'zhugeliang'), 'zhugeliang', cfg).ok).toBe(false)
   })
   it('俘虏 -> 拒绝', () => {
     const s = withCity(createInitialState(1), 'chengdu', { lordId: 'caocao' }) // 成都易主，诸葛亮成俘虏
@@ -90,11 +92,11 @@ describe('canSearch 前置校验', () => {
 })
 
 describe('search 下令', () => {
-  it('扣体力8、busy、入队；城/RNG 不变', () => {
+  it('扣体力8、占用(入队 search)；城/RNG 不变', () => {
     const s = createInitialState(1)
     const next = search(s, 'zhugeliang', cfg)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 8)
-    expect(next.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.rng.seed).toBe(s.rng.seed)
     expect(next.cities).toEqual(s.cities)
     expect(next.pendingCommands).toEqual([{ type: 'search', officerId: 'zhugeliang' }])
@@ -244,11 +246,11 @@ describe('executeSearch 发现道具', () => {
 })
 
 describe('搜寻端到端（apply + 月末执行 + 回城）', () => {
-  it('下令后入队，月末执行并回城（busy=false）', () => {
+  it('下令后入队，月末执行并释放占用（出队 → isBusy=false）', () => {
     const s = apply(createInitialState(1), { type: 'search', officerId: 'zhugeliang' })
     expect(s.pendingCommands).toHaveLength(1)
     const next = apply(s, { type: 'endMonth' })
     expect(next.pendingCommands).toHaveLength(0)
-    expect(next.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(next, 'zhugeliang')).toBe(false)
   })
 })

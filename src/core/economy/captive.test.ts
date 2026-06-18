@@ -15,6 +15,10 @@ function withOfficer(
 function setCityLord(s: GameState, cityId: string, lordId: string): GameState {
   return { ...s, cities: { ...s.cities, [cityId]: { ...s.cities[cityId]!, lordId } } }
 }
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 function giveItem(s: GameState, itemId: string, officerId: string): GameState {
   return { ...s, items: { ...s.items, [itemId]: holdByOfficer(s.items[itemId]!, officerId) } }
 }
@@ -55,7 +59,7 @@ describe('流放 banish', () => {
     expect(canBanish(s, 'guanyu').ok).toBe(true) // 己方在任武将
     expect(canBanish(s, 'liubei').ok).toBe(false) // 在任君主
     expect(canBanish(withOfficer(s, 'guanyu', { lordId: null }), 'guanyu').ok).toBe(false) // 在野
-    expect(canBanish(withOfficer(s, 'guanyu', { busy: true }), 'guanyu').ok).toBe(false) // 占用
+    expect(canBanish(occupy(s, 'guanyu'), 'guanyu').ok).toBe(false) // 占用
   })
 
   it('流放俘虏：变在野、随机落到某城、消耗 RNG', () => {

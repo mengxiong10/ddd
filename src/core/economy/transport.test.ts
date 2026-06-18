@@ -4,6 +4,7 @@ import { DEFAULT_CONFIG } from '../shared/config'
 import { randInt } from '../shared/rng'
 import type { GameState } from '../game-state'
 import { canTransport, transport, executeTransport } from './transport'
+import { isBusy } from '../world/queries'
 
 const cfg = DEFAULT_CONFIG
 
@@ -60,14 +61,14 @@ describe('canTransport 前置校验', () => {
 })
 
 describe('transport 下令', () => {
-  it('扣体力8、出发城立即扣粮/金/后备兵、busy、入队；RNG不变', () => {
+  it('扣体力8、出发城立即扣粮/金/后备兵、占用(入队 transport)；RNG不变', () => {
     const s = withCity(createInitialState(1), 'chengdu', { reserveTroops: 100 })
     const next = transport(s, 'zhugeliang', 'jiangling', 100, 50, 30, cfg)
     expect(next.cities.chengdu!.food).toBe(400 - 100)
     expect(next.cities.chengdu!.gold).toBe(500 - 50)
     expect(next.cities.chengdu!.reserveTroops).toBe(100 - 30)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 8)
-    expect(next.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.rng.seed).toBe(s.rng.seed)
     expect(next.pendingCommands).toEqual([
       {

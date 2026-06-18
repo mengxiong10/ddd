@@ -5,7 +5,7 @@ import type { City } from '../world/city'
 import type { Officer } from '../world/officer'
 import { addReserveTroops } from '../world/city'
 import { setTroops, troopCapacity } from '../world/officer'
-import { effectiveOfficer } from '../world/queries'
+import { effectiveOfficer, isBusy } from '../world/queries'
 
 /** 可分配上限 = min(带兵量上限, 后备兵 + 武将现有兵)。 */
 export function allocateMaxTroops(officer: Officer, city: City): number {
@@ -19,7 +19,7 @@ export function allocateMaxTroops(officer: Officer, city: City): number {
 export function canAllocate(state: GameState, officerId: OfficerId, amount: number): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }
 

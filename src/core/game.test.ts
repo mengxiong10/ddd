@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from './world/fixture'
 import { apply, canApply, type Action } from './game'
 import type { GameState } from './game-state'
+import { isBusy } from './world/queries'
 import { WEATHER_ORDER } from './military/battle-weather'
 
 function run(seed: number, actions: Action[]) {
@@ -12,7 +13,7 @@ describe('game apply 分派', () => {
   it('reclaim 增长农业并占用武将', () => {
     const next = apply(createInitialState(1), { type: 'reclaim', officerId: 'zhugeliang' })
     expect(next.cities.chengdu!.agriculture).toBeGreaterThan(300)
-    expect(next.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
   })
 
   it('commerce 增长商业', () => {
@@ -135,19 +136,19 @@ describe('canApply', () => {
 describe('征兵 / 分配 端到端', () => {
   it('征兵占人后经 endMonth 月末回城', () => {
     let s = apply(createInitialState(1), { type: 'recruit', officerId: 'zhugeliang', amount: 100 })
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
     expect(s.cities.chengdu!.reserveTroops).toBe(100)
     s = apply(s, { type: 'endMonth' })
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
   })
 
   it('分配不占人，同月该武将可再被下令（随后征兵）', () => {
     let s = apply(createInitialState(1), { type: 'allocate', officerId: 'zhugeliang', amount: 0 })
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
     expect(s.officers.zhugeliang!.troops).toBe(0)
     expect(s.cities.chengdu!.reserveTroops).toBe(100)
     s = apply(s, { type: 'recruit', officerId: 'zhugeliang', amount: 50 })
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
     expect(s.cities.chengdu!.reserveTroops).toBe(150)
   })
 })
@@ -155,14 +156,14 @@ describe('征兵 / 分配 端到端', () => {
 describe('掠夺 / 侦察 端到端', () => {
   it('掠夺占人、效果延到月末（破坏+收益）后回城、队列清空', () => {
     let s = apply(createInitialState(1), { type: 'plunder', officerId: 'zhugeliang' })
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
     expect(s.cities.chengdu!.agriculture).toBe(300) // 下令当下不破坏
     expect(s.pendingCommands).toHaveLength(1)
     s = apply(s, { type: 'endMonth' })
     expect(s.cities.chengdu!.agriculture).toBe(150) // 月末破坏
     expect(s.cities.chengdu!.food).toBe(400 + 750)
     expect(s.cities.chengdu!.gold).toBe(500 + 300)
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
     expect(s.pendingCommands).toEqual([])
   })
 
@@ -172,10 +173,10 @@ describe('掠夺 / 侦察 端到端', () => {
       officerId: 'zhugeliang',
       targetCityId: 'xuchang',
     })
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
     expect(s.cities.chengdu!.gold).toBe(500 - 20)
     s = apply(s, { type: 'endMonth' })
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
   })
 
   it('canApply 反映 canPlunder / canScout 校验', () => {
@@ -203,9 +204,9 @@ describe('赏赐 / 没收 端到端', () => {
       equipSeq: 0,
     })
     expect(s.officers.zhugeliang!.loyalty).toBe(58)
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
     s = apply(s, { type: 'reclaim', officerId: 'zhugeliang' }) // 不占人 -> 仍可下令
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
   })
 
   it('没收：道具收回城、忠诚−20', () => {
@@ -236,21 +237,21 @@ describe('赏赐 / 没收 端到端', () => {
 describe('出巡 / 宴请 / 交易 端到端', () => {
   it('出巡占人、即时提升民忠+人口，月末回城', () => {
     let s = apply(createInitialState(1), { type: 'patrol', officerId: 'zhugeliang' })
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
     expect(s.cities.chengdu!.population).toBe(30000 + 100)
     expect(s.cities.chengdu!.loyalty).toBeGreaterThan(50)
     expect(s.cities.chengdu!.gold).toBe(500 - 50)
-    expect(s.pendingCommands).toEqual([])
+    expect(s.pendingCommands).toEqual([{ type: 'patrol', officerId: 'zhugeliang' }])
     s = apply(s, { type: 'endMonth' })
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
   })
 
   it('宴请不占人：被宴请者同月仍可被派去开垦', () => {
     let s = apply(createInitialState(1), { type: 'banquet', officerId: 'zhugeliang' })
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
     expect(s.cities.chengdu!.gold).toBe(500 - 100)
     s = apply(s, { type: 'reclaim', officerId: 'zhugeliang' })
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
   })
 
   it('交易买入即时结算并占人', () => {
@@ -262,7 +263,7 @@ describe('出巡 / 宴请 / 交易 端到端', () => {
     })
     expect(s.cities.chengdu!.food).toBe(450)
     expect(s.cities.chengdu!.gold).toBe(250)
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
   })
 
   it('canApply 反映 canPatrol / canBanquet / canTrade 校验', () => {
@@ -282,12 +283,12 @@ describe('移动 / 输送 端到端', () => {
       officerId: 'zhugeliang',
       targetCityId: 'jiangling',
     })
-    expect(s.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(s, 'zhugeliang')).toBe(true)
     expect(s.officers.zhugeliang!.cityId).toBe('chengdu') // 下令当下未移动
     expect(s.pendingCommands).toHaveLength(1)
     s = apply(s, { type: 'endMonth' })
     expect(s.officers.zhugeliang!.cityId).toBe('jiangling')
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
     expect(s.pendingCommands).toEqual([])
   })
 
@@ -307,7 +308,7 @@ describe('移动 / 输送 端到端', () => {
     expect(s.cities.chengdu!.reserveTroops).toBe(100 - 30)
     expect(s.pendingCommands).toHaveLength(1)
     s = apply(s, { type: 'endMonth' })
-    expect(s.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(s, 'zhugeliang')).toBe(false)
     expect(s.officers.zhugeliang!.cityId).toBe('chengdu') // 执行人回原城
     // 送达或永损二选一，但目标城不会减少
     const jl = s.cities.jiangling!
@@ -368,12 +369,12 @@ describe('招降 / 处斩 / 流放 端到端', () => {
 
   it('招降占人、月末四关后归己（忠诚0必成），执行人回城、队列清空', () => {
     let s = apply(conquered(1), { type: 'suborn', officerId: 'guanyu', captiveId: 'caocao' })
-    expect(s.officers.guanyu!.busy).toBe(true)
+    expect(isBusy(s, 'guanyu')).toBe(true)
     expect(s.officers.caocao!.lordId).toBe('caocao') // 下令当下未生效
     expect(s.pendingCommands).toHaveLength(1)
     s = apply(s, { type: 'endMonth' })
     expect(s.officers.caocao!.lordId).toBe('liubei') // 月末归己
-    expect(s.officers.guanyu!.busy).toBe(false)
+    expect(isBusy(s, 'guanyu')).toBe(false)
     expect(s.pendingCommands).toEqual([])
   })
 

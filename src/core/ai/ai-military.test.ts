@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import { randInt } from '../shared/rng'
 import type { GameState } from '../game-state'
+import { isBusy } from '../world/queries'
 import { runAiMilitary } from './ai-military'
 
 function withOfficer(
@@ -12,10 +13,10 @@ function withOfficer(
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
-/** ye 仅 simayi 在任（zhangliao busy），simayi 兵力起始 10。 */
+/** ye 仅 simayi 在任（zhangliao 移出 ye），simayi 兵力起始 10。 */
 function single(seed: number, patch: Partial<GameState> = {}): GameState {
   let s = createInitialState(seed)
-  s = withOfficer(s, 'zhangliao', { busy: true })
+  s = withOfficer(s, 'zhangliao', { cityId: 'xuchang' })
   s = withOfficer(s, 'simayi', { troops: 10 })
   return { ...s, ...patch }
 }
@@ -28,7 +29,7 @@ describe('runAiMilitary 5.5.4 补兵', () => {
       const [, r1] = randInt(s.rng, 0, 0) // 单人 → 选强化对象消耗一次
       const [roll] = randInt(r1, 0, 8)
       const out = runAiMilitary(s, 'ye')
-      expect(out.officers.simayi!.busy).toBe(false)
+      expect(isBusy(out, 'simayi')).toBe(false)
       expect(out.cities.ye!.gold).toBe(s.cities.ye!.gold)
       expect(out.cities.ye!.reserveTroops).toBe(s.cities.ye!.reserveTroops)
       expect(out.pendingCommands).toEqual([])
@@ -96,7 +97,6 @@ describe('runAiMilitary 出征生成（16-ai-campaign）', () => {
             lordId: 'caocao',
             cityId: 'ye',
             troops: 500,
-            busy: false,
           },
         },
       }
@@ -120,7 +120,7 @@ describe('runAiMilitary 出征生成（16-ai-campaign）', () => {
       expect(camp.officerIds).toContain('simayi') // 兵力最高领衔
       expect(camp.provisions).toBe(s.cities.ye!.food)
       expect(out.cities.ye!.food).toBe(0) // 粮随军清零
-      for (const id of camp.officerIds) expect(out.officers[id]!.busy).toBe(true)
+      for (const id of camp.officerIds) expect(isBusy(out, id)).toBe(true)
     }
     expect(found).toBe(true)
   })

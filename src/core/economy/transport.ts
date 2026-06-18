@@ -4,8 +4,8 @@ import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { randInt } from '../shared/rng'
 import { addFood, addGold, addReserveTroops, spendFood, spendGold } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
-import { isCaptive } from '../world/queries'
+import { spendStamina } from '../world/officer'
+import { isBusy, isCaptive } from '../world/queries'
 
 /** 送达概率（规则身份，内联常量，不入 config）：月末 randInt(1,100) ≤ 80 即送达，否则永损。 */
 const TRANSPORT_SUCCESS_PERCENT = 80
@@ -26,7 +26,7 @@ export function canTransport(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可输送' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }
@@ -45,7 +45,7 @@ export function canTransport(
 }
 
 /**
- * 下令输送：扣体力、立即从出发城扣 food/gold/troops（后备兵）、占人、入队。不耗 RNG。
+ * 下令输送：扣体力、立即从出发城扣 food/gold/troops（后备兵）、入队（占用由队列派生）。不耗 RNG。
  * 前置不满足时为 no-op。
  */
 export function transport(
@@ -62,7 +62,7 @@ export function transport(
   const officer = state.officers[officerId]!
   const city0 = state.cities[officer.cityId]!
   const nextCity = addReserveTroops(spendGold(spendFood(city0, food), gold), -troops)
-  const nextOfficer = setBusy(spendStamina(officer, config.transportStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.transportStaminaCost)
 
   return {
     ...state,
@@ -78,7 +78,7 @@ export function transport(
 /**
  * 月末执行输送（供 turn 分派，非 campaign 趟）：消费 RNG 判 80% 送达。
  * 送达 → 目标城 += food/gold/后备兵；失败 → 资源永损（不退回）。无论成败都推进 RNG。
- * 执行人 cityId 不变（busy 由 endMonth 翻回）。
+ * 执行人 cityId 不变；占用随该命令出队即释放（派生 isBusy）。
  */
 export function executeTransport(
   state: GameState,

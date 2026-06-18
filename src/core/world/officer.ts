@@ -27,8 +27,6 @@ export interface Officer {
   readonly cityId: CityId
   /** 体力，取值 [0, STAMINA_MAX]。 */
   readonly stamina: number
-  /** 本月是否已被指令占用（离城）；月末回城时置回 false。 */
-  readonly busy: boolean
   /** 当前带兵数，取值 [0, 带兵量上限]。 */
   readonly troops: number
   /** 等级，静态属性，参与带兵量公式；本切片不成长。 */
@@ -85,11 +83,6 @@ export function spendStamina(o: Officer, amount: number): Officer {
 /** 恢复体力，封顶 STAMINA_MAX（不变量）。 */
 export function recoverStamina(o: Officer, amount: number): Officer {
   return { ...o, stamina: Math.min(STAMINA_MAX, o.stamina + amount) }
-}
-
-/** 设置占用状态（下令离城 / 月末回城）。 */
-export function setBusy(o: Officer, busy: boolean): Officer {
-  return { ...o, busy }
 }
 
 /** 直接升 1 级（AI 自动升级 / 军备 month%3 用）；不走经验、无上限。 */

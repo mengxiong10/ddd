@@ -2,7 +2,6 @@ import type { GameState, PendingCommand } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
 import type { City } from '../world/city'
 import type { Officer } from '../world/officer'
-import { setBusy } from '../world/officer'
 import { officersInCity } from '../world/queries'
 import { areAdjacent } from '../world/adjacency'
 
@@ -20,29 +19,27 @@ export function aiServingOfficers(state: GameState, cityId: CityId): Officer[] {
 }
 
 /**
- * AI 入队：置执行人 busy + 追加 PendingCommand；不扣任何成本、不动 RNG、不走 canX。
- * AI 作弊简化下令的唯一入队口（搜寻/移动/外交），月末复用现有 executeX 结算。
+ * AI 入队：追加 PendingCommand（占用由队列派生 queries.isBusy，入队即占用）；不扣任何成本、不动 RNG、不走 canX。
+ * AI 作弊简化下令的唯一入队口（内政/搜寻/移动/外交），月末复用现有 executeX 结算（即时类为空操作）。
  */
 export function busyEnqueue(
   state: GameState,
-  officerId: OfficerId,
+  _officerId: OfficerId,
   cmd: PendingCommand
 ): GameState {
-  return busyEnqueueMany(state, [officerId], cmd)
+  return { ...state, pendingCommands: [...state.pendingCommands, cmd] }
 }
 
 /**
- * AI 批量入队（出征）：对 officerIds 逐一 setBusy + 追加一条 PendingCommand；不扣成本、不动 RNG。
+ * AI 批量入队（出征）：追加一条 PendingCommand（占用由队列派生，officerIds 全部入队即占用）；不扣成本、不动 RNG。
  * 出征是唯一多人占人的 AI 命令，沿用作弊下令口（不走 canCampaign）。
  */
 export function busyEnqueueMany(
   state: GameState,
-  officerIds: readonly OfficerId[],
+  _officerIds: readonly OfficerId[],
   cmd: PendingCommand
 ): GameState {
-  const officers = { ...state.officers }
-  for (const id of officerIds) officers[id] = setBusy(officers[id]!, true)
-  return { ...state, officers, pendingCommands: [...state.pendingCommands, cmd] }
+  return { ...state, pendingCommands: [...state.pendingCommands, cmd] }
 }
 
 /** 某城的相邻敌城（lordId≠该势力，含玩家城），按 id 升序。供内政移动选城 + 军备选目标共用。 */

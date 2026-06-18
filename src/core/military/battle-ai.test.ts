@@ -18,7 +18,6 @@ function mkOfficer(id: string, over: Partial<Officer> = {}): Officer {
     lordId: 'lordA',
     cityId: 'cityA',
     stamina: 100,
-    busy: false,
     troops: 100,
     level: 1,
     force: 50,

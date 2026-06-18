@@ -3,10 +3,15 @@ import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import type { GameState } from '../game-state'
 import { canSuborn, suborn, executeSuborn } from './suborn'
-import { isCaptive } from '../world/queries'
+import { isBusy, isCaptive } from '../world/queries'
 import { randInt } from '../shared/rng'
 
 const cfg = DEFAULT_CONFIG
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withOfficer(
   s: GameState,
@@ -45,9 +50,7 @@ describe('canSuborn', () => {
     ).toBe(false)
   })
   it('执行人已占用 -> 拒绝', () => {
-    expect(
-      canSuborn(withOfficer(setup(1), 'guanyu', { busy: true }), 'guanyu', 'caocao', cfg).ok
-    ).toBe(false)
+    expect(canSuborn(occupy(setup(1), 'guanyu'), 'guanyu', 'caocao', cfg).ok).toBe(false)
   })
   it('执行人体力不足 -> 拒绝', () => {
     expect(
@@ -68,11 +71,11 @@ describe('canSuborn', () => {
 })
 
 describe('suborn 下令', () => {
-  it('扣体力15/城金100、busy、入队，不动 RNG', () => {
+  it('扣体力15/城金100、占用(入队 suborn)，不动 RNG', () => {
     const s = setup(1)
     const next = suborn(s, 'guanyu', 'caocao', cfg)
     expect(next.officers.guanyu!.stamina).toBe(s.officers.guanyu!.stamina - 15)
-    expect(next.officers.guanyu!.busy).toBe(true)
+    expect(isBusy(next, 'guanyu')).toBe(true)
     expect(next.cities.xuchang!.gold).toBe(s.cities.xuchang!.gold - 100)
     expect(next.pendingCommands).toContainEqual({
       type: 'suborn',

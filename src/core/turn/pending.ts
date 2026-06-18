@@ -13,8 +13,9 @@ import {
 } from '../economy/diplomacy'
 
 /**
- * 月末执行「非 campaign」待执行指令（掠夺/移动/输送/搜寻/招降/外交），按入队序分派到领域服务，
- * 执行后从队列移除（仅保留 campaign 项交由 end-month 逐条结算/挂起战斗）。
+ * 月末执行「非 campaign」待执行指令（掠夺/移动/输送/搜寻/招降/外交有月末效果；即时类 develop/patrol/govern/
+ * trade/scout/recruit 仅作占用标记、月末空操作），按入队序分派到领域服务，
+ * 执行后从队列移除（仅保留 campaign 项交由 end-month 逐条结算/挂起战斗）——出队即释放派生占用（queries.isBusy）。
  * campaign 不在此执行：玩家参与的出征会进入交互式战斗（end-month.advanceCampaigns）。
  * config 预留给后续需成本/系数的月末指令。
  */
@@ -60,6 +61,14 @@ export function runNonCampaignPending(state: GameState, _config: GameConfig): Ga
         break
       case 'induce':
         next = executeInduce(next, cmd.officerId, cmd.targetOfficerId)
+        break
+      // 即时生效指令：效果已于下令时结算，月末无操作；出队即释放派生占用（isBusy）。
+      case 'develop':
+      case 'patrol':
+      case 'govern':
+      case 'trade':
+      case 'scout':
+      case 'recruit':
         break
     }
   }

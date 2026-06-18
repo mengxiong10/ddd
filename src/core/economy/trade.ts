@@ -3,8 +3,8 @@ import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { addFood, addGold, spendFood, spendGold } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
-import { isCaptive } from '../world/queries'
+import { spendStamina } from '../world/officer'
+import { isBusy, isCaptive } from '../world/queries'
 
 export type TradeMode = 'buy' | 'sell'
 
@@ -33,7 +33,7 @@ export function canTrade(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可交易' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }
@@ -45,9 +45,9 @@ export function canTrade(
 }
 
 /**
- * 执行交易：即时结算、占人、不耗 RNG。
+ * 执行交易：即时结算、不耗 RNG。
  * 买入：城粮 += amount、城金 -= amount×5；卖出：城粮 -= amount、城金 += amount×2。
- * 前置不满足时为 no-op。
+ * 占用武将由入队 trade 命令派生（queries.isBusy），出队即释放；月末分支无效果。前置不满足时为 no-op。
  */
 export function trade(
   state: GameState,
@@ -64,11 +64,12 @@ export function trade(
     mode === 'buy'
       ? spendGold(addFood(city0, amount), amount * TRADE_BUY_GOLD_PER_FOOD)
       : addGold(spendFood(city0, amount), amount * TRADE_SELL_GOLD_PER_FOOD)
-  const nextOfficer = setBusy(spendStamina(officer, config.tradeStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.tradeStaminaCost)
 
   return {
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
+    pendingCommands: [...state.pendingCommands, { type: 'trade', officerId }],
   }
 }

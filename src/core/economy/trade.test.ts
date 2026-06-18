@@ -3,8 +3,14 @@ import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import type { GameState } from '../game-state'
 import { canTrade, trade } from './trade'
+import { isBusy } from '../world/queries'
 
 const cfg = DEFAULT_CONFIG
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withOfficer(
   s: GameState,
@@ -51,25 +57,19 @@ describe('canTrade 前置校验', () => {
   })
   it('武将已占用 -> 拒绝', () => {
     expect(
-      canTrade(
-        withOfficer(createInitialState(1), 'zhugeliang', { busy: true }),
-        'zhugeliang',
-        'buy',
-        1,
-        cfg
-      ).ok
+      canTrade(occupy(createInitialState(1), 'zhugeliang'), 'zhugeliang', 'buy', 1, cfg).ok
     ).toBe(false)
   })
 })
 
 describe('trade 下令（即时·占人）', () => {
-  it('买入：粮+amount、金-amount×5、扣体力12、busy、不入队', () => {
+  it('买入：粮+amount、金-amount×5、扣体力12、占用(入队 trade)', () => {
     const next = trade(createInitialState(1), 'zhugeliang', 'buy', 50, cfg)
     expect(next.cities.chengdu!.food).toBe(400 + 50)
     expect(next.cities.chengdu!.gold).toBe(500 - 250)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 12)
-    expect(next.officers.zhugeliang!.busy).toBe(true)
-    expect(next.pendingCommands).toEqual([])
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
+    expect(next.pendingCommands).toEqual([{ type: 'trade', officerId: 'zhugeliang' }])
   })
 
   it('卖出：粮-amount、金+amount×2', () => {

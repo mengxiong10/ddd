@@ -14,10 +14,15 @@ import {
   induce,
   executeInduce,
 } from './diplomacy'
-import { isCaptive } from '../world/queries'
+import { isBusy, isCaptive } from '../world/queries'
 import { randInt } from '../shared/rng'
 
 const cfg = DEFAULT_CONFIG
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withOfficer(
   s: GameState,
@@ -37,7 +42,7 @@ function setCityLord(s: GameState, cityId: string, lordId: string): GameState {
   return { ...s, cities: { ...s.cities, [cityId]: { ...s.cities[cityId]!, lordId } } }
 }
 function withWanderer(s: GameState, id: string, cityId: string): GameState {
-  const o = { ...s.officers.guojia!, id, name: id, lordId: null, cityId, busy: false }
+  const o = { ...s.officers.guojia!, id, name: id, lordId: null, cityId }
   return { ...s, officers: { ...s.officers, [id]: o } }
 }
 
@@ -62,14 +67,9 @@ describe('canEntice / canAlienate（敌方在任非君主武将）', () => {
     expect(canEntice(s, 'guanyu', 'xunyu', cfg).ok).toBe(false)
   })
   it('执行人占用 / 体力不足 / 城金不足 -> 拒绝', () => {
-    expect(
-      canEntice(
-        withOfficer(createInitialState(1), 'guanyu', { busy: true }),
-        'guanyu',
-        'xunyu',
-        cfg
-      ).ok
-    ).toBe(false)
+    expect(canEntice(occupy(createInitialState(1), 'guanyu'), 'guanyu', 'xunyu', cfg).ok).toBe(
+      false
+    )
     expect(
       canEntice(
         withOfficer(createInitialState(1), 'guanyu', { stamina: 10 }),
@@ -86,11 +86,11 @@ describe('canEntice / canAlienate（敌方在任非君主武将）', () => {
 })
 
 describe('下令（占人 + 入队 + 不动 RNG）', () => {
-  it('entice：扣体力20/城金50、busy、入队、rng 不变', () => {
+  it('entice：扣体力20/城金50、占用(入队)、rng 不变', () => {
     const s = createInitialState(1)
     const next = entice(s, 'guanyu', 'xunyu', cfg)
     expect(next.officers.guanyu!.stamina).toBe(s.officers.guanyu!.stamina - 20)
-    expect(next.officers.guanyu!.busy).toBe(true)
+    expect(isBusy(next, 'guanyu')).toBe(true)
     expect(next.cities.jiangling!.gold).toBe(s.cities.jiangling!.gold - 50)
     expect(next.pendingCommands).toContainEqual({
       type: 'entice',
@@ -241,7 +241,7 @@ describe('端到端（game.apply + endMonth）', () => {
     expect(s1.pendingCommands).toHaveLength(1)
     const s2 = apply(s1, { type: 'endMonth' })
     expect(s2.pendingCommands).toHaveLength(0)
-    expect(s2.officers.guanyu!.busy).toBe(false)
+    expect(isBusy(s2, 'guanyu')).toBe(false)
   })
 
   it('可复现：相同种子整段推进结果一致', async () => {

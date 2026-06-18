@@ -3,7 +3,7 @@ import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import { canReward, reward, canConfiscate, confiscate } from './reward'
 import { holdByOfficer } from '../world/item'
-import { itemsOfOfficer, itemsInCity, officerLoyalty } from '../world/queries'
+import { isBusy, itemsOfOfficer, itemsInCity, officerLoyalty } from '../world/queries'
 
 function withOfficer(
   s: GameState,
@@ -11,6 +11,10 @@ function withOfficer(
   patch: Partial<GameState['officers'][string]>
 ): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
+}
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
 }
 function giveItem(s: GameState, itemId: string, officerId: string): GameState {
   return { ...s, items: { ...s.items, [itemId]: holdByOfficer(s.items[itemId]!, officerId) } }
@@ -90,7 +94,7 @@ describe('reward 赏赐', () => {
     expect(itemsOfOfficer(next, 'zhugeliang').map((i) => i.id)).toEqual(['cixiongshuanggujian'])
     expect(itemsInCity(next, 'chengdu')).toHaveLength(0)
     expect(next.officers.zhugeliang!.loyalty).toBe(58)
-    expect(next.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(next, 'zhugeliang')).toBe(false)
     expect(next.pendingCommands).toEqual(s.pendingCommands)
     expect(next.rng.seed).toBe(s.rng.seed)
   })
@@ -104,8 +108,8 @@ describe('reward 赏赐', () => {
     expect(itemsOfOfficer(next, 'liubei')).toHaveLength(1)
     expect(officerLoyalty(next, 'liubei')).toBe(100)
   })
-  it('busy 武将仍可被赏赐（不校验 busy）', () => {
-    const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
+  it('占用中武将仍可被赏赐（不校验占用）', () => {
+    const s = occupy(createInitialState(1), 'zhugeliang')
     expect(reward(s, 'zhugeliang', 'cixiongshuanggujian').officers.zhugeliang!.loyalty).toBe(58)
   })
   it('非法 no-op（返回原状态）', () => {
@@ -166,7 +170,7 @@ describe('canConfiscate / confiscate 没收', () => {
     expect(itemsInCity(next, 'chengdu').map((i) => i.id)).toEqual(['cixiongshuanggujian'])
     expect(itemsOfOfficer(next, 'zhugeliang')).toHaveLength(0)
     expect(next.officers.zhugeliang!.loyalty).toBe(30)
-    expect(next.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(next, 'zhugeliang')).toBe(false)
   })
   it('忠诚下限 0', () => {
     const s = withOfficer(

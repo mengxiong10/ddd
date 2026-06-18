@@ -3,7 +3,8 @@ import type { CityId, OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { spendGold } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
+import { spendStamina } from '../world/officer'
+import { isBusy } from '../world/queries'
 
 /**
  * 校验侦察前置条件（不修改状态）。本城 = 武将所在城（officer.cityId）。
@@ -18,7 +19,7 @@ export function canScout(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }
   if (city.gold < config.scoutGoldCost) return { ok: false, reason: '城金不足' }
@@ -31,9 +32,10 @@ export function canScout(
 }
 
 /**
- * 执行侦察：效果在下令当下立即结算（扣本城金 + 扣体力 + 占用武将）。
+ * 执行侦察：效果在下令当下立即结算（扣本城金 + 扣体力）。
  * 「弹出目标城详情面板」是 UI 行为（成功 apply 后读取目标城渲染），core 无额外状态。
- * 不入待执行队列、不动 RNG。前置条件不满足时为 no-op，原样返回 state。
+ * 占用武将由入队 scout 命令派生（queries.isBusy），出队即释放；月末分支无效果。不动 RNG。
+ * 前置条件不满足时为 no-op，原样返回 state。
  */
 export function scout(
   state: GameState,
@@ -46,11 +48,12 @@ export function scout(
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
   const nextCity = spendGold(city, config.scoutGoldCost)
-  const nextOfficer = setBusy(spendStamina(officer, config.scoutStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.scoutStaminaCost)
 
   return {
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
+    pendingCommands: [...state.pendingCommands, { type: 'scout', officerId }],
   }
 }

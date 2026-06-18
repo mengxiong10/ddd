@@ -4,8 +4,14 @@ import { DEFAULT_CONFIG } from '../shared/config'
 import type { GameState } from '../game-state'
 import { canDevelop, develop } from './develop'
 import { holdByOfficer } from '../world/item'
+import { isBusy } from '../world/queries'
 
 const cfg = DEFAULT_CONFIG
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withCity(
   s: GameState,
@@ -29,7 +35,7 @@ describe('canDevelop 前置校验', () => {
   })
 
   it('武将已占用 -> 拒绝', () => {
-    const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
+    const s = occupy(createInitialState(1), 'zhugeliang')
     expect(canDevelop(s, 'zhugeliang', 'agriculture', cfg).ok).toBe(false)
   })
 
@@ -58,7 +64,7 @@ describe('develop 开垦/招商', () => {
     expect(next.cities.chengdu!.agriculture).toBeLessThanOrEqual(base + 30)
     expect(next.cities.chengdu!.gold).toBe(450)
     expect(next.officers.zhugeliang!.stamina).toBe(92)
-    expect(next.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.cities.chengdu!.commerce).toBe(200)
   })
 
@@ -84,7 +90,7 @@ describe('develop 开垦/招商', () => {
   })
 
   it('非法下令 no-op（返回原状态）', () => {
-    const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
+    const s = occupy(createInitialState(1), 'zhugeliang')
     expect(develop(s, 'zhugeliang', 'agriculture', cfg)).toBe(s)
   })
 

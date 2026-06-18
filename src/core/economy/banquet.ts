@@ -4,7 +4,7 @@ import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { spendGold } from '../world/city'
 import { adjustLoyalty, recoverStamina } from '../world/officer'
-import { isCaptive } from '../world/queries'
+import { isBusy, isCaptive } from '../world/queries'
 
 /**
  * 宴请效果（规则身份，内联常量，不入 config）：
@@ -24,7 +24,7 @@ export function canBanquet(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可宴请' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }

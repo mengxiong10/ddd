@@ -3,9 +3,15 @@ import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import { canAllocate, allocate, allocateMaxTroops } from './allocate'
 import { holdByOfficer } from '../world/item'
+import { isBusy } from '../world/queries'
 
 function giveItem(s: GameState, itemId: string, officerId: string): GameState {
   return { ...s, items: { ...s.items, [itemId]: holdByOfficer(s.items[itemId]!, officerId) } }
+}
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
 }
 
 function withCity(
@@ -14,13 +20,6 @@ function withCity(
   patch: Partial<GameState['cities'][string]>
 ): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
-}
-function withOfficer(
-  s: GameState,
-  id: string,
-  patch: Partial<GameState['officers'][string]>
-): GameState {
-  return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
 describe('分配上限', () => {
@@ -49,7 +48,7 @@ describe('canAllocate 前置校验', () => {
   })
 
   it('武将已占用 -> 拒绝', () => {
-    const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
+    const s = occupy(createInitialState(1), 'zhugeliang')
     expect(canAllocate(s, 'zhugeliang', 50).ok).toBe(false)
   })
 
@@ -98,12 +97,12 @@ describe('allocate 分配（双向）', () => {
     const next = allocate(s, 'zhugeliang', 0)
     expect(next.officers.zhugeliang!.stamina).toBe(s.officers.zhugeliang!.stamina)
     expect(next.cities.chengdu!.gold).toBe(s.cities.chengdu!.gold)
-    expect(next.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(next, 'zhugeliang')).toBe(false)
     expect(next.rng.seed).toBe(s.rng.seed)
   })
 
   it('非法下令 no-op（返回原状态）', () => {
-    const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
+    const s = occupy(createInitialState(1), 'zhugeliang')
     expect(allocate(s, 'zhugeliang', 50)).toBe(s)
   })
 })

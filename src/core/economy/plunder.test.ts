@@ -3,8 +3,14 @@ import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import type { GameState } from '../game-state'
 import { canPlunder, plunder, executePlunder } from './plunder'
+import { isBusy } from '../world/queries'
 
 const cfg = DEFAULT_CONFIG
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withOfficer(
   s: GameState,
@@ -21,7 +27,7 @@ describe('canPlunder 前置校验', () => {
   })
 
   it('武将已占用 -> 拒绝', () => {
-    const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
+    const s = occupy(createInitialState(1), 'zhugeliang')
     expect(canPlunder(s, 'zhugeliang', cfg).ok).toBe(false)
   })
 
@@ -32,11 +38,11 @@ describe('canPlunder 前置校验', () => {
 })
 
 describe('plunder 下令（效果延后）', () => {
-  it('扣体力 12、busy=true、入队；城/粮/金不变、RNG 不变', () => {
+  it('扣体力 12、占用(入队 plunder)；城/粮/金不变、RNG 不变', () => {
     const s = createInitialState(1)
     const next = plunder(s, 'zhugeliang', cfg)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 12)
-    expect(next.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.pendingCommands).toEqual([{ type: 'plunder', officerId: 'zhugeliang' }])
     expect(next.cities.chengdu!.agriculture).toBe(300)
     expect(next.cities.chengdu!.commerce).toBe(200)

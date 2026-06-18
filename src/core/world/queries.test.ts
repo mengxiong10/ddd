@@ -15,14 +15,19 @@ import {
   effectiveTroopType,
   officerMovement,
   defendingOfficers,
+  isBusy,
 } from './queries'
-import { setBusy } from './officer'
 import { holdByOfficer } from './item'
 import type { GameState } from '../game-state'
 
 /** 把某道具归属改给某武将。 */
 function giveItem(s: GameState, itemId: string, officerId: string): GameState {
   return { ...s, items: { ...s.items, [itemId]: holdByOfficer(s.items[itemId]!, officerId) } }
+}
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
 }
 
 /** 把某城归属改给另一君主（用于制造俘虏：城内原武将 lordId 不变 -> 成俘虏）。 */
@@ -56,10 +61,8 @@ describe('world queries（基于初始 fixture）', () => {
 
   it('onlyAvailable 排除已占用武将', () => {
     const s = createInitialState(1)
-    const busy = {
-      ...s,
-      officers: { ...s.officers, zhugeliang: setBusy(s.officers.zhugeliang!, true) },
-    }
+    const busy = occupy(s, 'zhugeliang')
+    expect(isBusy(busy, 'zhugeliang')).toBe(true)
     expect(officersInCity(busy, 'chengdu', { onlyAvailable: true })).toHaveLength(2)
     expect(officersInCity(busy, 'chengdu')).toHaveLength(3)
   })
@@ -115,7 +118,7 @@ describe('world queries（基于初始 fixture）', () => {
 
 /** 在成都放一名在野武将（lordId=null）。 */
 function withWanderer(s: GameState, id: string, cityId: string): GameState {
-  const o = { ...s.officers.zhugeliang!, id, name: id, lordId: null, cityId, busy: false }
+  const o = { ...s.officers.zhugeliang!, id, name: id, lordId: null, cityId }
   return { ...s, officers: { ...s.officers, [id]: o } }
 }
 
@@ -345,20 +348,17 @@ describe('effectiveTroopType / officerMovement / itemsOfOfficer 排序', () => {
   })
 })
 
-describe('defendingOfficers（守军：在城·本势力·非俘虏·非外出 campaign）', () => {
-  it('返回本城属本势力的武将（含本月即时/返回类 busy）', () => {
+describe('defendingOfficers（守军：在城·本势力·非俘虏·未被占用 isBusy）', () => {
+  it('返回本城属本势力且未被占用的武将；被占用者排除', () => {
     let s = createInitialState(1)
     expect(
       defendingOfficers(s, 'jiangling')
         .map((o) => o.id)
         .sort()
     ).toEqual(['guanyu', 'zhangfei'])
-    s = { ...s, officers: { ...s.officers, guanyu: setBusy(s.officers.guanyu!, true) } }
-    expect(
-      defendingOfficers(s, 'jiangling')
-        .map((o) => o.id)
-        .sort()
-    ).toEqual(['guanyu', 'zhangfei'])
+    // 占用关羽（入队引用其的命令）→ 守军排除之
+    s = occupy(s, 'guanyu')
+    expect(defendingOfficers(s, 'jiangling').map((o) => o.id)).toEqual(['zhangfei'])
   })
 
   it('排除俘虏与外势力武将', () => {

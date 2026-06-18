@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import { randInt } from '../shared/rng'
 import type { GameState } from '../game-state'
-import { isCaptive } from '../world/queries'
+import { isBusy, isCaptive } from '../world/queries'
 import { runAiDiplomacy } from './ai-diplomacy'
 
 function withOfficer(
@@ -13,9 +13,9 @@ function withOfficer(
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
 
-/** ye 仅 simayi 在任（zhangliao busy）。 */
+/** ye 仅 simayi 在任（zhangliao 移出 ye）。 */
 function singleServing(seed: number): GameState {
-  return withOfficer(createInitialState(seed), 'zhangliao', { busy: true })
+  return withOfficer(createInitialState(seed), 'zhangliao', { cityId: 'xuchang' })
 }
 
 // 敌方（刘备）在任非君主：guanyu/pangtong/zhangfei/zhugeliang；太守(非君主)：guanyu(江陵)；敌君主：liubei
@@ -27,7 +27,7 @@ describe('runAiDiplomacy 5.5.3 入队分支', () => {
       if (roll < 3 || roll === 7) continue
       const out = runAiDiplomacy(s, 'ye')
       const cmd = out.pendingCommands.at(-1)!
-      expect(out.officers.simayi!.busy).toBe(true)
+      expect(isBusy(out, 'simayi')).toBe(true)
       if (roll === 3) expect(cmd.type).toBe('alienate')
       if (roll === 4) expect(cmd.type).toBe('entice')
       if (roll === 5) {
@@ -53,7 +53,7 @@ describe('runAiDiplomacy 5.5.3 入队分支', () => {
       if (roll !== 2 && roll !== 7) continue
       const out = runAiDiplomacy(s, 'ye')
       expect(out.pendingCommands).toEqual([])
-      expect(out.officers.simayi!.busy).toBe(false)
+      expect(isBusy(out, 'simayi')).toBe(false)
     }
   })
 })
@@ -78,11 +78,11 @@ describe('runAiDiplomacy 即时招降/处斩', () => {
         sawSuborn = true
         expect(out.officers.guanyu!.lordId).toBe('caocao')
         expect(isCaptive(out, 'guanyu')).toBe(false)
-        expect(out.officers.simayi!.busy).toBe(false) // 即时、不占人
+        expect(isBusy(out, 'simayi')).toBe(false) // 即时、不占人
       } else if (roll === 1) {
         sawBehead = true
         expect(out.officers.guanyu).toBeUndefined()
-        expect(out.officers.simayi!.busy).toBe(false)
+        expect(isBusy(out, 'simayi')).toBe(false)
       }
     }
     expect(sawSuborn).toBe(true)

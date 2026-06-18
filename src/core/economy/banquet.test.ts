@@ -3,8 +3,14 @@ import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import type { GameState } from '../game-state'
 import { canBanquet, banquet } from './banquet'
+import { isBusy } from '../world/queries'
 
 const cfg = DEFAULT_CONFIG
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withOfficer(
   s: GameState,
@@ -26,13 +32,9 @@ describe('canBanquet 前置校验', () => {
     expect(canBanquet(createInitialState(1), 'zhugeliang', cfg).ok).toBe(true)
   })
   it('目标已占用（非在任）-> 拒绝', () => {
-    expect(
-      canBanquet(
-        withOfficer(createInitialState(1), 'zhugeliang', { busy: true }),
-        'zhugeliang',
-        cfg
-      ).ok
-    ).toBe(false)
+    expect(canBanquet(occupy(createInitialState(1), 'zhugeliang'), 'zhugeliang', cfg).ok).toBe(
+      false
+    )
   })
   it('本城金 < 100 -> 拒绝', () => {
     expect(
@@ -42,13 +44,13 @@ describe('canBanquet 前置校验', () => {
 })
 
 describe('banquet 下令（即时·不占人）', () => {
-  it('扣城金100、目标体力+50封顶100、非君主忠诚+1、busy不变、不入队', () => {
+  it('扣城金100、目标体力+50封顶100、非君主忠诚+1、不占用、不入队', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 30, loyalty: 50 })
     const next = banquet(s, 'zhugeliang', cfg)
     expect(next.cities.chengdu!.gold).toBe(500 - 100)
     expect(next.officers.zhugeliang!.stamina).toBe(80)
     expect(next.officers.zhugeliang!.loyalty).toBe(51)
-    expect(next.officers.zhugeliang!.busy).toBe(false)
+    expect(isBusy(next, 'zhugeliang')).toBe(false)
     expect(next.pendingCommands).toEqual([])
     expect(next.rng.seed).toBe(s.rng.seed)
   })

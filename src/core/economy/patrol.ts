@@ -4,7 +4,8 @@ import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { randInt } from '../shared/rng'
 import { addPopulation, gainLoyalty, spendGold } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
+import { spendStamina } from '../world/officer'
+import { isBusy } from '../world/queries'
 
 /**
  * 出巡效果（规则身份，内联常量，不入 config）：
@@ -25,7 +26,7 @@ export function canPatrol(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }
   if (officer.lordId !== city.lordId) return { ok: false, reason: '俘虏不可出巡' }
@@ -35,8 +36,9 @@ export function canPatrol(
 }
 
 /**
- * 执行出巡：效果在下令当下立即结算（民忠回升 + 人口增长 + 扣金扣体力 + 占用武将 + 推进 RNG）。
- * 不入 pendingCommands；前置条件不满足时为 no-op，原样返回 state。
+ * 执行出巡：效果在下令当下立即结算（民忠回升 + 人口增长 + 扣金扣体力 + 推进 RNG）。
+ * 占用武将由入队 patrol 命令派生（queries.isBusy），出队即释放；月末分支无效果。
+ * 前置条件不满足时为 no-op，原样返回 state。
  */
 export function patrol(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
   if (!canPatrol(state, officerId, config).ok) return state
@@ -53,12 +55,13 @@ export function patrol(state: GameState, officerId: OfficerId, config: GameConfi
     addPopulation(gainLoyalty(city, loyaltyGain), PATROL_POPULATION_GAIN),
     config.patrolGoldCost
   )
-  const nextOfficer = setBusy(spendStamina(officer, config.patrolStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.patrolStaminaCost)
 
   return {
     ...state,
     rng: nextRng,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
+    pendingCommands: [...state.pendingCommands, { type: 'patrol', officerId }],
   }
 }

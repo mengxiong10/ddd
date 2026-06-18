@@ -2,7 +2,7 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
 import { holdByCity, discover } from '../world/item'
-import { isCaptive, itemsOfOfficer } from '../world/queries'
+import { isBusy, isCaptive, itemsOfOfficer } from '../world/queries'
 import { pickRandomCity } from '../world/placement'
 
 /**
@@ -40,7 +40,7 @@ export function canBanish(state: GameState, officerId: OfficerId): CommandCheck 
   if (!officer) return { ok: false, reason: '武将不存在' }
   if (officer.lordId === null) return { ok: false, reason: '在野武将无需流放' }
   if (isCaptive(state, officerId)) return { ok: true } // 俘虏（含被俘君主）可流放
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   if (officer.lordId === officer.id) return { ok: false, reason: '不能流放在任君主' }
   return { ok: true }
 }

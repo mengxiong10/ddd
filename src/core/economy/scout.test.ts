@@ -3,8 +3,14 @@ import { createInitialState } from '../world/fixture'
 import { DEFAULT_CONFIG } from '../shared/config'
 import type { GameState } from '../game-state'
 import { canScout, scout } from './scout'
+import { isBusy } from '../world/queries'
 
 const cfg = DEFAULT_CONFIG
+
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+}
 
 function withCity(
   s: GameState,
@@ -28,7 +34,7 @@ describe('canScout 前置校验', () => {
   })
 
   it('武将已占用 -> 拒绝', () => {
-    const s = withOfficer(createInitialState(1), 'zhugeliang', { busy: true })
+    const s = occupy(createInitialState(1), 'zhugeliang')
     expect(canScout(s, 'zhugeliang', 'xuchang', cfg).ok).toBe(false)
   })
 
@@ -56,13 +62,13 @@ describe('canScout 前置校验', () => {
 })
 
 describe('scout 侦察（即时）', () => {
-  it('扣体力 10、扣本城金 20、busy=true；不入队、RNG 不变', () => {
+  it('扣体力 10、扣本城金 20、占用(入队 scout)；RNG 不变', () => {
     const s = createInitialState(1)
     const next = scout(s, 'zhugeliang', 'xuchang', cfg)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 10)
-    expect(next.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.cities.chengdu!.gold).toBe(500 - 20)
-    expect(next.pendingCommands).toEqual([])
+    expect(next.pendingCommands).toEqual([{ type: 'scout', officerId: 'zhugeliang' }])
     expect(next.rng.seed).toBe(s.rng.seed)
     // 目标城不被改动
     expect(next.cities.xuchang).toEqual(s.cities.xuchang)

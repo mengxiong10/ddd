@@ -22,6 +22,17 @@ export function isCaptive(state: GameState, officerId: OfficerId): boolean {
 }
 
 /**
+ * 占用中（派生，非存储字段）：武将被某条 pending command 引用即"本月已占用"。
+ * 占人指令一律入队，故"占用中"恰好等价于"队列引用"——campaign 看 officerIds 成员、其余单人命令看 officerId。
+ * 与俘虏/太守/君主忠诚同属"派生不存字段"；出队（runNonCampaignPending 过滤 / dropFirstCampaign 移除）即释放。
+ */
+export function isBusy(state: GameState, officerId: OfficerId): boolean {
+  return state.pendingCommands.some((c) =>
+    c.type === 'campaign' ? c.officerIds.includes(officerId) : c.officerId === officerId
+  )
+}
+
+/**
  * 取驻于某城的武将。onlyAvailable=true 时仅返回「在任」武将（未被占用、非俘虏、非无主/在野），
  * 即可被下令的武将；UI 据此列出可指派对象。在野武将（lordId===null）隐匿、不可被指派。
  */
@@ -34,7 +45,7 @@ export function officersInCity(
   return Object.values(state.officers).filter(
     (o) =>
       o.cityId === cityId &&
-      (!onlyAvailable || (!o.busy && o.lordId !== null && !isCaptive(state, o.id)))
+      (!onlyAvailable || (!isBusy(state, o.id) && o.lordId !== null && !isCaptive(state, o.id)))
   )
 }
 
@@ -44,22 +55,13 @@ export function wanderingOfficersInCity(state: GameState, cityId: CityId): Offic
 }
 
 /**
- * 城防守军（`16-ai-campaign`）：在该城、属本城势力、非俘虏，且未被任何待执行 campaign 征调的武将。
- * 出征在外者 cityId 仍滞留源城直到战斗结算（concludeBattle/quickResolveCampaign 才改写），故需显式排除；
- * 其余 busy（本月被即时/返回类命令占用）仍计为守军——月末回防。
+ * 城防守军（`16-ai-campaign`）：在该城、属本城势力、非俘虏、未被占用（isBusy 为假）的武将——即「在任武将」。
+ * 占人一律入队故 isBusy 派生自队列：外出 campaign 者仍被其 campaign 命令引用 → 占用中 → 自动排除；
+ * 即时/经营类占人在 runNonCampaignPending 已出队（守军判定均在其后调用）→ 非占用 → 计为守军。
  * 「无守军直接占城」判定、initBattle 自动选守、AI vs AI 速算守方均共用此口径。
  */
 export function defendingOfficers(state: GameState, cityId: CityId): Officer[] {
-  const city = state.cities[cityId]
-  if (!city) return []
-  const onCampaign = new Set<OfficerId>()
-  for (const cmd of state.pendingCommands) {
-    if (cmd.type === 'campaign') for (const id of cmd.officerIds) onCampaign.add(id)
-  }
-  // lordId===city.lordId 已蕴含「非俘虏」（俘虏定义为 lordId≠所在城 lordId）。
-  return Object.values(state.officers).filter(
-    (o) => o.cityId === cityId && o.lordId === city.lordId && !onCampaign.has(o.id)
-  )
+  return officersInCity(state, cityId, { onlyAvailable: true })
 }
 
 /** 本城俘虏（isCaptive 为真者）：招降/处斩的候选、UI 列示。派生，无第二份存储。 */

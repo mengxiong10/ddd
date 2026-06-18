@@ -3,8 +3,8 @@ import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import { spendGold } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
-import { effectiveOfficer, isCaptive } from '../world/queries'
+import { spendStamina } from '../world/officer'
+import { effectiveOfficer, isBusy, isCaptive } from '../world/queries'
 import { randInt } from '../shared/rng'
 
 /**
@@ -37,7 +37,7 @@ export function canSuborn(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   const captive = state.officers[captiveId]
   if (!captive) return { ok: false, reason: '俘虏不存在' }
   if (captive.cityId !== officer.cityId) return { ok: false, reason: '俘虏不在本城' }
@@ -50,7 +50,7 @@ export function canSuborn(
 }
 
 /**
- * 下令招降：效果延到月末（见 executeSuborn）。下令当下扣执行人体力、扣本城金、占用武将、入队，不动 RNG。
+ * 下令招降：效果延到月末（见 executeSuborn）。下令当下扣执行人体力、扣本城金、入队（占用由队列派生），不动 RNG。
  * 前置不满足时为 no-op，原样返回 state。
  */
 export function suborn(
@@ -63,7 +63,7 @@ export function suborn(
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
-  const nextOfficer = setBusy(spendStamina(officer, config.subornStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.subornStaminaCost)
   const nextCity = spendGold(city, config.subornGoldCost)
 
   return {

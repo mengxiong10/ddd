@@ -9,7 +9,6 @@ import {
   setStatus,
   raisePrevention,
 } from '../world/city'
-import { setBusy } from '../world/officer'
 import { citiesOfLord } from '../world/queries'
 import { aiServingOfficers, busyEnqueue, byId, adjacentEnemyCities } from './ai-shared'
 
@@ -78,7 +77,7 @@ function developBusy(
   kind: 'agriculture' | 'commerce'
 ): GameState {
   const city = raiseAttribute(state.cities[cityId]!, kind, AI_DEVELOP_DELTA)
-  return setCityBusy(state, cityId, city, officerId)
+  return setCityBusy(state, cityId, city, officerId, 'develop')
 }
 
 /** 出巡：民忠 +4 封顶、人口 +100 + 占人。 */
@@ -87,27 +86,27 @@ function patrolBusy(state: GameState, cityId: CityId, officerId: OfficerId): Gam
     gainLoyalty(state.cities[cityId]!, AI_PATROL_LOYALTY),
     AI_PATROL_POPULATION
   )
-  return setCityBusy(state, cityId, city, officerId)
+  return setCityBusy(state, cityId, city, officerId, 'patrol')
 }
 
 /** 治理：状态改 normal、防灾 +4 封顶 + 占人。 */
 function governBusy(state: GameState, cityId: CityId, officerId: OfficerId): GameState {
   const city = raisePrevention(setStatus(state.cities[cityId]!, 'normal'), AI_GOVERN_PREVENTION)
-  return setCityBusy(state, cityId, city, officerId)
+  return setCityBusy(state, cityId, city, officerId, 'govern')
 }
 
-/** 写回城 + 置执行人 busy（立即生效命令的占人表达）。 */
+/** 写回城 + 入队对应即时 type（占用由队列派生 queries.isBusy；月末空操作）。 */
 function setCityBusy(
   state: GameState,
   cityId: CityId,
   city: GameState['cities'][CityId],
-  officerId: OfficerId
+  officerId: OfficerId,
+  type: 'develop' | 'patrol' | 'govern'
 ): GameState {
-  return {
-    ...state,
-    cities: { ...state.cities, [cityId]: city },
-    officers: { ...state.officers, [officerId]: setBusy(state.officers[officerId]!, true) },
-  }
+  return busyEnqueue({ ...state, cities: { ...state.cities, [cityId]: city } }, officerId, {
+    type,
+    officerId,
+  })
 }
 
 /**

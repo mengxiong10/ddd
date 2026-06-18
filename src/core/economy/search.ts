@@ -4,10 +4,11 @@ import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import type { Rng } from '../shared/rng'
 import { randInt } from '../shared/rng'
-import { setBusy, spendStamina } from '../world/officer'
+import { spendStamina } from '../world/officer'
 import { discover } from '../world/item'
 import {
   effectiveOfficer,
+  isBusy,
   isCaptive,
   undiscoveredItemsInCity,
   wanderingOfficersInCity,
@@ -40,21 +41,21 @@ export function canSearch(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可搜寻' }
   if (officer.stamina < config.searchStaminaCost) return { ok: false, reason: '体力不足' }
   return { ok: true }
 }
 
 /**
- * 下令搜寻：效果延到月末（见 executeSearch）。下令仅扣体力、占用武将、入队；不改城、不动 RNG。
+ * 下令搜寻：效果延到月末（见 executeSearch）。下令仅扣体力、入队（占用由队列派生）；不改城、不动 RNG。
  * 前置不满足为 no-op。
  */
 export function search(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
   if (!canSearch(state, officerId, config).ok) return state
 
   const officer = state.officers[officerId]!
-  const nextOfficer = setBusy(spendStamina(officer, config.searchStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.searchStaminaCost)
   return {
     ...state,
     officers: { ...state.officers, [officerId]: nextOfficer },

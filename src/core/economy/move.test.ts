@@ -2,13 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import { canMove, move, executeMove } from './move'
+import { isBusy } from '../world/queries'
 
-function withOfficer(
-  s: GameState,
-  id: string,
-  patch: Partial<GameState['officers'][string]>
-): GameState {
-  return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
+/** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
+function occupy(s: GameState, id: string): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
 }
 
 // 刘备方：成都(chengdu) / 江陵(jiangling)；曹操方：许昌(xuchang)
@@ -26,21 +24,17 @@ describe('canMove 前置校验', () => {
     expect(canMove(createInitialState(1), 'zhugeliang', 'nowhere').ok).toBe(false)
   })
   it('武将已占用 -> 拒绝', () => {
-    expect(
-      canMove(
-        withOfficer(createInitialState(1), 'zhugeliang', { busy: true }),
-        'zhugeliang',
-        'jiangling'
-      ).ok
-    ).toBe(false)
+    expect(canMove(occupy(createInitialState(1), 'zhugeliang'), 'zhugeliang', 'jiangling').ok).toBe(
+      false
+    )
   })
 })
 
 describe('move 下令（月末执行）', () => {
-  it('busy=true、入队 move；不扣体力/金，目标城与 cityId 不变', () => {
+  it('占用(入队 move)；不扣体力/金，目标城与 cityId 不变', () => {
     const s = createInitialState(1)
     const next = move(s, 'zhugeliang', 'jiangling')
-    expect(next.officers.zhugeliang!.busy).toBe(true)
+    expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.officers.zhugeliang!.cityId).toBe('chengdu')
     expect(next.officers.zhugeliang!.stamina).toBe(100)
     expect(next.pendingCommands).toEqual([

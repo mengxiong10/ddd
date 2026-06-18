@@ -4,7 +4,8 @@ import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
 import type { City } from '../world/city'
 import { addReserveTroops, spendGold } from '../world/city'
-import { setBusy, spendStamina } from '../world/officer'
+import { spendStamina } from '../world/officer'
+import { isBusy } from '../world/queries'
 
 /**
  * 征兵转化率（规则身份，内联常量，不入 config）：
@@ -36,7 +37,7 @@ export function canRecruit(
 ): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: '武将不存在' }
-  if (officer.busy) return { ok: false, reason: '武将本月已被占用' }
+  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
   const city = state.cities[officer.cityId]
   if (!city) return { ok: false, reason: '城不存在' }
 
@@ -48,8 +49,9 @@ export function canRecruit(
 }
 
 /**
- * 执行征兵：效果在下令当下立即结算（后备兵 += N + 扣金扣体力 + 占用武将），不推进 RNG。
- * 占人武将由月末 endMonth 统一回城。前置条件不满足时为 no-op，原样返回 state。
+ * 执行征兵：效果在下令当下立即结算（后备兵 += N + 扣金扣体力），不推进 RNG。
+ * 占用武将由入队 recruit 命令派生（queries.isBusy），出队即释放；月末分支无效果。
+ * 前置条件不满足时为 no-op，原样返回 state。
  */
 export function recruit(
   state: GameState,
@@ -63,11 +65,12 @@ export function recruit(
   const city = state.cities[officer.cityId]!
 
   const nextCity = spendGold(addReserveTroops(city, amount), recruitGoldCost(amount))
-  const nextOfficer = setBusy(spendStamina(officer, config.recruitStaminaCost), true)
+  const nextOfficer = spendStamina(officer, config.recruitStaminaCost)
 
   return {
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
+    pendingCommands: [...state.pendingCommands, { type: 'recruit', officerId }],
   }
 }
