@@ -7,6 +7,7 @@ import type { TroopType, TroopTypeOverride } from './troop-type'
 import type { CityId, ItemId, OfficerId } from '../shared/ids'
 import { createRng } from '../shared/rng'
 import { buildAdjacency } from './adjacency'
+import { DEFAULT_MAP_ID } from '../military/battle-map'
 
 /** 起始年份（公元 189 年，东汉末）。 */
 const START_YEAR = 189
@@ -166,6 +167,7 @@ export function createInitialState(seed: number): GameState {
       loyalty: MOCK_CITY_LOYALTY, reserveTroops: MOCK_RESERVE_TROOPS,
       population: cs.population,
       status: 'normal', disasterPrevention: MOCK_DISASTER_PREVENTION,
+      battleMapId: DEFAULT_MAP_ID,
     }
     for (const os of cs.officers) {
       officers[os.id] = {
@@ -174,6 +176,7 @@ export function createInitialState(seed: number): GameState {
         troops: MOCK_TROOPS, level: MOCK_LEVEL, force: MOCK_FORCE,
         loyalty: os.id === cs.lordId ? MOCK_LORD_LOYALTY : MOCK_OFFICER_LOYALTY,
         recruiterId: null, personality: os.personality, troopType: os.troopType,
+        experience: 0,
       }
     }
   }
@@ -198,7 +201,7 @@ export function createInitialState(seed: number): GameState {
         lordId: null, stamina: STAMINA_MAX, busy: false,
         troops: 0, level: MOCK_LEVEL, force: s.force,
         loyalty: MOCK_OFFICER_LOYALTY, recruiterId: s.recruiterId, personality: s.personality,
-        troopType: s.troopType,
+        troopType: s.troopType, experience: 0,
       },
     })),
     ...DEBUT_ITEM_SEEDS.map((s): DebutEntry => ({
@@ -224,5 +227,6 @@ export function createInitialState(seed: number): GameState {
     pendingCommands: [],
     pendingDebuts,
     adjacency: buildAdjacency(ADJACENCY_EDGES),
+    activeBattle: null,
   }
 }

@@ -6,7 +6,7 @@ const base: City = {
   id: 'c1', name: '成都', lordId: 'o1',
   agriculture: 300, commerce: 200, agricultureCap: 1000, commerceCap: 1000,
   gold: 500, food: 400, loyalty: 50, reserveTroops: 0, population: 30000,
-  status: 'normal', disasterPrevention: 50,
+  status: 'normal', disasterPrevention: 50, battleMapId: 'plains',
 }
 
 describe('city 聚合', () => {

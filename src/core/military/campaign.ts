@@ -17,14 +17,30 @@ export function executeCampaign(
   targetCityId: CityId,
   provisions: number,
 ): GameState {
+  const attackerStrength = officerIds.reduce((sum, id) => sum + state.officers[id]!.troops, 0)
+  const defenderStrength = defenderTroops(state, targetCityId)
+  const attackerWins = attackerStrength > defenderStrength
+  return resolveCampaignOutcome(state, officerIds, targetCityId, provisions, attackerWins)
+}
+
+/**
+ * 战后处理（出征速算与地图战共用）：给定 attackerWins——
+ * 出征武将 cityId 不论胜负都移到目标城（胜=进驻、败=就地成俘虏）；
+ * 攻方胜则目标城 lordId 改攻方、城粮 += 随军粮草；
+ * 末了对攻/守两方君主各跑一次 resolveSuccession（未被俘即 no-op）。
+ * 攻方君主由 officerIds[0] 所在城派生（出征前共处一城）。
+ */
+export function resolveCampaignOutcome(
+  state: GameState,
+  officerIds: readonly OfficerId[],
+  targetCityId: CityId,
+  provisions: number,
+  attackerWins: boolean,
+): GameState {
   const sourceCityId = state.officers[officerIds[0]!]!.cityId
   const attackerLord = state.cities[sourceCityId]!.lordId
   const target = state.cities[targetCityId]!
   const defenderLord = target.lordId
-
-  const attackerStrength = officerIds.reduce((sum, id) => sum + state.officers[id]!.troops, 0)
-  const defenderStrength = defenderTroops(state, targetCityId)
-  const attackerWins = attackerStrength > defenderStrength
 
   const officers = { ...state.officers }
   for (const id of officerIds) officers[id] = { ...officers[id]!, cityId: targetCityId }

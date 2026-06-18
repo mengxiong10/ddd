@@ -6,7 +6,8 @@ import { plunder } from '../economy/plunder'
 import { campaign } from '../economy/campaign'
 import { isCaptive } from '../world/queries'
 import type { GameState } from '../game-state'
-import { endMonth } from './end-month'
+import type { BattleState } from '../military/battle'
+import { endMonth, resumeMonth } from './end-month'
 
 const cfg = DEFAULT_CONFIG
 
@@ -63,23 +64,48 @@ describe('endMonth 月末编排', () => {
     expect(next.officers.zhugeliang!.busy).toBe(false)
   })
 
-  it('出征经 endMonth 结算：攻方胜则占城，出征武将月末 busy=false 但不回出发城', () => {
-    // 关羽 500 + 张飞 100 = 600 > 许昌守军 300
+  it('玩家出征：endMonth 挂起为交互式战斗，不立即占城/不推进月份', () => {
     const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
     const queued = campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120)
     const next = endMonth(queued, cfg)
 
+    expect(next.activeBattle).not.toBeNull()
+    expect(next.activeBattle!.mode).toBe('attack')
+    expect(next.cities.xuchang!.lordId).toBe('caocao') // 尚未结算
+    expect(next.month).toBe(1) // 月末挂起，未推进
+    expect(next.pendingCommands).toHaveLength(1) // campaign 留队待续战
+  })
+
+  it('resumeMonth：战斗玩家胜→占城 + 续完月末（武将进驻、busy=false、月份+1、队列清空）', () => {
+    const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
+    const suspended = endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
+    const won: GameState = { ...suspended, activeBattle: { ...(suspended.activeBattle as BattleState), outcome: 'playerWin' } }
+    const next = resumeMonth(won, cfg)
+
+    expect(next.activeBattle).toBeNull()
     expect(next.cities.xuchang!.lordId).toBe('liubei')
     expect(next.officers.guanyu!.cityId).toBe('xuchang') // 进驻新城，未回江陵
     expect(next.officers.guanyu!.busy).toBe(false)
-    expect(isCaptive(next, 'guanyu')).toBe(false)
     expect(isCaptive(next, 'caocao')).toBe(true)
     expect(next.cities.ye!.lordId).toBe('simayi') // 曹操被俘，重选君主
     expect(next.pendingCommands).toEqual([])
     expect(next.month).toBe(2)
   })
 
-  it('整段推进确定性可复现', () => {
+  it('resumeMonth：战斗玩家败→不占城、出征武将成俘虏，仍续完月末', () => {
+    const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
+    const suspended = endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
+    const lost: GameState = { ...suspended, activeBattle: { ...(suspended.activeBattle as BattleState), outcome: 'playerLose' } }
+    const next = resumeMonth(lost, cfg)
+
+    expect(next.activeBattle).toBeNull()
+    expect(next.cities.xuchang!.lordId).toBe('caocao')
+    expect(next.officers.guanyu!.cityId).toBe('xuchang')
+    expect(isCaptive(next, 'guanyu')).toBe(true)
+    expect(next.month).toBe(2)
+  })
+
+  it('挂起战斗确定性可复现', () => {
     const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
     const run = () => endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
     expect(run()).toEqual(run())

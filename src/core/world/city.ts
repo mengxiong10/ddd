@@ -38,6 +38,8 @@ export interface City {
   readonly status: CityStatus
   /** 防灾值 [0, DISASTER_PREVENTION_MAX]；越高越不易发灾、越快从旱/水灾恢复。 */
   readonly disasterPrevention: number
+  /** 战斗地图 id（指向 military/battle-map 的 BATTLE_MAPS 模板，fixture 播种）。用 string 避免 world→military 反向依赖。 */
+  readonly battleMapId: string
 }
 
 /** 按开发种类取对应的城级上限。 */

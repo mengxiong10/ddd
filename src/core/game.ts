@@ -23,7 +23,8 @@ import {
 } from './economy/diplomacy'
 import { canBehead, behead, canBanish, banish } from './economy/captive'
 import { canGovern, govern } from './economy/govern'
-import { endMonth } from './turn/end-month'
+import { endMonth, resumeMonth } from './turn/end-month'
+import { canBattle, reduceBattle, type BattleAction } from './military/battle'
 
 /**
  * 对外可派发的动作。reclaim/commerce/recruit/allocate 是「指令」（需 canApply 校验），
@@ -53,6 +54,8 @@ export type Action =
   | { type: 'behead'; captiveId: OfficerId } // 处斩（不占人，即时）
   | { type: 'banish'; officerId: OfficerId } // 流放（不占人，即时）
   | { type: 'govern'; officerId: OfficerId } // 治理（占人，即时）
+  | { type: 'battle'; action: BattleAction } // 战斗推进（单包装委派 military/battle，不需 config）
+  | { type: 'resumeMonth' } // 战斗分胜负后续跑月末（写回 + 续 campaign/尾段）
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -104,8 +107,12 @@ export function canApply(state: GameState, action: Action, config: GameConfig = 
       return canBanish(state, action.officerId)
     case 'govern':
       return canGovern(state, action.officerId, config)
-    case 'endMonth':
+    case 'battle':
+      return canBattle(state, action.action)
+    case 'resumeMonth':
       return { ok: true }
+    case 'endMonth':
+      return state.activeBattle ? { ok: false, reason: '战斗进行中，请先结束战斗' } : { ok: true }
   }
 }
 
@@ -158,6 +165,10 @@ export function apply(state: GameState, action: Action, config: GameConfig = DEF
       return banish(state, action.officerId)
     case 'govern':
       return govern(state, action.officerId, config)
+    case 'battle':
+      return reduceBattle(state, action.action)
+    case 'resumeMonth':
+      return resumeMonth(state, config)
     case 'endMonth':
       return endMonth(state, config)
   }

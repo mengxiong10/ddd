@@ -4,6 +4,7 @@ import type { City } from './world/city'
 import type { Officer } from './world/officer'
 import type { Item } from './world/item'
 import type { Adjacency } from './world/adjacency'
+import type { BattleState } from './military/battle'
 
 /**
  * 效果延到月末执行的指令项；月末由 turn 层按 type 分派（与 game.apply 同构）。
@@ -83,8 +84,9 @@ export interface GameState {
   /** 城邻接拓扑（静态，fixture 播种）；出征「可达=相邻」据此校验。 */
   readonly adjacency: Adjacency
   /**
-   * 本月待月末执行的指令，按下令顺序入队；月末 runPendingCommands 执行后清空。
-   * 仅「效果延后」指令入队（本切片仅掠夺）；占人本身仍由 Officer.busy 表达。
+   * 本月待月末执行的指令，按下令顺序入队；月末由 turn 层处理后清空。
+   * 非 campaign 项经 runNonCampaignPending 执行；campaign 项由 end-month 逐条结算/挂起战斗。
+   * 仅「效果延后」指令入队；占人本身仍由 Officer.busy 表达。
    */
   readonly pendingCommands: readonly PendingCommand[]
   /**
@@ -92,4 +94,9 @@ export interface GameState {
    * 见 world/debut.runDebuts。
    */
   readonly pendingDebuts: readonly DebutEntry[]
+  /**
+   * 进行中的战斗（交互式子对局）；非 null 表示月末挂起在战斗中、经 BattleAction 推进。
+   * 分胜负后由 turn.resumeMonth 写回并清空、续跑月末。普通态恒为 null。
+   */
+  readonly activeBattle: BattleState | null
 }

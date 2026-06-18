@@ -23,6 +23,21 @@ describe('game apply 分派', () => {
     const next = apply(createInitialState(1), { type: 'endMonth' })
     expect(next.month).toBe(2)
   })
+
+  it('战斗端到端：出征→endMonth 挂起→battle 撤退→resumeMonth 续月末', () => {
+    const ordered = apply(createInitialState(1), { type: 'campaign', officerIds: ['guanyu', 'zhangfei'], targetCityId: 'xuchang', provisions: 120 })
+    const suspended = apply(ordered, { type: 'endMonth' })
+    expect(suspended.activeBattle).not.toBeNull()
+    // 战斗进行中不可 endMonth
+    expect(canApply(suspended, { type: 'endMonth' }).ok).toBe(false)
+    // 撤退判玩家败，再续月末
+    const retreated = apply(suspended, { type: 'battle', action: { type: 'retreat' } })
+    expect(retreated.activeBattle!.outcome).toBe('playerLose')
+    const next = apply(retreated, { type: 'resumeMonth' })
+    expect(next.activeBattle).toBeNull()
+    expect(next.month).toBe(2)
+    expect(next.cities.xuchang!.lordId).toBe('caocao') // 败，未占城
+  })
 })
 
 describe('canApply', () => {

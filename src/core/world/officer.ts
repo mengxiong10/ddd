@@ -46,6 +46,8 @@ export interface Officer {
   readonly personality: Personality
   /** 基础兵种（fixture 可信播种、不跑 >105 门槛）；有效兵种由 queries 派生、不写回。 */
   readonly troopType: TroopType
+  /** 经验，取值 [0,100)；战斗中累积，满 100 升级扣 100（fixture 播种）。 */
+  readonly experience: number
 }
 
 /**
