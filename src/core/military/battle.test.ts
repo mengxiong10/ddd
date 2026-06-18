@@ -487,3 +487,39 @@ describe('concludeBattle 写回 + 组装 CampaignOutcome（攻方胜）', () => 
     expect(next.activeBattle).toBeNull()
   })
 })
+
+describe('endDay 对手方（AI）行动（17-battle-ai）', () => {
+  // 玩家进攻许昌（attack 模式）：曹操=对手方守军，邻接玩家主将关羽。
+  // 把曹操属性压低、兵力远超带兵量 → 必跳技能筛、走普攻、扑主将关羽。
+  const base = createInitialState(1)
+  const s: GameState = {
+    ...base,
+    officers: {
+      ...base.officers,
+      caocao: {
+        ...base.officers.caocao!,
+        force: 1,
+        intelligence: 1,
+        level: 1,
+        troopType: 'cavalry',
+      },
+    },
+  }
+  const b = makeBattle([
+    unit('guanyu', 'player', { x: 5, y: 5 }, 100),
+    unit('caocao', 'opponent', { x: 6, y: 5 }, 3000),
+  ])
+  const after = reduceBattle(withBattle(s, b), { type: 'endDay' })
+
+  it('AI 守军普攻玩家主将 → 关羽掉兵', () => {
+    expect(after.activeBattle!.units.guanyu!.troops).toBeLessThan(100)
+  })
+  it('未分胜负则推进到第 2 天', () => {
+    expect(after.activeBattle!.day).toBe(2)
+    expect(after.activeBattle!.outcome).toBeNull()
+  })
+  it('对手静止旧假设已不成立：endDay 不再是 no-op', () => {
+    const stillFull = after.activeBattle!.units.guanyu!.troops === 100
+    expect(stillFull).toBe(false)
+  })
+})
