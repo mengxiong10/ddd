@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from './world/fixture'
 import { apply, canApply, type Action } from './game'
 import type { GameState } from './game-state'
+import { WEATHER_ORDER } from './military/battle-weather'
 
 function run(seed: number, actions: Action[]) {
   return actions.reduce((s, a) => apply(s, a), createInitialState(seed))
@@ -37,6 +38,14 @@ describe('game apply 分派', () => {
     expect(next.activeBattle).toBeNull()
     expect(next.month).toBe(2)
     expect(next.cities.xuchang!.lordId).toBe('caocao') // 败，未占城
+  })
+
+  it('战斗挂起即初始化技能系统：天气/MP/状态（initBattle+startDay 全链接线）', () => {
+    const ordered = apply(createInitialState(1), { type: 'campaign', officerIds: ['guanyu', 'zhangfei'], targetCityId: 'xuchang', provisions: 120 })
+    const b = apply(ordered, { type: 'endMonth' }).activeBattle!
+    expect(WEATHER_ORDER).toContain(b.weather) // startDay 已刷新天气
+    expect(b.units.guanyu!.mp).toBeGreaterThan(0) // initBattle 派生 MP
+    expect(b.units.guanyu!.status).toBe('normal')
   })
 })
 

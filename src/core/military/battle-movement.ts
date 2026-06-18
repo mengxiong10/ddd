@@ -8,20 +8,22 @@ import type { BattleState } from './battle'
 import type { BattleMap } from './battle-map'
 import { BATTLE_MAPS, MAX_MOVEMENT, MOVE_COST, inBounds, terrainAt } from './battle-map'
 import { ATTACK_MASK } from './battle-combat'
+import type { SkillId } from './battle-skill'
+import { RANGE_MASK } from './battle-skill'
 
 const STEPS: readonly Position[] = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }]
 const key = (p: Position): string => `${p.x},${p.y}`
 
 /** 某格存活单位（非击溃）；无则 undefined。 */
 function unitAt(battle: BattleState, p: Position) {
-  return Object.values(battle.units).find((u) => !u.routed && samePos(u.pos, p))
+  return Object.values(battle.units).find((u) => u.status !== 'dead' && samePos(u.pos, p))
 }
 
 /** 敌方接敌停步区：所有存活敌方单位的上下左右四格之并。 */
 function zocTiles(battle: BattleState, mySide: BattleState['units'][string]['side']): Set<string> {
   const zoc = new Set<string>()
   for (const u of Object.values(battle.units)) {
-    if (u.routed || u.side === mySide) continue
+    if (u.status === 'dead' || u.side === mySide) continue
     for (const s of STEPS) zoc.add(key({ x: u.pos.x + s.x, y: u.pos.y + s.y }))
   }
   return zoc
@@ -36,12 +38,14 @@ function zocTiles(battle: BattleState, mySide: BattleState['units'][string]['sid
  */
 export function reachableTiles(state: GameState, battle: BattleState, officerId: OfficerId): Position[] {
   const unit = battle.units[officerId]
-  if (!unit || unit.routed) return []
+  if (!unit || unit.status === 'dead') return []
   const map: BattleMap = BATTLE_MAPS[battle.mapId]!
   const troopType: TroopType = effectiveTroopType(state, officerId)
-  const budget = Math.min(officerMovement(state, officerId), MAX_MOVEMENT)
+  // 定身：移动力降为 1；其余按派生移动力封顶 8。
+  const budget = unit.status === 'rooted' ? 1 : Math.min(officerMovement(state, officerId), MAX_MOVEMENT)
   const start = unit.pos
-  const zoc = zocTiles(battle, unit.side)
+  // 奇门：可穿越敌方接敌停步区 → 不受 ZoC 压制。
+  const zoc = unit.status === 'qimen' ? new Set<string>() : zocTiles(battle, unit.side)
 
   const dist = new Map<string, number>([[key(start), 0]])
   const frontier: Position[] = [start]
@@ -89,6 +93,19 @@ export function reachableTiles(state: GameState, battle: BattleState, officerId:
 export function attackableTiles(map: BattleMap, from: Position, troopType: TroopType): Position[] {
   const result: Position[] = []
   for (const off of ATTACK_MASK[troopType]) {
+    const p: Position = { x: from.x + off.x, y: from.y + off.y }
+    if (inBounds(map, p)) result.push(p)
+  }
+  return result
+}
+
+/**
+ * 技能目标候选格（§6.4.2）：以 from 为中心套该技能 9×9 掩码（界内即返回）。
+ * 阵营/地形/兵种合法性由调用方（canBattle）另判；self/无目标技能返回 []。
+ */
+export function skillTargetTiles(map: BattleMap, from: Position, skillId: SkillId): Position[] {
+  const result: Position[] = []
+  for (const off of RANGE_MASK[skillId] ?? []) {
     const p: Position = { x: from.x + off.x, y: from.y + off.y }
     if (inBounds(map, p)) result.push(p)
   }

@@ -8,7 +8,7 @@ import { runDebuts } from '../world/debut'
 import { runDisasters } from '../world/disaster'
 import { runNonCampaignPending } from './pending'
 import { executeCampaign } from '../military/campaign'
-import { initBattle, concludeBattle } from '../military/battle'
+import { initBattle, startDay, concludeBattle } from '../military/battle'
 
 type CampaignPending = Extract<PendingCommand, { type: 'campaign' }>
 
@@ -43,7 +43,9 @@ function advanceCampaigns(state: GameState, config: GameConfig): GameState {
   if (idx < 0) return finishMonthTail(state, config)
   const c = state.pendingCommands[idx] as CampaignPending
   if (isPlayerCampaign(state, c)) {
-    return { ...state, activeBattle: initBattle(state, c.officerIds, c.targetCityId, c.provisions) }
+    // 装好单位后跑第 1 天开头（刷天气/状态/重置行动），与后续每日 endDay 同构。
+    const started = startDay({ ...state, activeBattle: initBattle(state, c.officerIds, c.targetCityId, c.provisions) })
+    return started
   }
   // 非玩家 campaign（本切片 AI 不出征故走不到，保留前向兼容）：速算后继续
   const resolved = executeCampaign(state, c.officerIds, c.targetCityId, c.provisions)

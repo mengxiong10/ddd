@@ -48,6 +48,11 @@ export interface Officer {
   readonly troopType: TroopType
   /** 经验，取值 [0,100)；战斗中累积，满 100 升级扣 100（fixture 播种）。 */
   readonly experience: number
+  /**
+   * 个人技能 id 列表（战斗技能，fixture 播种、默认 []）。不受等级解锁公式限制、恒可用。
+   * 用 number 而非 SkillId 以规避 world→military 反向依赖（同 City.battleMapId 用 string）。
+   */
+  readonly personalSkills: readonly number[]
 }
 
 /**

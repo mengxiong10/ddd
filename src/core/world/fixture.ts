@@ -33,6 +33,8 @@ interface OfficerSeed {
   readonly personality: Personality
   /** 基础兵种（mock 占位，待平衡）。 */
   readonly troopType: TroopType
+  /** 个人技能 id（战斗技能，默认 []）。 */
+  readonly personalSkills?: readonly number[]
 }
 
 interface CitySeed {
@@ -118,7 +120,7 @@ const CITY_SEEDS: readonly CitySeed[] = [
     agriculture: 300, commerce: 200, gold: 500, food: 400, population: 30000,
     officers: [
       { id: 'liubei', name: '刘备', intelligence: 75, personality: 1, troopType: 'cavalry' }, // 君主·大义
-      { id: 'zhugeliang', name: '诸葛亮', intelligence: 100, personality: 0, troopType: 'infantry' }, // 忠义
+      { id: 'zhugeliang', name: '诸葛亮', intelligence: 100, personality: 0, troopType: 'infantry', personalSkills: [22, 23] }, // 忠义·天变/石阵
       { id: 'pangtong', name: '庞统', intelligence: 90, personality: 1, troopType: 'infantry' }, // 大志
     ],
   },
@@ -176,7 +178,7 @@ export function createInitialState(seed: number): GameState {
         troops: MOCK_TROOPS, level: MOCK_LEVEL, force: MOCK_FORCE,
         loyalty: os.id === cs.lordId ? MOCK_LORD_LOYALTY : MOCK_OFFICER_LOYALTY,
         recruiterId: null, personality: os.personality, troopType: os.troopType,
-        experience: 0,
+        experience: 0, personalSkills: os.personalSkills ?? [],
       }
     }
   }
@@ -201,7 +203,7 @@ export function createInitialState(seed: number): GameState {
         lordId: null, stamina: STAMINA_MAX, busy: false,
         troops: 0, level: MOCK_LEVEL, force: s.force,
         loyalty: MOCK_OFFICER_LOYALTY, recruiterId: s.recruiterId, personality: s.personality,
-        troopType: s.troopType, experience: 0,
+        troopType: s.troopType, experience: 0, personalSkills: [],
       },
     })),
     ...DEBUT_ITEM_SEEDS.map((s): DebutEntry => ({
