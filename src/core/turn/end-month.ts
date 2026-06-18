@@ -1,6 +1,7 @@
 import type { GameState, PendingCommand } from '../game-state'
 import type { GameConfig } from '../shared/config'
 import type { OfficerId } from '../shared/ids'
+import type { CommandCheck } from '../shared/command'
 import { settle } from '../economy/settle'
 import { aiTakeTurn } from '../ai/ai'
 import { recoverStamina, setBusy } from '../world/officer'
@@ -8,7 +9,12 @@ import { runDebuts } from '../world/debut'
 import { runDisasters } from '../world/disaster'
 import { runNonCampaignPending } from './pending'
 import { initBattle, startDay, concludeBattle } from '../military/battle'
+import { quickResolveCampaign } from '../military/quick-battle'
 import { promoteLord, canChooseSuccessor } from '../world/succession'
+import { defendingOfficers } from '../world/queries'
+
+/** 玩家防守可选守军上限（与战斗单位上限同量纲）。 */
+const MAX_DEFENDERS = 10
 
 type CampaignPending = Extract<PendingCommand, { type: 'campaign' }>
 
@@ -20,7 +26,7 @@ type CampaignPending = Extract<PendingCommand, { type: 'campaign' }>
  * 活动战斗中（activeBattle 非空）调用 endMonth 为 no-op（应改用 resumeMonth）。
  */
 export function endMonth(state: GameState, config: GameConfig): GameState {
-  if (state.activeBattle || state.pendingSuccession) return state
+  if (state.activeBattle || state.pendingSuccession || state.pendingDefense) return state
   const afterAi = aiTakeTurn(state, config)
   const afterPending = runNonCampaignPending(afterAi, config)
   return advanceCampaigns(afterPending, config)
@@ -54,15 +60,84 @@ export function chooseSuccessor(
   return advanceCampaigns({ ...promoted, pendingSuccession: null }, config)
 }
 
-/** 逐条处理队列中的 campaign：玩家进攻必挂起战斗返回（AI 不出征故无非玩家 campaign）；无 campaign→尾段。 */
-function advanceCampaigns(state: GameState, config: GameConfig): GameState {
+/**
+ * 逐条处理队列中首个 campaign（`16-ai-campaign` 三类分流）；无 campaign→尾段。
+ * 也是 resumeMonth/chooseSuccessor/chooseDefenders 的续跑入口（导出供测试直接驱动分流）：
+ * - 目标城无守军（攻方 AI/玩家皆然）→ quickResolveCampaign 直接占城 → 丢弃该 campaign → 递归；
+ * - 玩家进攻有守军敌城 → 挂起交互式战斗（activeBattle）返回；
+ * - AI 进攻有守军玩家城 → 挂起 pendingDefense（待玩家选守军）返回；
+ * - AI vs AI 有守军 → quickResolveCampaign 速算 → 丢弃 → 递归。
+ */
+export function advanceCampaigns(state: GameState, config: GameConfig): GameState {
   const idx = state.pendingCommands.findIndex((c) => c.type === 'campaign')
   if (idx < 0) return finishMonthTail(state, config)
   const c = state.pendingCommands[idx] as CampaignPending
-  // 装好单位后跑第 1 天开头（刷天气/状态/重置行动），与后续每日 endDay 同构。
+  const defenders = defendingOfficers(state, c.targetCityId)
+  const attackerLord = state.officers[c.officerIds[0]!]?.lordId
+  const defenderLord = state.cities[c.targetCityId]?.lordId
+
+  if (defenders.length === 0) {
+    const resolved = quickResolveCampaign(state, c.officerIds, [], c.targetCityId, c.provisions)
+    return advanceCampaigns(dropFirstCampaign(resolved), config)
+  }
+  if (attackerLord === state.playerLordId) {
+    // 玩家进攻：装好单位后跑第 1 天开头，挂起战斗。
+    return startDay({
+      ...state,
+      activeBattle: initBattle(state, c.officerIds, c.targetCityId, c.provisions),
+    })
+  }
+  if (defenderLord === state.playerLordId) {
+    return { ...state, pendingDefense: { targetCityId: c.targetCityId } }
+  }
+  // AI vs AI：速算后续跑。
+  const resolved = quickResolveCampaign(
+    state,
+    c.officerIds,
+    defenders.map((o) => o.id),
+    c.targetCityId,
+    c.provisions
+  )
+  return advanceCampaigns(dropFirstCampaign(resolved), config)
+}
+
+/** 校验玩家选守军（供 canApply）：pendingDefense 非空 + 去重 + ≤10 + 全属该城守军。空数组合法（弃守）。 */
+export function canChooseDefenders(
+  state: GameState,
+  officerIds: readonly OfficerId[]
+): CommandCheck {
+  const pd = state.pendingDefense
+  if (!pd) return { ok: false, reason: '当前无待守军选择' }
+  if (new Set(officerIds).size !== officerIds.length) return { ok: false, reason: '守军重复' }
+  if (officerIds.length > MAX_DEFENDERS)
+    return { ok: false, reason: `守军最多 ${MAX_DEFENDERS} 名` }
+  const pool = new Set(defendingOfficers(state, pd.targetCityId).map((o) => o.id))
+  if (!officerIds.every((id) => pool.has(id))) return { ok: false, reason: '守军须为该城在城武将' }
+  return { ok: true }
+}
+
+/**
+ * 玩家选定守军后兑现并续跑月末（chooseDefenders action 委派）。非法（canChooseDefenders 不过）→ no-op。
+ * 清空 pendingDefense 后：选 0 名=弃守 → quickResolveCampaign 直接占城 → 续跑；
+ * 否则以显式守军开战（initBattle defend 模式 + startDay 挂起）。
+ */
+export function chooseDefenders(
+  state: GameState,
+  officerIds: readonly OfficerId[],
+  config: GameConfig
+): GameState {
+  if (!canChooseDefenders(state, officerIds).ok) return state
+  const idx = state.pendingCommands.findIndex((c) => c.type === 'campaign')
+  if (idx < 0) return state
+  const c = state.pendingCommands[idx] as CampaignPending
+  const cleared: GameState = { ...state, pendingDefense: null }
+  if (officerIds.length === 0) {
+    const resolved = quickResolveCampaign(cleared, c.officerIds, [], c.targetCityId, c.provisions)
+    return advanceCampaigns(dropFirstCampaign(resolved), config)
+  }
   return startDay({
-    ...state,
-    activeBattle: initBattle(state, c.officerIds, c.targetCityId, c.provisions),
+    ...cleared,
+    activeBattle: initBattle(cleared, c.officerIds, c.targetCityId, c.provisions, officerIds),
   })
 }
 

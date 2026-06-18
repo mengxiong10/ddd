@@ -349,5 +349,6 @@ export function createInitialState(seed: number): GameState {
     adjacency: buildAdjacency(ADJACENCY_EDGES),
     activeBattle: null,
     pendingSuccession: null,
+    pendingDefense: null,
   }
 }

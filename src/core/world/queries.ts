@@ -43,6 +43,25 @@ export function wanderingOfficersInCity(state: GameState, cityId: CityId): Offic
   return Object.values(state.officers).filter((o) => o.cityId === cityId && o.lordId === null)
 }
 
+/**
+ * 城防守军（`16-ai-campaign`）：在该城、属本城势力、非俘虏，且未被任何待执行 campaign 征调的武将。
+ * 出征在外者 cityId 仍滞留源城直到战斗结算（concludeBattle/quickResolveCampaign 才改写），故需显式排除；
+ * 其余 busy（本月被即时/返回类命令占用）仍计为守军——月末回防。
+ * 「无守军直接占城」判定、initBattle 自动选守、AI vs AI 速算守方均共用此口径。
+ */
+export function defendingOfficers(state: GameState, cityId: CityId): Officer[] {
+  const city = state.cities[cityId]
+  if (!city) return []
+  const onCampaign = new Set<OfficerId>()
+  for (const cmd of state.pendingCommands) {
+    if (cmd.type === 'campaign') for (const id of cmd.officerIds) onCampaign.add(id)
+  }
+  // lordId===city.lordId 已蕴含「非俘虏」（俘虏定义为 lordId≠所在城 lordId）。
+  return Object.values(state.officers).filter(
+    (o) => o.cityId === cityId && o.lordId === city.lordId && !onCampaign.has(o.id)
+  )
+}
+
 /** 本城俘虏（isCaptive 为真者）：招降/处斩的候选、UI 列示。派生，无第二份存储。 */
 export function captivesInCity(state: GameState, cityId: CityId): Officer[] {
   return Object.values(state.officers).filter((o) => o.cityId === cityId && isCaptive(state, o.id))

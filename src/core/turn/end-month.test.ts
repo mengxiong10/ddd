@@ -7,7 +7,15 @@ import { campaign } from '../economy/campaign'
 import { isCaptive } from '../world/queries'
 import type { GameState } from '../game-state'
 import type { BattleState } from '../military/battle'
-import { endMonth, resumeMonth, chooseSuccessor } from './end-month'
+import {
+  endMonth,
+  resumeMonth,
+  chooseSuccessor,
+  advanceCampaigns,
+  chooseDefenders,
+  canChooseDefenders,
+} from './end-month'
+import type { PendingCommand } from '../game-state'
 
 const cfg = DEFAULT_CONFIG
 
@@ -197,5 +205,123 @@ describe('endMonth 灾害（月末最后一步）', () => {
     expect(s.cities.chengdu!.food).toBe(before.food + Math.floor(before.agriculture / 4))
     expect(s.cities.chengdu!.gold).toBe(before.gold + Math.floor(before.commerce / 2))
     expect(s.cities.chengdu!.status).toBe('normal')
+  })
+})
+
+// --- 16-ai-campaign：出征三类分流 + 玩家防守选守军 ---
+
+function enqueue(s: GameState, cmd: PendingCommand): GameState {
+  return { ...s, pendingCommands: [...s.pendingCommands, cmd] }
+}
+/** 把某城及其武将整体改归一个自立君主（造独立 AI 势力）。 */
+function makeIndependentLord(
+  s: GameState,
+  cityId: string,
+  lord: string,
+  members: string[]
+): GameState {
+  let next: GameState = {
+    ...s,
+    cities: { ...s.cities, [cityId]: { ...s.cities[cityId]!, lordId: lord } },
+  }
+  for (const id of members) next = withOfficer(next, id, { lordId: lord })
+  return next
+}
+
+describe('advanceCampaigns 三类分流', () => {
+  it('无守军城（玩家进攻空敌城）→ 直接占城、不进战斗、续跑到月末', () => {
+    // 把邺城守军移走 → 邺城无守军；江陵关羽出征邺城。
+    let s = withOfficer(createInitialState(1), 'simayi', { cityId: 'xuchang' })
+    s = withOfficer(s, 'zhangliao', { cityId: 'xuchang' })
+    s = enqueue(s, { type: 'campaign', officerIds: ['guanyu'], targetCityId: 'ye', provisions: 50 })
+    const out = advanceCampaigns(s, cfg)
+    expect(out.cities.ye!.lordId).toBe('liubei') // 直接占城
+    expect(out.activeBattle).toBeNull()
+    expect(out.pendingDefense).toBeNull()
+    expect(out.month).toBe(2) // 走到月末尾段
+    expect(out.pendingCommands).toEqual([])
+  })
+
+  it('玩家进攻有守军敌城 → 挂起交互式战斗（attack 模式），月份不推进', () => {
+    const s = enqueue(createInitialState(1), {
+      type: 'campaign',
+      officerIds: ['guanyu'],
+      targetCityId: 'xuchang',
+      provisions: 50,
+    })
+    const out = advanceCampaigns(s, cfg)
+    expect(out.activeBattle).not.toBeNull()
+    expect(out.activeBattle!.mode).toBe('attack')
+    expect(out.month).toBe(1)
+  })
+
+  it('AI 进攻有守军玩家城 → 挂起 pendingDefense，月份不推进、不进战斗', () => {
+    const s = enqueue(createInitialState(1), {
+      type: 'campaign',
+      officerIds: ['caocao'],
+      targetCityId: 'jiangling',
+      provisions: 50,
+    })
+    const out = advanceCampaigns(s, cfg)
+    expect(out.pendingDefense).toEqual({ targetCityId: 'jiangling' })
+    expect(out.activeBattle).toBeNull()
+    expect(out.month).toBe(1)
+  })
+
+  it('AI vs AI 有守军 → 速算（不暂停、不进地图战），续跑到月末', () => {
+    // 邺城自立为简懿势力；曹操(许昌)出征邺城 = AI vs AI。
+    let s = makeIndependentLord(createInitialState(7), 'ye', 'simayi', ['simayi', 'zhangliao'])
+    s = withOfficer(s, 'caocao', { troops: 8000 })
+    s = enqueue(s, { type: 'campaign', officerIds: ['caocao'], targetCityId: 'ye', provisions: 40 })
+    const out = advanceCampaigns(s, cfg)
+    expect(out.activeBattle).toBeNull()
+    expect(out.pendingDefense).toBeNull()
+    expect(out.pendingSuccession).toBeNull()
+    expect(out.pendingCommands.some((c) => c.type === 'campaign')).toBe(false)
+    expect(out.month).toBe(2)
+  })
+})
+
+describe('chooseDefenders 玩家防守选守军', () => {
+  function pending(): GameState {
+    const s = enqueue(createInitialState(1), {
+      type: 'campaign',
+      officerIds: ['caocao'],
+      targetCityId: 'jiangling',
+      provisions: 50,
+    })
+    return advanceCampaigns(s, cfg) // 挂起 pendingDefense
+  }
+
+  it('选 ≥1 守军 → 进 defend 交互式战斗、清空 pendingDefense', () => {
+    const out = chooseDefenders(pending(), ['guanyu'], cfg)
+    expect(out.pendingDefense).toBeNull()
+    expect(out.activeBattle).not.toBeNull()
+    expect(out.activeBattle!.mode).toBe('defend')
+    expect(out.activeBattle!.units.guanyu).toBeTruthy()
+  })
+
+  it('选 0 名（弃守）→ 直接被占、续跑到月末', () => {
+    const out = chooseDefenders(pending(), [], cfg)
+    expect(out.cities.jiangling!.lordId).toBe('caocao')
+    expect(out.pendingDefense).toBeNull()
+    expect(out.activeBattle).toBeNull()
+    expect(out.month).toBe(2)
+  })
+
+  it('canChooseDefenders：无 pendingDefense / 越界 / 非该城武将 → 拒；合法子集 → 通过', () => {
+    const base = createInitialState(1)
+    expect(canChooseDefenders(base, ['guanyu']).ok).toBe(false) // 无 pendingDefense
+    const pd = pending()
+    expect(canChooseDefenders(pd, ['guanyu', 'guanyu']).ok).toBe(false) // 重复
+    expect(canChooseDefenders(pd, ['caocao']).ok).toBe(false) // 非江陵守军
+    expect(canChooseDefenders(pd, ['guanyu', 'zhangfei']).ok).toBe(true)
+    expect(canChooseDefenders(pd, []).ok).toBe(true) // 弃守合法
+    expect(chooseDefenders(pd, ['caocao'], cfg)).toEqual(pd) // 非法 no-op
+  })
+
+  it('pendingDefense 非空时 endMonth 拒推进', () => {
+    const pd = pending()
+    expect(endMonth(pd, cfg)).toEqual(pd)
   })
 })

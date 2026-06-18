@@ -112,4 +112,10 @@ export interface GameState {
    * 经 chooseSuccessor action 兑现后续跑月末。仅玩家势力触发（AI 立即自动立新君）。普通态恒为 null。
    */
   readonly pendingSuccession: { readonly lordId: OfficerId } | null
+  /**
+   * 待玩家选守军（`16-ai-campaign`）：非空=月末挂起在「AI 进攻玩家城、等玩家挑选出战守军」，
+   * 经 chooseDefenders action 兑现（开战或弃守占城）后清空。仅玩家防守触发。普通态恒为 null。
+   * 类比 pendingSuccession：窄态、攻方/粮草从待执行队列首个 campaign 派生。
+   */
+  readonly pendingDefense: { readonly targetCityId: CityId } | null
 }

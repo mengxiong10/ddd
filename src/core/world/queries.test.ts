@@ -14,6 +14,7 @@ import {
   governorOf,
   effectiveTroopType,
   officerMovement,
+  defendingOfficers,
 } from './queries'
 import { setBusy } from './officer'
 import { holdByOfficer } from './item'
@@ -341,5 +342,39 @@ describe('effectiveTroopType / officerMovement / itemsOfOfficer 排序', () => {
     // 装备改极兵(基础6) 且 movement+2 → 6+2=8
     const s1 = equip(s0, 'horse', 'zhugeliang', 0, 3, { force: 60, movement: 2 })
     expect(officerMovement(s1, 'zhugeliang')).toBe(8)
+  })
+})
+
+describe('defendingOfficers（守军：在城·本势力·非俘虏·非外出 campaign）', () => {
+  it('返回本城属本势力的武将（含本月即时/返回类 busy）', () => {
+    let s = createInitialState(1)
+    expect(
+      defendingOfficers(s, 'jiangling')
+        .map((o) => o.id)
+        .sort()
+    ).toEqual(['guanyu', 'zhangfei'])
+    s = { ...s, officers: { ...s.officers, guanyu: setBusy(s.officers.guanyu!, true) } }
+    expect(
+      defendingOfficers(s, 'jiangling')
+        .map((o) => o.id)
+        .sort()
+    ).toEqual(['guanyu', 'zhangfei'])
+  })
+
+  it('排除俘虏与外势力武将', () => {
+    // 江陵改归曹操 → 原刘备武将就地成俘虏 → 守军空
+    const s = setCityLord(createInitialState(1), 'jiangling', 'caocao')
+    expect(defendingOfficers(s, 'jiangling')).toEqual([])
+  })
+
+  it('排除被待执行 campaign 征调（外出出征）的武将', () => {
+    const base = createInitialState(1)
+    const s: GameState = {
+      ...base,
+      pendingCommands: [
+        { type: 'campaign', officerIds: ['guanyu'], targetCityId: 'xuchang', provisions: 10 },
+      ],
+    }
+    expect(defendingOfficers(s, 'jiangling').map((o) => o.id)).toEqual(['zhangfei'])
   })
 })

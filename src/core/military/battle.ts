@@ -4,7 +4,13 @@ import type { Position } from '../shared/position'
 import { samePos } from '../shared/position'
 import type { CommandCheck } from '../shared/command'
 import type { Rng } from '../shared/rng'
-import { effectiveOfficer, effectiveTroopType, governorOf } from '../world/queries'
+import {
+  effectiveOfficer,
+  effectiveTroopType,
+  governorOf,
+  defendingOfficers,
+} from '../world/queries'
+import type { Officer } from '../world/officer'
 import type { MapId, BattleMap } from './battle-map'
 import {
   BATTLE_MAPS,
@@ -136,33 +142,36 @@ const sideAlive = (battle: BattleState, side: BattleSide): boolean =>
   aliveUnits(battle).some((u) => u.side === side)
 
 /**
- * 从一条玩家 campaign 初始化战斗：读目标城地图、按攻守模式摆双方单位（≤10/方）、
+ * 从一条 campaign 初始化战斗：读目标城地图、按攻守模式摆双方单位（≤10/方）、
  * 算战场粮草（攻=随军粮草、守=目标城开战快照城粮）、定主将（防守方第一名）、day=1。
  * 调用方保证玩家参与（攻或守一方为 playerLordId）。
+ * explicitDefenderIds 由玩家防守时（chooseDefenders）传入已选名单；省略时（玩家进攻）自动取守军。
  */
 export function initBattle(
   state: GameState,
   officerIds: readonly OfficerId[],
   targetCityId: CityId,
-  provisions: number
+  provisions: number,
+  explicitDefenderIds?: readonly OfficerId[]
 ): BattleState {
   const attackerLord = state.officers[officerIds[0]!]!.lordId!
   const target = state.cities[targetCityId]!
-  const defenderLord = target.lordId
   const mode: BattleMode = attackerLord === state.playerLordId ? 'attack' : 'defend'
   const attackerSide: BattleSide = mode === 'attack' ? 'player' : 'opponent'
   const defenderSide: BattleSide = mode === 'attack' ? 'opponent' : 'player'
   const map: BattleMap = BATTLE_MAPS[target.battleMapId] ?? BATTLE_MAPS.plains!
 
-  // 防守方 = 目标城归属方在城武将（自动排除俘虏/在野）：太守领衔，其余按兵力降序（平局 id 升序），限 10。
+  // 防守方守军：玩家防守取显式名单、否则自动取 defendingOfficers（在城·本势力·非俘虏·非外出 campaign）；
+  // 太守领衔（须在名单内），其余按兵力降序（平局 id 升序），限 10。
   const governor = governorOf(state, targetCityId)
-  const defenders = Object.values(state.officers).filter(
-    (o) => o.cityId === targetCityId && o.lordId === defenderLord
-  )
-  const rest = defenders
+  const pool: Officer[] = explicitDefenderIds
+    ? explicitDefenderIds.map((id) => state.officers[id]).filter((o): o is Officer => !!o)
+    : defendingOfficers(state, targetCityId)
+  const governorLeads = !!governor && pool.some((o) => o.id === governor.id)
+  const rest = pool
     .filter((o) => o.id !== governor?.id)
     .sort((a, b) => b.troops - a.troops || (a.id < b.id ? -1 : 1))
-  const defenderIds = [...(governor ? [governor.id] : []), ...rest.map((o) => o.id)].slice(
+  const defenderIds = [...(governorLeads ? [governor!.id] : []), ...rest.map((o) => o.id)].slice(
     0,
     MAX_BATTLE_UNITS
   )

@@ -11,8 +11,7 @@ import {
 } from '../world/city'
 import { setBusy } from '../world/officer'
 import { citiesOfLord } from '../world/queries'
-import { areAdjacent } from '../world/adjacency'
-import { aiServingOfficers, busyEnqueue, byId } from './ai-shared'
+import { aiServingOfficers, busyEnqueue, byId, adjacentEnemyCities } from './ai-shared'
 
 /**
  * 内政固定成长（规则身份，内联——AI 作弊：不吃智力公式、不扣城金）：
@@ -130,18 +129,11 @@ export function pickMoveTarget(
   let candidate = ownCities[0]!.id
   let cur = rng
   for (const c of ownCities) {
-    if (!hasAdjacentEnemy(state, c.id, lordId)) continue
+    if (adjacentEnemyCities(state, c.id, lordId).length === 0) continue
     candidate = c.id
     const [stop, r] = randInt(cur, 0, 1)
     cur = r
     if (stop === 0) return [candidate, cur]
   }
   return [candidate, cur]
-}
-
-/** 某城是否有相邻敌城（归属 ≠ 该势力，含玩家城）。 */
-function hasAdjacentEnemy(state: GameState, cityId: CityId, lordId: OfficerId): boolean {
-  return Object.values(state.cities).some(
-    (c) => c.lordId !== lordId && areAdjacent(state.adjacency, cityId, c.id)
-  )
 }

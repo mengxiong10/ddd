@@ -29,7 +29,13 @@ import {
 } from './economy/diplomacy'
 import { canBehead, behead, canBanish, banish } from './economy/captive'
 import { canGovern, govern } from './economy/govern'
-import { endMonth, resumeMonth, chooseSuccessor } from './turn/end-month'
+import {
+  endMonth,
+  resumeMonth,
+  chooseSuccessor,
+  chooseDefenders,
+  canChooseDefenders,
+} from './turn/end-month'
 import { canChooseSuccessor } from './world/succession'
 import { canBattle, reduceBattle, type BattleAction } from './military/battle'
 
@@ -71,6 +77,7 @@ export type Action =
   | { type: 'battle'; action: BattleAction } // 战斗推进（单包装委派 military/battle，不需 config）
   | { type: 'resumeMonth' } // 战斗分胜负后续跑月末（写回 + 续 campaign/尾段）
   | { type: 'chooseSuccessor'; officerId: OfficerId } // 玩家君主遭劫后手动立新君（续跑月末）
+  | { type: 'chooseDefenders'; officerIds: readonly OfficerId[] } // AI 进攻玩家城后玩家选守军开战/弃守
   | { type: 'endMonth' }
 
 /** 校验动作能否执行；UI 用其结果置灰按钮并展示 reason。endMonth 恒可执行。 */
@@ -140,9 +147,12 @@ export function canApply(
       return { ok: true }
     case 'chooseSuccessor':
       return canChooseSuccessor(state, action.officerId)
+    case 'chooseDefenders':
+      return canChooseDefenders(state, action.officerIds)
     case 'endMonth':
       if (state.activeBattle) return { ok: false, reason: '战斗进行中，请先结束战斗' }
       if (state.pendingSuccession) return { ok: false, reason: '请先选定新君' }
+      if (state.pendingDefense) return { ok: false, reason: '请先选守军迎战' }
       return { ok: true }
   }
 }
@@ -214,6 +224,8 @@ export function apply(
       return resumeMonth(state, config)
     case 'chooseSuccessor':
       return chooseSuccessor(state, action.officerId, config)
+    case 'chooseDefenders':
+      return chooseDefenders(state, action.officerIds, config)
     case 'endMonth':
       return endMonth(state, config)
   }

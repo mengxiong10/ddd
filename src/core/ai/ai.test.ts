@@ -172,4 +172,39 @@ describe('endMonth 集成（AI 经营接入月末）', () => {
     const out = endMonth(s, { ...DEFAULT_CONFIG, aiLevelUpRate: 50 })
     expect(out.month).toBe(2)
   })
+
+  it('AI 出征玩家城：endMonth 全链（aiTakeTurn→pending→分流）挂起 pendingDefense', () => {
+    // 预置一条 AI 出征（曹操→江陵）；它在队列首位，月末分流必先处理它。
+    const s: GameState = {
+      ...createInitialState(4),
+      pendingCommands: [
+        { type: 'campaign', officerIds: ['caocao'], targetCityId: 'jiangling', provisions: 50 },
+      ],
+    }
+    const out = endMonth(s, DEFAULT_CONFIG)
+    expect(out.pendingDefense).toEqual({ targetCityId: 'jiangling' })
+    expect(out.activeBattle).toBeNull()
+    expect(out.month).toBe(1) // 暂停、未推进
+    expect(endMonth(s, DEFAULT_CONFIG)).toEqual(out) // 确定性
+  })
+
+  it('campaign-capable 地图整月可复现（同 seed 两次一致、不抛错）', () => {
+    // 邺城自立为简懿势力（与曹操许昌相邻）→ 存在 AI vs AI 出征可能。
+    for (let seed = 1; seed <= 60; seed++) {
+      let s = withCity(createInitialState(seed), 'ye', { lordId: 'simayi' })
+      s = {
+        ...s,
+        officers: {
+          ...s.officers,
+          simayi: { ...s.officers.simayi!, lordId: 'simayi', troops: 1500 },
+          zhangliao: { ...s.officers.zhangliao!, lordId: 'simayi', troops: 1200 },
+        },
+      }
+      const out = endMonth(s, DEFAULT_CONFIG)
+      expect(endMonth(s, DEFAULT_CONFIG)).toEqual(out)
+      // 未挂起则月份必推进；挂起（玩家防守/选新君）则停在本月。
+      const paused = out.pendingDefense || out.pendingSuccession || out.activeBattle
+      expect(out.month).toBe(paused ? 1 : 2)
+    }
+  })
 })

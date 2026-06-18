@@ -37,6 +37,11 @@
 - **重选君主拆 actor-agnostic 纯工具 + 显式 `playerLordId` 例外（`14-campaign-aftermath`）**：`world/succession` 改为纯工具（`successionCandidates`/`pickSuccessor`/`promoteLord`/`canChooseSuccessor`，候选=该势力非俘虏非自身武将、自动选取有效智力最高平局 id 最小、`promoteLord` 把势力城+非俘虏武将归新君且新君忠诚 100、`oldLord===playerLordId` 时一并迁 `playerLordId`），**不读 `playerLordId`**；删旧 `resolveSuccession`。「AI 自动立新君 vs 玩家手动选」的分支由 `aftermath.resolveStrickenLord` 读 `state.playerLordId` 决定——这是 core actor-agnostic 的**第二处显式游戏规则例外**（同 10 劝降玩家君主免疫）。遭劫君主无城/无候选→灭亡（不立新君）；君主战死被删也能触发（守卫不依赖 `isCaptive`）。
 - **玩家决策暂停态 `GameState.pendingSuccession`（`14-campaign-aftermath`，类比 `activeBattle`）**：玩家君主遭劫时 `resolveStrickenLord` 不换主、只设 `pendingSuccession={lordId}`（窄态、候选动态派生），`resumeMonth` 检测到即提前返回（月份不推进）；新 action `{type:'chooseSuccessor',officerId}` 委派 `turn.chooseSuccessor`——`promoteLord` 兑现换主→清空 `pendingSuccession`→续跑 `advanceCampaigns`（可重入：同月剩余 campaign 可再起战斗）。`endMonth`/`canApply` 在 `pendingSuccession` 非空时拒绝推进。纯同步、无 Promise。`turn` import `world/succession`（`promoteLord`/`canChooseSuccessor`）+ `military`（`concludeBattle`），`military/aftermath` 不 import `turn`。
 - **AI 经营走「作弊简化下令 + 复用月末执行」（`15-ai-economy`）**：`core/ai/aiTakeTurn`（月末 `endMonth` 最前、玩家命令之前）对每座非玩家城（`lordId≠playerLordId`）按**君主性格**选内政/外交/军备一条路径，逐在任武将（按 id 升序）随机生成命令。AI 是**作弊简化路径**：固定成长（开垦/招商 +200、出巡民忠+4·人口+100、治理防灾+4）、不扣金/体力、不吃智力公式、**不走 `canX`**；AI 下令 = 立即施加固定效果（含**即时**招降/处斩，区别于玩家月末四关模型）或 `busyEnqueue`（仅置 `Officer.busy` + push `PendingCommand`，不复用会扣成本的 `search()/move()/entice()` 下令体）。**月末结算复用现有 `executeSearch/executeMove/executeEntice/…`**（单一月末结算源），故 `turn` 层不改。全程消费 `GameState.rng`、城与武将均按 id 升序遍历、同 seed 可复现。**本切片不产生任何 AI 出征**（军备出征分支留 TODO），`advanceCampaigns`「无非玩家 campaign」假设仍成立。布局仿 `military/battle`：`ai.ts` 编排 + `ai-shared.ts`（破环共享助手）+ `ai-internal/diplomacy/military.ts` 三叶；`ai/*` 单向依赖 economy/world/shared，不被反向依赖。
+- **AI 出征承接军备 `roll===7`（`16-ai-campaign`）**：`ai-military` 中**仅首位武将（i===0）**的 `roll===7` 可触发出征尝试（每城每月至多一次，后续武将的 7 跳过）。固定判定顺序（仅 50% 那步耗 RNG）：相邻敌城（`ai-shared.adjacentEnemyCities`）→ 在任武将按兵力降序门槛（数 ≥4 且最高 ≥1000）→ `RandInt(0,1)===0` 50% → 选**最弱**相邻敌城（`estimatedGarrison` 估算守军合计：在任武将兵 + 队列中该城命令∉{move,campaign}的执行人兵，**不含后备兵**；平局 id 最小）→ 名单取兵力降序前 `min(10,在任−1)`（最多 10、至少留 1）+ 随军粮草填本城全部粮且 `spendFood` 清零 → `ai-shared.busyEnqueueMany`（批量占人入队、不走 `canCampaign`、不扣金/体力）。
+- **出征月末三类分流（`16-ai-campaign`，`turn.advanceCampaigns` 重写、导出供测）**：找队列首个 campaign，按「目标城守军（`world/queries.defendingOfficers`）+ 攻/守是否玩家」分流——①**无守军**（攻方 AI/玩家皆然）→ `military/quick-battle.quickResolveCampaign` 直接占城（`defenderIds` 空即 `attackerWins`、不掷骰、不耗 RNG）→ 丢弃 campaign → 递归；②**玩家进攻**有守军敌城 → `initBattle`+`startDay` 挂起交互式战斗（现有）；③**AI 进攻玩家城**有守军 → 挂起 `GameState.pendingDefense={targetCityId}`（暂停选守军）；④**AI vs AI** 有守军 → `quickResolveCampaign` 速算 → 丢弃 → 递归。修订 `15` 的「`advanceCampaigns` 无非玩家 campaign」假设。
+- **守军单一定义 `world/queries.defendingOfficers`（`16-ai-campaign`）**：在该城、属本城势力、**且未被任何待执行 campaign 征调**的武将（出征在外者 cityId 滞留源城直到战斗结算，须显式排除；其余 busy 月末回防仍算守军）。`initBattle` 自动选守 / 「无守军」判定 / 速算守方三处共用，消除重复；`initBattle` 自动路由此改为排除「外出 campaign」武将（修正一城同月既攻又守重复用人的潜在错误）。
+- **无地图速算收敛 `military/quick-battle`（`16-ai-campaign`）**：`attackerWinPercent(A,D,FA,FD)`（纯，胜率表：A=0→0 / D=0→100 / A≥2D→70 / A>D 粮多 60·否则 40 / 2A<D→2 / 其余含相等 粮多 30·否则 10）+ `quickResolveCampaign`（D 含目标城后备兵、掷 `RandInt(0,99)`、消费 `GameState.rng`）；与 `battle` 并列、同走 `aftermath.resolveCampaignOutcome`。本切片**仍不实现 AI 地图战斗行动**（防守战中 AI 进攻方 `endDay` no-op，玩家可歼敌或拖到第 30 天胜）。
+- **玩家决策暂停态再添 `GameState.pendingDefense`（`16-ai-campaign`，类比 `pendingSuccession`/`activeBattle`）**：窄态，攻方/粮草从队列首个 campaign 派生；`endMonth`/`canApply(endMonth)`/`resumeMonth` 在其非空时拒推进；新 action `{type:'chooseDefenders',officerIds}` 委派 `turn.chooseDefenders`——选 ≥1 守军 → `initBattle(defend, explicitDefenderIds)`+`startDay` 开战，选 0=弃守 → `quickResolveCampaign` 直接被占；`canChooseDefenders` 校验（去重·≤10·∈该城守军，空合法）。纯同步、无 Promise。
 
 ## 流程
 
@@ -44,22 +49,24 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 
 ## 功能列表
 
-| 功能                               | PRD                                 | 开发文档                            | 状态 |
-| ---------------------------------- | ----------------------------------- | ----------------------------------- | ---- |
-| 经营循环 economy-loop              | specs/01-economy-loop/prd.md        | specs/01-economy-loop/dev.md        | done |
-| 兵力系统 troops                    | specs/02-troops/prd.md              | specs/02-troops/dev.md              | done |
-| 掠夺/侦察 plunder-scout            | specs/03-plunder-scout/prd.md       | specs/03-plunder-scout/dev.md       | done |
-| 出征 campaign                      | specs/04-campaign/prd.md            | specs/04-campaign/dev.md            | done |
-| 道具系统 items                     | specs/05-items/prd.md               | specs/05-items/dev.md               | done |
-| 登场与搜寻 debut-search            | specs/06-debut-search/prd.md        | specs/06-debut-search/dev.md        | done |
-| 城务指令 city-commands             | specs/07-city-commands/prd.md       | specs/07-city-commands/dev.md       | done |
-| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | done |
-| 城市灾害 city-disaster             | specs/09-city-disaster/prd.md       | specs/09-city-disaster/dev.md       | done |
-| 外交 diplomacy                     | specs/10-diplomacy/prd.md           | specs/10-diplomacy/dev.md           | done |
-| 兵种系统 troop-types               | specs/11-troop-types/prd.md         | specs/11-troop-types/dev.md         | done |
-| 战斗系统 battle                    | specs/12-battle/prd.md              | specs/12-battle/dev.md              | done |
-| 战斗技能 battle-skills             | specs/13-battle-skills/prd.md       | specs/13-battle-skills/dev.md       | done |
-| 完整战后处理 campaign-aftermath    | specs/14-campaign-aftermath/prd.md  | specs/14-campaign-aftermath/dev.md  | done |
-| AI 经营 ai-economy                 | specs/15-ai-economy/prd.md          | specs/15-ai-economy/dev.md          | done |
+| 功能                               | PRD                                 | 开发文档                            | 状态  |
+| ---------------------------------- | ----------------------------------- | ----------------------------------- | ----- |
+| 经营循环 economy-loop              | specs/01-economy-loop/prd.md        | specs/01-economy-loop/dev.md        | done  |
+| 兵力系统 troops                    | specs/02-troops/prd.md              | specs/02-troops/dev.md              | done  |
+| 掠夺/侦察 plunder-scout            | specs/03-plunder-scout/prd.md       | specs/03-plunder-scout/dev.md       | done  |
+| 出征 campaign                      | specs/04-campaign/prd.md            | specs/04-campaign/dev.md            | done  |
+| 道具系统 items                     | specs/05-items/prd.md               | specs/05-items/dev.md               | done  |
+| 登场与搜寻 debut-search            | specs/06-debut-search/prd.md        | specs/06-debut-search/dev.md        | done  |
+| 城务指令 city-commands             | specs/07-city-commands/prd.md       | specs/07-city-commands/dev.md       | done  |
+| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | done  |
+| 城市灾害 city-disaster             | specs/09-city-disaster/prd.md       | specs/09-city-disaster/dev.md       | done  |
+| 外交 diplomacy                     | specs/10-diplomacy/prd.md           | specs/10-diplomacy/dev.md           | done  |
+| 兵种系统 troop-types               | specs/11-troop-types/prd.md         | specs/11-troop-types/dev.md         | done  |
+| 战斗系统 battle                    | specs/12-battle/prd.md              | specs/12-battle/dev.md              | done  |
+| 战斗技能 battle-skills             | specs/13-battle-skills/prd.md       | specs/13-battle-skills/dev.md       | done  |
+| 完整战后处理 campaign-aftermath    | specs/14-campaign-aftermath/prd.md  | specs/14-campaign-aftermath/dev.md  | done  |
+| AI 经营 ai-economy                 | specs/15-ai-economy/prd.md          | specs/15-ai-economy/dev.md          | done  |
+| AI 出征 ai-campaign                | specs/16-ai-campaign/prd.md         | specs/16-ai-campaign/dev.md         | done  |
+| 战斗 AI battle-ai                  | specs/17-battle-ai/prd.md           | —                                   | draft |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）

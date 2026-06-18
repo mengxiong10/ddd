@@ -75,6 +75,30 @@ describe('game apply 分派', () => {
     expect(done.month).toBe(2)
   })
 
+  it('AI 进攻玩家城：pendingDefense 期间拒推进，chooseDefenders 开战/弃守经 apply 分派', () => {
+    // 模拟 AI 已下令：曹操出征江陵；挂起待玩家选守军。
+    const base = createInitialState(1)
+    const paused: GameState = {
+      ...base,
+      pendingCommands: [
+        { type: 'campaign', officerIds: ['caocao'], targetCityId: 'jiangling', provisions: 50 },
+      ],
+      pendingDefense: { targetCityId: 'jiangling' },
+    }
+    expect(canApply(paused, { type: 'endMonth' }).ok).toBe(false)
+    expect(canApply(paused, { type: 'chooseDefenders', officerIds: ['caocao'] }).ok).toBe(false)
+    expect(canApply(paused, { type: 'chooseDefenders', officerIds: ['guanyu'] }).ok).toBe(true)
+
+    const fighting = apply(paused, { type: 'chooseDefenders', officerIds: ['guanyu', 'zhangfei'] })
+    expect(fighting.pendingDefense).toBeNull()
+    expect(fighting.activeBattle!.mode).toBe('defend')
+
+    // 弃守（选 0 名）→ 直接被占、续跑月末。
+    const surrendered = apply(paused, { type: 'chooseDefenders', officerIds: [] })
+    expect(surrendered.cities.jiangling!.lordId).toBe('caocao')
+    expect(surrendered.month).toBe(2)
+  })
+
   it('战斗挂起即初始化技能系统：天气/MP/状态（initBattle+startDay 全链接线）', () => {
     const ordered = apply(createInitialState(1), {
       type: 'campaign',
