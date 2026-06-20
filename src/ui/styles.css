@@ -1,0 +1,186 @@
+:root {
+  font-family:
+    system-ui,
+    -apple-system,
+    'PingFang SC',
+    'Microsoft YaHei',
+    sans-serif;
+  font-size: 14px;
+  color: #1f2328;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #f3f1ea;
+}
+.app {
+  padding: 12px;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  background: #2b2620;
+  color: #f3f1ea;
+  border-radius: 6px;
+}
+.topbar .era {
+  font-weight: 600;
+}
+.topbar button {
+  margin-left: auto;
+}
+.topbar .newgame {
+  margin-left: 8px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 180px 1fr 1.2fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+.panel {
+  background: #fff;
+  border: 1px solid #d8d2c4;
+  border-radius: 6px;
+  padding: 10px;
+}
+.panel h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.city-list,
+.officer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.center,
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.city-item,
+.officer-item {
+  text-align: left;
+  padding: 6px 8px;
+  border: 1px solid #d8d2c4;
+  border-radius: 4px;
+  background: #faf8f2;
+  cursor: pointer;
+}
+.city-item.active,
+.officer-item.active {
+  background: #c9a86a;
+  color: #2b2620;
+  border-color: #a8843f;
+}
+.officer-item.tag-俘虏 {
+  color: #b0411a;
+}
+.officer-item.tag-在野 {
+  color: #6b6b6b;
+}
+.city-info .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+.officer-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #d8d2c4;
+  border-radius: 6px;
+}
+.command-panel .cmd-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  border-top: 1px dashed #e3ddcd;
+}
+.cmd-label {
+  width: 100%;
+  color: #6b6b6b;
+}
+.cmd {
+  padding: 4px 10px;
+  border: 1px solid #a8843f;
+  border-radius: 4px;
+  background: #e6c98f;
+  cursor: pointer;
+}
+.cmd:disabled {
+  background: #eceae3;
+  border-color: #d8d2c4;
+  color: #9a958a;
+  cursor: not-allowed;
+}
+.numcmd {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.numcmd input {
+  width: 72px;
+  padding: 3px 4px;
+}
+.captive-cmds {
+  display: inline-flex;
+  gap: 4px;
+}
+.toast-host {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+}
+.toast {
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  background: #2b6a3a;
+  color: #fff;
+}
+.toast-fail {
+  background: #9a2b1f;
+}
+.dialog-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+.dialog {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  min-width: 320px;
+}
+.dialog .hint {
+  color: #9a2b1f;
+  font-size: 12px;
+}
+.dialog-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}

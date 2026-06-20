@@ -1,3 +1,13 @@
+import { GameScreen } from './ui/app-shell'
+import { ToastHost } from './ui/feedback/toast'
+import { PauseDialogs } from './ui/pause-dialogs'
+
 export function App() {
-  return <main>三国 · 经营统一（UI 待后续切片接入）</main>
+  return (
+    <main className="app">
+      <GameScreen />
+      <PauseDialogs />
+      <ToastHost />
+    </main>
+  )
 }

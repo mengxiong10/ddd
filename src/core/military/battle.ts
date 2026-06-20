@@ -2,7 +2,7 @@ import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
 import { withEvents, type WithEvents } from '../shared/outcome'
 import type { Position } from '../shared/position'
-import { effectiveOfficer, governorOf } from '../world/queries'
+import { effectiveOfficer, governorOf, defendingOfficers } from '../world/queries'
 import type { BattleMap } from './battle-map'
 import { BATTLE_MAPS, MAX_DAYS } from './battle-map'
 import { dailyFoodCost } from './battle-combat'
@@ -47,28 +47,28 @@ export function initBattle(
   state: GameState,
   officerIds: readonly OfficerId[],
   targetCityId: CityId,
-  provisions: number
+  provisions: number,
+  // TODO： 必选，把 AI选的 defenderIds 传进来，去掉 defendingOfficers 相关查询；
+  explicitDefenderIds?: readonly OfficerId[]
 ): BattleState {
   const attackerLord = state.officers[officerIds[0]!]!.lordId!
   const target = state.cities[targetCityId]!
-  const defenderLord = target.lordId
   const mode = attackerLord === state.playerLordId ? 'attack' : 'defend'
   const attackerSide: BattleSide = mode === 'attack' ? 'player' : 'opponent'
   const defenderSide: BattleSide = mode === 'attack' ? 'opponent' : 'player'
   const map: BattleMap = BATTLE_MAPS[target.battleMapId] ?? BATTLE_MAPS.plains!
 
-  // 防守方 = 目标城归属方在城武将（自动排除俘虏/在野）：太守领衔，其余按兵力降序（平局 id 升序），限 10。
+  // 防守方：显式守军（玩家防守时 chooseDefenders 传入的已选子集，已 ⊆ defendingOfficers）或自动取
+  // defendingOfficers(target)（在城·本势力·非俘虏·未被占用）。两路均「太守领衔（若在守军内）+ 其余兵力降序（平局 id 升序）」、限 10。
   const governor = governorOf(state, targetCityId)
-  const defenders = Object.values(state.officers).filter(
-    (o) => o.cityId === targetCityId && o.lordId === defenderLord
-  )
-  const rest = defenders
+  const pool = explicitDefenderIds
+    ? explicitDefenderIds.map((id) => state.officers[id]!)
+    : defendingOfficers(state, targetCityId)
+  const governorLeads = governor && pool.some((o) => o.id === governor.id) ? [governor.id] : []
+  const rest = pool
     .filter((o) => o.id !== governor?.id)
     .sort((a, b) => b.troops - a.troops || (a.id < b.id ? -1 : 1))
-  const defenderIds = [...(governor ? [governor.id] : []), ...rest.map((o) => o.id)].slice(
-    0,
-    MAX_BATTLE_UNITS
-  )
+  const defenderIds = [...governorLeads, ...rest.map((o) => o.id)].slice(0, MAX_BATTLE_UNITS)
   const attackerIds = officerIds.slice(0, MAX_BATTLE_UNITS)
 
   const units: Record<OfficerId, BattleUnit> = {}

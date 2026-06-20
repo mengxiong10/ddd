@@ -53,7 +53,7 @@ function targetPoint(battle: BattleState, map: BattleMap): Position {
 }
 
 /** 选将（§7.2）：对手方、可行动（非 dead/confused/stone）、未行动；离目标点曼哈顿最小（平局 officerId 升序）。 */
-function selectUnitId(state: GameState, battle: BattleState, map: BattleMap): OfficerId | null {
+function selectUnitId(battle: BattleState, map: BattleMap): OfficerId | null {
   const tp = targetPoint(battle, map)
   const candidates = aliveUnits(battle).filter(
     (u) => u.side === 'opponent' && !u.acted && canActWithStatus(u.status)
@@ -287,7 +287,7 @@ export function nextOpponentAction(
   const battle = state.activeBattle
   if (!battle || battle.outcome) return null
   const map = mapOf(battle)
-  const officerId = selectUnitId(state, battle, map)
+  const officerId = selectUnitId(battle, map)
   if (!officerId) return null
   const pos = chooseTile(state, battle, map, officerId)
   const [terminal, rng] = chooseTerminal(state, battle, map, officerId, pos, state.rng)
