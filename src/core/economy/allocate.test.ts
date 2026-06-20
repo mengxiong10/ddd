@@ -71,7 +71,7 @@ describe('canAllocate 前置校验', () => {
 describe('allocate 分配（双向）', () => {
   it('N > 原兵：城 → 武将', () => {
     const s = withCity(createInitialState(1), 'chengdu', { reserveTroops: 200 })
-    const next = allocate(s, 'zhugeliang', 250)
+    const next = allocate(s, 'zhugeliang', 250).state
     // 后备兵 = 200 + (100 − 250) = 50；武将兵 = 250
     expect(next.cities.chengdu!.reserveTroops).toBe(50)
     expect(next.officers.zhugeliang!.troops).toBe(250)
@@ -79,7 +79,7 @@ describe('allocate 分配（双向）', () => {
 
   it('N < 原兵：上交回城', () => {
     const s = withCity(createInitialState(1), 'chengdu', { reserveTroops: 0 })
-    const next = allocate(s, 'zhugeliang', 40)
+    const next = allocate(s, 'zhugeliang', 40).state
     // 后备兵 = 0 + (100 − 40) = 60；武将兵 = 40
     expect(next.cities.chengdu!.reserveTroops).toBe(60)
     expect(next.officers.zhugeliang!.troops).toBe(40)
@@ -87,22 +87,26 @@ describe('allocate 分配（双向）', () => {
 
   it('N = 0：全部上交', () => {
     const s = withCity(createInitialState(1), 'chengdu', { reserveTroops: 0 })
-    const next = allocate(s, 'zhugeliang', 0)
+    const next = allocate(s, 'zhugeliang', 0).state
     expect(next.cities.chengdu!.reserveTroops).toBe(100)
     expect(next.officers.zhugeliang!.troops).toBe(0)
   })
 
   it('不扣体力/金、不占人；RNG 不变', () => {
     const s = createInitialState(1)
-    const next = allocate(s, 'zhugeliang', 0)
+    const next = allocate(s, 'zhugeliang', 0).state
     expect(next.officers.zhugeliang!.stamina).toBe(s.officers.zhugeliang!.stamina)
     expect(next.cities.chengdu!.gold).toBe(s.cities.chengdu!.gold)
     expect(isBusy(next, 'zhugeliang')).toBe(false)
     expect(next.rng.seed).toBe(s.rng.seed)
   })
 
-  it('非法下令 no-op（返回原状态）', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = occupy(createInitialState(1), 'zhugeliang')
-    expect(allocate(s, 'zhugeliang', 50)).toBe(s)
+    const res = allocate(s, 'zhugeliang', 50)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('officer-busy')
+    expect(res.events).toEqual([])
   })
 })

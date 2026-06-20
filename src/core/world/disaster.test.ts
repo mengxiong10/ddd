@@ -25,7 +25,7 @@ describe('runDisasters · 破坏（异常城）', () => {
       commerce: 200,
     })
     const expected = applyDisasterDamage(s.cities.only!, 'drought')
-    const c = runDisasters(s).cities.only!
+    const c = runDisasters(s).state.cities.only!
     expect(c.status).toBe('drought')
     expect(c.food).toBe(expected.food)
     expect(c.reserveTroops).toBe(expected.reserveTroops)
@@ -36,7 +36,7 @@ describe('runDisasters · 破坏（异常城）', () => {
 
   it('正常城（防灾=100）永不发灾、状态不变', () => {
     const s = oneCity(1, { status: 'normal', disasterPrevention: 100 })
-    expect(runDisasters(s).cities.only!.status).toBe('normal')
+    expect(runDisasters(s).state.cities.only!.status).toBe('normal')
   })
 })
 
@@ -44,7 +44,7 @@ describe('runDisasters · 生成（正常城）', () => {
   it('防灾=100 任何 seed 都不发灾', () => {
     for (let seed = 1; seed <= 30; seed++) {
       const s = oneCity(seed, { status: 'normal', disasterPrevention: 100 })
-      expect(runDisasters(s).cities.only!.status).toBe('normal')
+      expect(runDisasters(s).state.cities.only!.status).toBe('normal')
     }
   })
 
@@ -53,7 +53,7 @@ describe('runDisasters · 生成（正常城）', () => {
       const s = oneCity(seed, { status: 'normal', disasterPrevention: -1, loyalty: 50 })
       const [, rng1] = randInt(s.rng, 0, 99) // R > -1 恒成立
       const [kind, rng2] = randInt(rng1, 0, 4)
-      const out = runDisasters(s).cities.only!.status
+      const out = runDisasters(s).state.cities.only!.status
       if (kind === 0) expect(out).toBe('drought')
       else if (kind === 1) expect(out).toBe('flood')
       else if (kind === 2) {
@@ -67,33 +67,36 @@ describe('runDisasters · 生成（正常城）', () => {
 describe('runDisasters · 恢复（异常城）', () => {
   it('饥荒：粮>0 即恢复，不耗 RNG', () => {
     const s = oneCity(1, { status: 'famine', food: 10 })
-    const out = runDisasters(s)
+    const out = runDisasters(s).state
     expect(out.cities.only!.status).toBe('normal')
     expect(out.rng.seed).toBe(s.rng.seed)
   })
 
   it('饥荒：粮=0 不恢复，不耗 RNG', () => {
     const s = oneCity(1, { status: 'famine', food: 0 })
-    const out = runDisasters(s)
+    const out = runDisasters(s).state
     expect(out.cities.only!.status).toBe('famine')
     expect(out.rng.seed).toBe(s.rng.seed)
   })
 
   it('旱灾：防灾=100 必恢复 / 防灾=0 不恢复', () => {
     expect(
-      runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 100 })).cities.only!.status
+      runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 100 })).state.cities.only!
+        .status
     ).toBe('normal')
     expect(
-      runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 0 })).cities.only!.status
+      runDisasters(oneCity(1, { status: 'drought', disasterPrevention: 0 })).state.cities.only!
+        .status
     ).toBe('drought')
   })
 
   it('水灾：防灾=100 必恢复 / 防灾=0 不恢复', () => {
     expect(
-      runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 100 })).cities.only!.status
+      runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 100 })).state.cities.only!
+        .status
     ).toBe('normal')
     expect(
-      runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 0 })).cities.only!.status
+      runDisasters(oneCity(1, { status: 'flood', disasterPrevention: 0 })).state.cities.only!.status
     ).toBe('flood')
   })
 
@@ -102,9 +105,34 @@ describe('runDisasters · 恢复（异常城）', () => {
       const s = oneCity(seed, { status: 'riot', loyalty: 80, disasterPrevention: 50 })
       const damagedLoyalty = applyDisasterDamage(s.cities.only!, 'riot').loyalty
       const [r] = randInt(s.rng, 0, 99)
-      const out = runDisasters(s).cities.only!.status
+      const out = runDisasters(s).state.cities.only!.status
       expect(out).toBe(r < damagedLoyalty ? 'normal' : 'riot')
     }
+  })
+})
+
+describe('runDisasters · 事件', () => {
+  it('正常→异常 产 city-disaster 事件（携灾种）', () => {
+    const s = oneCity(1, { status: 'normal', disasterPrevention: -1, loyalty: 50 })
+    const { state, events } = runDisasters(s)
+    const status = state.cities.only!.status
+    if (status !== 'normal') {
+      expect(events).toContainEqual({ kind: 'city-disaster', cityId: 'only', status })
+    } else {
+      expect(events.some((e) => e.kind === 'city-disaster')).toBe(false)
+    }
+  })
+
+  it('异常→正常 产 city-recovered 事件', () => {
+    const s = oneCity(1, { status: 'famine', food: 10 })
+    const { events } = runDisasters(s)
+    expect(events).toContainEqual({ kind: 'city-recovered', cityId: 'only' })
+  })
+
+  it('维持异常（不恢复）不产事件', () => {
+    const s = oneCity(1, { status: 'famine', food: 0 })
+    const { events } = runDisasters(s)
+    expect(events).toEqual([])
   })
 })
 
@@ -116,6 +144,6 @@ describe('runDisasters · 确定性 & 全局', () => {
 
   it('对所有城（含 AI）生效：全 normal 局面推进 RNG', () => {
     const s = createInitialState(3)
-    expect(runDisasters(s).rng.seed).not.toBe(s.rng.seed)
+    expect(runDisasters(s).state.rng.seed).not.toBe(s.rng.seed)
   })
 })

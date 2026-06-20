@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createInitialState } from './world/fixture'
-import { apply, canApply, type Action } from './game'
+import { apply, applyWithEvents, canApply, type Action } from './game'
 import type { GameState } from './game-state'
 import { isBusy } from './world/queries'
 import { WEATHER_ORDER } from './military/battle-weather'
@@ -24,6 +24,28 @@ describe('game apply 分派', () => {
   it('endMonth 推进月份', () => {
     const next = apply(createInitialState(1), { type: 'endMonth' })
     expect(next.month).toBe(2)
+  })
+
+  it('applyWithEvents 产事件、自报告 ok、apply 取其 .state（逐字节一致）', () => {
+    const s = createInitialState(1)
+    const action: Action = { type: 'reclaim', officerId: 'zhugeliang' }
+    const { ok, reason, state, events } = applyWithEvents(s, action)
+    expect(ok).toBe(true)
+    expect(reason).toBeUndefined()
+    expect(state).toEqual(apply(s, action))
+    expect(events).toHaveLength(1)
+    expect(events[0]!.kind).toBe('develop-done')
+  })
+
+  it('applyWithEvents 经营动作失败：冒泡 reason、state 不变、无事件（校验只跑一次）', () => {
+    const s = createInitialState(1)
+    // 庞统占用诸葛亮后再令其开垦 → officer-busy
+    const busy = { ...s, pendingCommands: [{ type: 'develop', officerId: 'zhugeliang' } as const] }
+    const res = applyWithEvents(busy, { type: 'reclaim', officerId: 'zhugeliang' })
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('officer-busy')
+    expect(res.state).toBe(busy)
+    expect(res.events).toEqual([])
   })
 
   it('战斗端到端：出征→endMonth 挂起→battle 撤退→resumeMonth 续月末', () => {

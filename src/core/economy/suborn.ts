@@ -2,6 +2,13 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import {
+  withEvents,
+  commandOk,
+  commandFail,
+  type WithEvents,
+  type WithCheck,
+} from '../shared/outcome'
 import { spendGold } from '../world/city'
 import { spendStamina } from '../world/officer'
 import { effectiveOfficer, isBusy, isCaptive } from '../world/queries'
@@ -36,16 +43,17 @@ export function canSuborn(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   const captive = state.officers[captiveId]
-  if (!captive) return { ok: false, reason: '俘虏不存在' }
-  if (captive.cityId !== officer.cityId) return { ok: false, reason: '俘虏不在本城' }
-  if (!isCaptive(state, captiveId)) return { ok: false, reason: '目标不是俘虏' }
-  if (officer.stamina < config.subornStaminaCost) return { ok: false, reason: '体力不足' }
+  if (!captive) return { ok: false, reason: 'captive-not-found' }
+  if (captive.cityId !== officer.cityId) return { ok: false, reason: 'captive-not-in-city' }
+  if (!isCaptive(state, captiveId)) return { ok: false, reason: 'target-not-captive' }
+  if (officer.stamina < config.subornStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (city.gold < config.subornGoldCost) return { ok: false, reason: '城金不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (city.gold < config.subornGoldCost) return { ok: false, reason: 'gold-insufficient' }
   return { ok: true }
 }
 
@@ -58,20 +66,21 @@ export function suborn(
   officerId: OfficerId,
   captiveId: OfficerId,
   config: GameConfig
-): GameState {
-  if (!canSuborn(state, officerId, captiveId, config).ok) return state
+): WithCheck<GameState> {
+  const check = canSuborn(state, officerId, captiveId, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
   const nextOfficer = spendStamina(officer, config.subornStaminaCost)
   const nextCity = spendGold(city, config.subornGoldCost)
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'suborn', officerId, captiveId }],
-  }
+  })
 }
 
 /**
@@ -89,9 +98,13 @@ export function executeSuborn(
   state: GameState,
   officerId: OfficerId,
   captiveId: OfficerId
-): GameState {
+): WithEvents<GameState> {
   const officer = state.officers[officerId]
-  if (!officer || !state.officers[captiveId] || !isCaptive(state, captiveId)) return state
+  if (!officer || !state.officers[captiveId] || !isCaptive(state, captiveId))
+    return withEvents(state)
+
+  const fail = (s: GameState): WithEvents<GameState> =>
+    withEvents(s, [{ kind: 'suborn-result', officerId, captiveId, success: false }])
 
   const execIntel = effectiveOfficer(state, officerId).intelligence
   const targetIntel = effectiveOfficer(state, captiveId).intelligence
@@ -99,7 +112,7 @@ export function executeSuborn(
   // 1. 智力差关
   const [r1, rng1] = randInt(state.rng, 0, ROLL_MAX)
   const threshold = execIntel - targetIntel + SUBORN_INTEL_SAFETY
-  if (r1 > threshold) return { ...state, rng: rng1 }
+  if (r1 > threshold) return fail({ ...state, rng: rng1 })
 
   // 2. 降忠诚（持久化）
   const captive = state.officers[captiveId]!
@@ -112,16 +125,19 @@ export function executeSuborn(
     rng: rng1,
     officers: { ...state.officers, [captiveId]: lowered },
   }
-  if (l0 > SUBORN_LOYALTY_GATE) return afterDrop
+  if (l0 > SUBORN_LOYALTY_GATE) return fail(afterDrop)
 
   // 3. 终判
   const s = SUBORN_COEFF[captive.personality]!
   const [r2, rng2] = randInt(rng1, 0, ROLL_MAX)
   const failThreshold = Math.floor(loweredLoyalty / s)
-  if (r2 < failThreshold) return { ...afterDrop, rng: rng2 }
+  if (r2 < failThreshold) return fail({ ...afterDrop, rng: rng2 })
 
   // 4. 成功：归己 + 重置忠诚
   const [okLoyalty, rng3] = randInt(rng2, SUBORN_OK_LOYALTY_MIN, SUBORN_OK_LOYALTY_MAX)
   const won = { ...lowered, lordId: officer.lordId, loyalty: okLoyalty }
-  return { ...afterDrop, rng: rng3, officers: { ...afterDrop.officers, [captiveId]: won } }
+  return withEvents(
+    { ...afterDrop, rng: rng3, officers: { ...afterDrop.officers, [captiveId]: won } },
+    [{ kind: 'suborn-result', officerId, captiveId, success: true }]
+  )
 }

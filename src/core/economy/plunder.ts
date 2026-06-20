@@ -2,6 +2,13 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import {
+  withEvents,
+  commandOk,
+  commandFail,
+  type WithEvents,
+  type WithCheck,
+} from '../shared/outcome'
 import { addFood, addGold, ravage } from '../world/city'
 import { spendStamina } from '../world/officer'
 import { effectiveOfficer, isBusy } from '../world/queries'
@@ -24,9 +31,10 @@ export function canPlunder(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
-  if (officer.stamina < config.plunderStaminaCost) return { ok: false, reason: '体力不足' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
+  if (officer.stamina < config.plunderStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
   return { ok: true }
 }
 
@@ -34,33 +42,39 @@ export function canPlunder(
  * 下令掠夺：效果延到月末（见 executePlunder）。下令当下仅扣体力、入队（占用由队列派生），不改城、不动 RNG。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
-export function plunder(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
-  if (!canPlunder(state, officerId, config).ok) return state
+export function plunder(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): WithCheck<GameState> {
+  const check = canPlunder(state, officerId, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const nextOfficer = spendStamina(officer, config.plunderStaminaCost)
 
-  return {
+  return commandOk({
     ...state,
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'plunder', officerId }],
-  }
+  })
 }
 
 /**
  * 月末执行单条掠夺（供 turn 层按 type 分派）：本城 = 执行人所在城。
  * 破坏本城（ravage）+ 收益本城（粮 += power×5、金 += power×2）。
  */
-export function executePlunder(state: GameState, officerId: OfficerId): GameState {
+export function executePlunder(state: GameState, officerId: OfficerId): WithEvents<GameState> {
   const officer = state.officers[officerId]!
   const cityId = officer.cityId
   const eff = effectiveOfficer(state, officerId)
   const power = eff.intelligence + eff.force
+  const goldGained = power * PLUNDER_GOLD_PER_POWER
+  const foodGained = power * PLUNDER_FOOD_PER_POWER
   const ravaged = ravage(state.cities[cityId]!)
-  const nextCity = addGold(
-    addFood(ravaged, power * PLUNDER_FOOD_PER_POWER),
-    power * PLUNDER_GOLD_PER_POWER
-  )
+  const nextCity = addGold(addFood(ravaged, foodGained), goldGained)
 
-  return { ...state, cities: { ...state.cities, [cityId]: nextCity } }
+  return withEvents({ ...state, cities: { ...state.cities, [cityId]: nextCity } }, [
+    { kind: 'plunder-done', officerId, cityId, goldGained, foodGained },
+  ])
 }

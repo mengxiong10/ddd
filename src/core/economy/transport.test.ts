@@ -63,7 +63,7 @@ describe('canTransport 前置校验', () => {
 describe('transport 下令', () => {
   it('扣体力8、出发城立即扣粮/金/后备兵、占用(入队 transport)；RNG不变', () => {
     const s = withCity(createInitialState(1), 'chengdu', { reserveTroops: 100 })
-    const next = transport(s, 'zhugeliang', 'jiangling', 100, 50, 30, cfg)
+    const next = transport(s, 'zhugeliang', 'jiangling', 100, 50, 30, cfg).state
     expect(next.cities.chengdu!.food).toBe(400 - 100)
     expect(next.cities.chengdu!.gold).toBe(500 - 50)
     expect(next.cities.chengdu!.reserveTroops).toBe(100 - 30)
@@ -82,9 +82,12 @@ describe('transport 下令', () => {
     ])
   })
 
-  it('非法下令 no-op', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = createInitialState(1)
-    expect(transport(s, 'zhugeliang', 'xuchang', 0, 0, 0, cfg)).toBe(s)
+    const res = transport(s, 'zhugeliang', 'xuchang', 0, 0, 0, cfg)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('target-not-friendly-city')
   })
 })
 
@@ -96,7 +99,7 @@ describe('executeTransport 月末执行（80/20）', () => {
       reserveTroops: 0,
     })
     const [roll] = randInt(s.rng, 1, 100)
-    const next = executeTransport(s, 'zhugeliang', 'jiangling', 100, 50, 30)
+    const next = executeTransport(s, 'zhugeliang', 'jiangling', 100, 50, 30).state
     expect(next.rng.seed).not.toBe(s.rng.seed)
     if (roll <= 80) {
       expect(next.cities.jiangling!.food).toBe(300 + 100)
@@ -123,7 +126,50 @@ describe('executeTransport 月末执行（80/20）', () => {
       rng: { seed },
       cities: { ...s0.cities, jiangling: { ...s0.cities.jiangling!, food: 300 } },
     }
-    const next = executeTransport(s, 'zhugeliang', 'jiangling', 100, 0, 0)
+    const next = executeTransport(s, 'zhugeliang', 'jiangling', 100, 0, 0).state
     expect(next.cities.jiangling!.food).toBe(300)
+  })
+
+  it('成败分支产出对应事件', () => {
+    const base = createInitialState(1)
+    const okSeed = (() => {
+      let seed = 1
+      while (randInt({ seed }, 1, 100)[0] > 80) seed++
+      return seed
+    })()
+    const robbedSeed = (() => {
+      let seed = 1
+      while (randInt({ seed }, 1, 100)[0] <= 80) seed++
+      return seed
+    })()
+    const ok = executeTransport(
+      { ...base, rng: { seed: okSeed } },
+      'zhugeliang',
+      'jiangling',
+      100,
+      50,
+      30
+    )
+    expect(ok.events).toEqual([
+      {
+        kind: 'transport-delivered',
+        officerId: 'zhugeliang',
+        targetCityId: 'jiangling',
+        food: 100,
+        gold: 50,
+        troops: 30,
+      },
+    ])
+    const robbed = executeTransport(
+      { ...base, rng: { seed: robbedSeed } },
+      'zhugeliang',
+      'jiangling',
+      100,
+      50,
+      30
+    )
+    expect(robbed.events).toEqual([
+      { kind: 'transport-robbed', officerId: 'zhugeliang', targetCityId: 'jiangling' },
+    ])
   })
 })

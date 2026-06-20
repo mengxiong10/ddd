@@ -37,7 +37,7 @@ describe('处斩 behead', () => {
   it('处斩：删除武将、其道具退回本城并标记已发现', () => {
     let s = conquered(1)
     s = giveItem(s, 'mengde-xinshu', 'caocao') // 孟德新书原在许昌城，先给曹操
-    const next = behead(s, 'caocao')
+    const next = behead(s, 'caocao').state
     expect(next.officers.caocao).toBeUndefined() // 永久删除
     expect(itemsOfOfficer(next, 'caocao')).toHaveLength(0)
     const item = next.items['mengde-xinshu']!
@@ -46,9 +46,12 @@ describe('处斩 behead', () => {
     expect(itemsInCity(next, 'xuchang').map((i) => i.id)).toContain('mengde-xinshu')
   })
 
-  it('处斩非俘虏 -> no-op', () => {
+  it('处斩非俘虏 -> no-op（state 不变、自报告失败 reason）', () => {
     const s = createInitialState(1)
-    expect(behead(s, 'caocao')).toBe(s)
+    const res = behead(s, 'caocao')
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('target-not-captive')
   })
 })
 
@@ -64,7 +67,7 @@ describe('流放 banish', () => {
 
   it('流放俘虏：变在野、随机落到某城、消耗 RNG', () => {
     const s = conquered(1)
-    const next = banish(s, 'caocao')
+    const next = banish(s, 'caocao').state
     expect(next.officers.caocao!.lordId).toBeNull()
     expect(next.cities[next.officers.caocao!.cityId]).toBeDefined()
     expect(next.rng).not.toEqual(s.rng)
@@ -73,7 +76,7 @@ describe('流放 banish', () => {
   it('流放保留所持道具（holder 仍指向其本人，不退城）', () => {
     let s = conquered(1)
     s = giveItem(s, 'mengde-xinshu', 'caocao')
-    const next = banish(s, 'caocao')
+    const next = banish(s, 'caocao').state
     expect(next.items['mengde-xinshu']!.holder).toEqual({
       kind: 'officer',
       officerId: 'caocao',
@@ -84,12 +87,15 @@ describe('流放 banish', () => {
 
   it('流放己方在任武将：变在野', () => {
     const s = conquered(1)
-    const next = banish(s, 'guanyu')
+    const next = banish(s, 'guanyu').state
     expect(next.officers.guanyu!.lordId).toBeNull()
   })
 
-  it('流放在任君主 -> no-op', () => {
+  it('流放在任君主 -> no-op（state 不变、自报告失败 reason）', () => {
     const s = conquered(1)
-    expect(banish(s, 'liubei')).toBe(s)
+    const res = banish(s, 'liubei')
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('cannot-banish-active-lord')
   })
 })

@@ -85,7 +85,7 @@ describe('canCampaign 前置校验', () => {
 describe('campaign 下令（效果延后）', () => {
   it('扣本城粮、武将占用(入队 campaign)；目标城/RNG 不变', () => {
     const s = createInitialState(1)
-    const next = campaign(s, ATTACKERS, TARGET, 120)
+    const next = campaign(s, ATTACKERS, TARGET, 120).state
     expect(next.cities.jiangling!.food).toBe(300 - 120)
     expect(isBusy(next, 'guanyu')).toBe(true)
     expect(isBusy(next, 'zhangfei')).toBe(true)
@@ -98,8 +98,11 @@ describe('campaign 下令（效果延后）', () => {
     expect(next.rng.seed).toBe(s.rng.seed)
   })
 
-  it('非法下令 no-op（返回原状态）', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = createInitialState(1)
-    expect(campaign(s, ATTACKERS, 'ye', 100)).toBe(s)
+    const res = campaign(s, ATTACKERS, 'ye', 100)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('target-not-adjacent')
   })
 })

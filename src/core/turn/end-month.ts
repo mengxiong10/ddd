@@ -2,6 +2,7 @@ import type { GameState, PendingCommand } from '../game-state'
 import type { GameConfig } from '../shared/config'
 import type { OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
+import { step, withEvents, type WithEvents } from '../shared/outcome'
 import { settle } from '../economy/settle'
 import { aiTakeTurn } from '../ai/ai'
 import { recoverStamina } from '../world/officer'
@@ -25,11 +26,17 @@ type CampaignPending = Extract<PendingCommand, { type: 'campaign' }>
  * 非玩家者走速算 fallback；全部 campaign 处理完进入月末尾段。
  * 活动战斗中（activeBattle 非空）调用 endMonth 为 no-op（应改用 resumeMonth）。
  */
-export function endMonth(state: GameState, config: GameConfig): GameState {
-  if (state.activeBattle || state.pendingSuccession || state.pendingDefense) return state
+export function endMonthWithEvents(state: GameState, config: GameConfig): WithEvents<GameState> {
+  if (state.activeBattle || state.pendingSuccession || state.pendingDefense)
+    return withEvents(state)
   const afterAi = aiTakeTurn(state, config)
   const afterPending = runNonCampaignPending(afterAi, config)
-  return advanceCampaigns(afterPending, config)
+  return step(afterPending, (s) => advanceCampaigns(s, config))
+}
+
+/** 月末（简化包装）：丢弃事件、只取新状态；行为与既往逐字节一致。 */
+export function endMonth(state: GameState, config: GameConfig): GameState {
+  return endMonthWithEvents(state, config).state
 }
 
 /**
@@ -37,12 +44,14 @@ export function endMonth(state: GameState, config: GameConfig): GameState {
  * 若战后处理挂起了玩家「待选新君」(pendingSuccession 非空) 则提前返回（等 chooseSuccessor）；
  * 否则继续处理剩余 campaign/尾段。要求 state.activeBattle 已有 outcome；否则 no-op。
  */
-export function resumeMonth(state: GameState, config: GameConfig): GameState {
-  if (!state.activeBattle || !state.activeBattle.outcome) return state
-  const concluded = concludeBattle(state) // 写回 + 完整战后处理 + 清空 activeBattle
-  const dropped = dropFirstCampaign(concluded)
-  if (dropped.pendingSuccession) return dropped // 玩家君主遭劫，挂起等手动选新君
-  return advanceCampaigns(dropped, config)
+export function resumeMonth(state: GameState, config: GameConfig): WithEvents<GameState> {
+  if (!state.activeBattle || !state.activeBattle.outcome) return withEvents(state)
+  // concludeBattle 写回 + 完整战后处理（含遭劫君主事件）+ 清空 activeBattle。
+  return step(concludeBattle(state), (concluded) => {
+    const dropped = dropFirstCampaign(concluded)
+    if (dropped.pendingSuccession) return withEvents(dropped) // 玩家君主遭劫，挂起等手动选新君
+    return advanceCampaigns(dropped, config)
+  })
 }
 
 /**
@@ -53,11 +62,15 @@ export function chooseSuccessor(
   state: GameState,
   officerId: OfficerId,
   config: GameConfig
-): GameState {
-  if (!state.pendingSuccession) return state
-  if (!canChooseSuccessor(state, officerId).ok) return state
-  const promoted = promoteLord(state, state.pendingSuccession.lordId, officerId)
-  return advanceCampaigns({ ...promoted, pendingSuccession: null }, config)
+): WithEvents<GameState> {
+  if (!state.pendingSuccession) return withEvents(state)
+  if (!canChooseSuccessor(state, officerId).ok) return withEvents(state)
+  const oldLordId = state.pendingSuccession.lordId
+  const promoted = promoteLord(state, oldLordId, officerId)
+  const cleared = withEvents<GameState>({ ...promoted, pendingSuccession: null }, [
+    { kind: 'lord-succeeded', oldLordId, newLordId: officerId },
+  ])
+  return step(cleared, (s) => advanceCampaigns(s, config))
 }
 
 /**
@@ -68,7 +81,7 @@ export function chooseSuccessor(
  * - AI 进攻有守军玩家城 → 挂起 pendingDefense（待玩家选守军）返回；
  * - AI vs AI 有守军 → quickResolveCampaign 速算 → 丢弃 → 递归。
  */
-export function advanceCampaigns(state: GameState, config: GameConfig): GameState {
+export function advanceCampaigns(state: GameState, config: GameConfig): WithEvents<GameState> {
   const idx = state.pendingCommands.findIndex((c) => c.type === 'campaign')
   if (idx < 0) return finishMonthTail(state, config)
   const c = state.pendingCommands[idx] as CampaignPending
@@ -78,17 +91,19 @@ export function advanceCampaigns(state: GameState, config: GameConfig): GameStat
 
   if (defenders.length === 0) {
     const resolved = quickResolveCampaign(state, c.officerIds, [], c.targetCityId, c.provisions)
-    return advanceCampaigns(dropFirstCampaign(resolved), config)
+    return step(resolved, (s) => advanceCampaigns(dropFirstCampaign(s), config))
   }
   if (attackerLord === state.playerLordId) {
     // 玩家进攻：装好单位后跑第 1 天开头，挂起战斗。
-    return startDay({
-      ...state,
-      activeBattle: initBattle(state, c.officerIds, c.targetCityId, c.provisions),
-    })
+    return withEvents(
+      startDay({
+        ...state,
+        activeBattle: initBattle(state, c.officerIds, c.targetCityId, c.provisions),
+      })
+    )
   }
   if (defenderLord === state.playerLordId) {
-    return { ...state, pendingDefense: { targetCityId: c.targetCityId } }
+    return withEvents({ ...state, pendingDefense: { targetCityId: c.targetCityId } })
   }
   // AI vs AI：速算后续跑。
   const resolved = quickResolveCampaign(
@@ -98,7 +113,7 @@ export function advanceCampaigns(state: GameState, config: GameConfig): GameStat
     c.targetCityId,
     c.provisions
   )
-  return advanceCampaigns(dropFirstCampaign(resolved), config)
+  return step(resolved, (s) => advanceCampaigns(dropFirstCampaign(s), config))
 }
 
 /** 校验玩家选守军（供 canApply）：pendingDefense 非空 + 去重 + ≤10 + 全属该城守军。空数组合法（弃守）。 */
@@ -107,12 +122,12 @@ export function canChooseDefenders(
   officerIds: readonly OfficerId[]
 ): CommandCheck {
   const pd = state.pendingDefense
-  if (!pd) return { ok: false, reason: '当前无待守军选择' }
-  if (new Set(officerIds).size !== officerIds.length) return { ok: false, reason: '守军重复' }
-  if (officerIds.length > MAX_DEFENDERS)
-    return { ok: false, reason: `守军最多 ${MAX_DEFENDERS} 名` }
+  if (!pd) return { ok: false, reason: 'no-pending-defense' }
+  if (new Set(officerIds).size !== officerIds.length)
+    return { ok: false, reason: 'duplicate-defenders' }
+  if (officerIds.length > MAX_DEFENDERS) return { ok: false, reason: 'too-many-defenders' }
   const pool = new Set(defendingOfficers(state, pd.targetCityId).map((o) => o.id))
-  if (!officerIds.every((id) => pool.has(id))) return { ok: false, reason: '守军须为该城在城武将' }
+  if (!officerIds.every((id) => pool.has(id))) return { ok: false, reason: 'invalid-defenders' }
   return { ok: true }
 }
 
@@ -125,20 +140,22 @@ export function chooseDefenders(
   state: GameState,
   officerIds: readonly OfficerId[],
   config: GameConfig
-): GameState {
-  if (!canChooseDefenders(state, officerIds).ok) return state
+): WithEvents<GameState> {
+  if (!canChooseDefenders(state, officerIds).ok) return withEvents(state)
   const idx = state.pendingCommands.findIndex((c) => c.type === 'campaign')
-  if (idx < 0) return state
+  if (idx < 0) return withEvents(state)
   const c = state.pendingCommands[idx] as CampaignPending
   const cleared: GameState = { ...state, pendingDefense: null }
   if (officerIds.length === 0) {
     const resolved = quickResolveCampaign(cleared, c.officerIds, [], c.targetCityId, c.provisions)
-    return advanceCampaigns(dropFirstCampaign(resolved), config)
+    return step(resolved, (s) => advanceCampaigns(dropFirstCampaign(s), config))
   }
-  return startDay({
-    ...cleared,
-    activeBattle: initBattle(cleared, c.officerIds, c.targetCityId, c.provisions, officerIds),
-  })
+  return withEvents(
+    startDay({
+      ...cleared,
+      activeBattle: initBattle(cleared, c.officerIds, c.targetCityId, c.provisions, officerIds),
+    })
+  )
 }
 
 /** 移除队列中第一条 campaign（resumeMonth 结算后用）。 */
@@ -152,7 +169,7 @@ function dropFirstCampaign(state: GameState): GameState {
  * 月末尾段（所有 campaign 处理完后）：收粮/收税 → 体力恢复 → 月份 +1（跨年）→ 登场 → 灾害。
  * 清空待执行队列（campaign 均已结算/速算）——队列清空即所有派生占用归零，无需显式置位。
  */
-function finishMonthTail(state: GameState, config: GameConfig): GameState {
+function finishMonthTail(state: GameState, config: GameConfig): WithEvents<GameState> {
   const settled = settle({ ...state, pendingCommands: [] })
   const officers: Record<OfficerId, GameState['officers'][OfficerId]> = { ...settled.officers }
   for (const id of Object.keys(officers)) {
@@ -161,5 +178,5 @@ function finishMonthTail(state: GameState, config: GameConfig): GameState {
   const month = settled.month === 12 ? 1 : settled.month + 1
   const year = settled.month === 12 ? settled.year + 1 : settled.year
   const debuted = runDebuts({ ...settled, officers, month, year })
-  return runDisasters(debuted)
+  return runDisasters(debuted) // WithEvents（city-disaster/city-recovered）
 }

@@ -471,7 +471,7 @@ describe('concludeBattle 写回 + 组装 CampaignOutcome（攻方胜）', () => 
     ],
     { outcome: 'playerWin', playerProvisions: 120, opponentProvisions: 300 }
   )
-  const next = concludeBattle(withBattle(s, b))
+  const next = concludeBattle(withBattle(s, b)).state
   it('胜方单位兵力/经验/等级写回 Officer 并进驻目标城', () => {
     expect(next.officers.guanyu!.troops).toBe(55)
     expect(next.officers.guanyu!.experience).toBe(40)

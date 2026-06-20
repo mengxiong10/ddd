@@ -1,5 +1,6 @@
 import type { GameState, PendingCommand } from '../game-state'
 import type { GameConfig } from '../shared/config'
+import { step, withEvents, type WithEvents } from '../shared/outcome'
 import { executePlunder } from '../economy/plunder'
 import { executeMove } from '../economy/move'
 import { executeTransport } from '../economy/transport'
@@ -19,58 +20,52 @@ import {
  * campaign 不在此执行：玩家参与的出征会进入交互式战斗（end-month.advanceCampaigns）。
  * config 预留给后续需成本/系数的月末指令。
  */
-export function runNonCampaignPending(state: GameState, _config: GameConfig): GameState {
-  if (state.pendingCommands.length === 0) return state
+export function runNonCampaignPending(
+  state: GameState,
+  _config: GameConfig
+): WithEvents<GameState> {
+  if (state.pendingCommands.length === 0) return withEvents(state)
   const isCampaign = (c: PendingCommand) => c.type === 'campaign'
   const others = state.pendingCommands.filter((c) => !isCampaign(c))
-  if (others.length === 0) return state // 仅余 campaign：原样保留，交给 end-month
+  if (others.length === 0) return withEvents(state) // 仅余 campaign：原样保留，交给 end-month
 
-  let next = state
+  let acc: WithEvents<GameState> = withEvents(state)
   for (const cmd of others) {
-    switch (cmd.type) {
-      case 'plunder':
-        next = executePlunder(next, cmd.officerId)
-        break
-      case 'move':
-        next = executeMove(next, cmd.officerId, cmd.targetCityId)
-        break
-      case 'transport':
-        next = executeTransport(
-          next,
-          cmd.officerId,
-          cmd.targetCityId,
-          cmd.food,
-          cmd.gold,
-          cmd.troops
-        )
-        break
-      case 'search':
-        next = executeSearch(next, cmd.officerId)
-        break
-      case 'suborn':
-        next = executeSuborn(next, cmd.officerId, cmd.captiveId)
-        break
-      case 'entice':
-        next = executeEntice(next, cmd.officerId, cmd.targetOfficerId)
-        break
-      case 'alienate':
-        next = executeAlienate(next, cmd.officerId, cmd.targetOfficerId)
-        break
-      case 'instigate':
-        next = executeInstigate(next, cmd.officerId, cmd.targetOfficerId)
-        break
-      case 'induce':
-        next = executeInduce(next, cmd.officerId, cmd.targetOfficerId)
-        break
-      // 即时生效指令：效果已于下令时结算，月末无操作；出队即释放派生占用（isBusy）。
-      case 'develop':
-      case 'patrol':
-      case 'govern':
-      case 'trade':
-      case 'scout':
-      case 'recruit':
-        break
-    }
+    acc = step(acc, (next) => {
+      switch (cmd.type) {
+        case 'plunder':
+          return executePlunder(next, cmd.officerId)
+        case 'move':
+          return withEvents(executeMove(next, cmd.officerId, cmd.targetCityId))
+        case 'transport':
+          return executeTransport(
+            next,
+            cmd.officerId,
+            cmd.targetCityId,
+            cmd.food,
+            cmd.gold,
+            cmd.troops
+          )
+        case 'search':
+          return executeSearch(next, cmd.officerId)
+        case 'suborn':
+          return executeSuborn(next, cmd.officerId, cmd.captiveId)
+        case 'entice':
+          return executeEntice(next, cmd.officerId, cmd.targetOfficerId)
+        case 'alienate':
+          return executeAlienate(next, cmd.officerId, cmd.targetOfficerId)
+        case 'instigate':
+          return executeInstigate(next, cmd.officerId, cmd.targetOfficerId)
+        case 'induce':
+          return executeInduce(next, cmd.officerId, cmd.targetOfficerId)
+        // 即时生效指令：效果已于下令时结算，月末无操作；出队即释放派生占用（isBusy）。
+        default:
+          return withEvents(next)
+      }
+    })
   }
-  return { ...next, pendingCommands: state.pendingCommands.filter(isCampaign) }
+  return {
+    state: { ...acc.state, pendingCommands: state.pendingCommands.filter(isCampaign) },
+    events: acc.events,
+  }
 }

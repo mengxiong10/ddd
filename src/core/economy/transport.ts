@@ -2,6 +2,13 @@ import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import {
+  withEvents,
+  commandOk,
+  commandFail,
+  type WithEvents,
+  type WithCheck,
+} from '../shared/outcome'
 import { randInt } from '../shared/rng'
 import { addFood, addGold, addReserveTroops, spendFood, spendGold } from '../world/city'
 import { spendStamina } from '../world/officer'
@@ -25,22 +32,23 @@ export function canTransport(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可输送' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (officer.stamina < config.transportStaminaCost) return { ok: false, reason: '体力不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (officer.stamina < config.transportStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
   const target = state.cities[targetCityId]
-  if (!target) return { ok: false, reason: '目标城不存在' }
-  if (targetCityId === officer.cityId) return { ok: false, reason: '目标城不能是本城' }
-  if (target.lordId !== officer.lordId) return { ok: false, reason: '只能输送到己方城' }
+  if (!target) return { ok: false, reason: 'target-city-not-found' }
+  if (targetCityId === officer.cityId) return { ok: false, reason: 'target-is-self-city' }
+  if (target.lordId !== officer.lordId) return { ok: false, reason: 'target-not-friendly-city' }
   for (const v of [food, gold, troops]) {
-    if (!Number.isInteger(v) || v < 0) return { ok: false, reason: '输送量非法' }
+    if (!Number.isInteger(v) || v < 0) return { ok: false, reason: 'invalid-amount' }
   }
-  if (food > city.food) return { ok: false, reason: '城粮不足' }
-  if (gold > city.gold) return { ok: false, reason: '城金不足' }
-  if (troops > city.reserveTroops) return { ok: false, reason: '后备兵不足' }
+  if (food > city.food) return { ok: false, reason: 'food-insufficient' }
+  if (gold > city.gold) return { ok: false, reason: 'gold-insufficient' }
+  if (troops > city.reserveTroops) return { ok: false, reason: 'reserve-troops-insufficient' }
   return { ok: true }
 }
 
@@ -56,15 +64,16 @@ export function transport(
   gold: number,
   troops: number,
   config: GameConfig
-): GameState {
-  if (!canTransport(state, officerId, targetCityId, food, gold, troops, config).ok) return state
+): WithCheck<GameState> {
+  const check = canTransport(state, officerId, targetCityId, food, gold, troops, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city0 = state.cities[officer.cityId]!
   const nextCity = addReserveTroops(spendGold(spendFood(city0, food), gold), -troops)
   const nextOfficer = spendStamina(officer, config.transportStaminaCost)
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
@@ -72,7 +81,7 @@ export function transport(
       ...state.pendingCommands,
       { type: 'transport', officerId, targetCityId, food, gold, troops },
     ],
-  }
+  })
 }
 
 /**
@@ -82,16 +91,22 @@ export function transport(
  */
 export function executeTransport(
   state: GameState,
-  _officerId: OfficerId,
+  officerId: OfficerId,
   targetCityId: CityId,
   food: number,
   gold: number,
   troops: number
-): GameState {
+): WithEvents<GameState> {
   const [roll, nextRng] = randInt(state.rng, 1, 100)
-  if (roll > TRANSPORT_SUCCESS_PERCENT) return { ...state, rng: nextRng }
+  if (roll > TRANSPORT_SUCCESS_PERCENT)
+    return withEvents({ ...state, rng: nextRng }, [
+      { kind: 'transport-robbed', officerId, targetCityId },
+    ])
 
   const target = state.cities[targetCityId]!
   const nextTarget = addReserveTroops(addGold(addFood(target, food), gold), troops)
-  return { ...state, rng: nextRng, cities: { ...state.cities, [targetCityId]: nextTarget } }
+  return withEvents(
+    { ...state, rng: nextRng, cities: { ...state.cities, [targetCityId]: nextTarget } },
+    [{ kind: 'transport-delivered', officerId, targetCityId, food, gold, troops }]
+  )
 }

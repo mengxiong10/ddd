@@ -58,7 +58,7 @@ describe('canDevelop 前置校验', () => {
 describe('develop 开垦/招商', () => {
   it('开垦增长农业（floor(智力/5)+[0,30]），扣金扣体力，占用武将', () => {
     const s = createInitialState(1)
-    const next = develop(s, 'zhugeliang', 'agriculture', cfg)
+    const next = develop(s, 'zhugeliang', 'agriculture', cfg).state
     const base = 300 + Math.floor(100 / 5) // 320
     expect(next.cities.chengdu!.agriculture).toBeGreaterThanOrEqual(base)
     expect(next.cities.chengdu!.agriculture).toBeLessThanOrEqual(base + 30)
@@ -70,28 +70,49 @@ describe('develop 开垦/招商', () => {
 
   it('招商增长商业', () => {
     const s = createInitialState(1)
-    const next = develop(s, 'zhugeliang', 'commerce', cfg)
+    const next = develop(s, 'zhugeliang', 'commerce', cfg).state
     expect(next.cities.chengdu!.commerce).toBeGreaterThanOrEqual(200 + 20)
     expect(next.cities.chengdu!.agriculture).toBe(300)
   })
 
   it('按城级上限截断', () => {
     const s = withCity(createInitialState(1), 'chengdu', { agriculture: 995 })
-    const next = develop(s, 'zhugeliang', 'agriculture', cfg)
+    const next = develop(s, 'zhugeliang', 'agriculture', cfg).state
     expect(next.cities.chengdu!.agriculture).toBe(1000)
   })
 
   it('确定性：相同 seed 相同结果', () => {
     const s = createInitialState(7)
-    const a = develop(s, 'zhugeliang', 'agriculture', cfg)
-    const b = develop(s, 'zhugeliang', 'agriculture', cfg)
+    const a = develop(s, 'zhugeliang', 'agriculture', cfg).state
+    const b = develop(s, 'zhugeliang', 'agriculture', cfg).state
     expect(a.cities.chengdu!.agriculture).toBe(b.cities.chengdu!.agriculture)
     expect(a.rng.seed).toBe(b.rng.seed)
   })
 
   it('非法下令 no-op（返回原状态）', () => {
     const s = occupy(createInitialState(1), 'zhugeliang')
-    expect(develop(s, 'zhugeliang', 'agriculture', cfg)).toBe(s)
+    expect(develop(s, 'zhugeliang', 'agriculture', cfg).state).toBe(s)
+  })
+
+  it('产出 develop-done 事件（attr/newValue/delta 与城属性一致）', () => {
+    const s = createInitialState(1)
+    const { state, events } = develop(s, 'zhugeliang', 'agriculture', cfg)
+    const newValue = state.cities.chengdu!.agriculture
+    expect(events).toEqual([
+      {
+        kind: 'develop-done',
+        officerId: 'zhugeliang',
+        cityId: 'chengdu',
+        attr: 'agriculture',
+        newValue,
+        delta: newValue - 300,
+      },
+    ])
+  })
+
+  it('非法下令不产事件', () => {
+    const s = occupy(createInitialState(1), 'zhugeliang')
+    expect(develop(s, 'zhugeliang', 'agriculture', cfg).events).toEqual([])
   })
 
   it('开垦增量吃道具加成（有效智力）', () => {
@@ -104,8 +125,8 @@ describe('develop 开垦/招商', () => {
         'mengde-xinshu': holdByOfficer(s.items['mengde-xinshu']!, 'zhugeliang'),
       },
     }
-    const a = develop(s, 'zhugeliang', 'agriculture', cfg).cities.chengdu!.agriculture
-    const b = develop(withItem, 'zhugeliang', 'agriculture', cfg).cities.chengdu!.agriculture
+    const a = develop(s, 'zhugeliang', 'agriculture', cfg).state.cities.chengdu!.agriculture
+    const b = develop(withItem, 'zhugeliang', 'agriculture', cfg).state.cities.chengdu!.agriculture
     expect(b - a).toBe(2)
   })
 })

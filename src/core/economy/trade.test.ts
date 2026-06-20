@@ -64,7 +64,7 @@ describe('canTrade 前置校验', () => {
 
 describe('trade 下令（即时·占人）', () => {
   it('买入：粮+amount、金-amount×5、扣体力12、占用(入队 trade)', () => {
-    const next = trade(createInitialState(1), 'zhugeliang', 'buy', 50, cfg)
+    const next = trade(createInitialState(1), 'zhugeliang', 'buy', 50, cfg).state
     expect(next.cities.chengdu!.food).toBe(400 + 50)
     expect(next.cities.chengdu!.gold).toBe(500 - 250)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 12)
@@ -73,18 +73,21 @@ describe('trade 下令（即时·占人）', () => {
   })
 
   it('卖出：粮-amount、金+amount×2', () => {
-    const next = trade(createInitialState(1), 'zhugeliang', 'sell', 100, cfg)
+    const next = trade(createInitialState(1), 'zhugeliang', 'sell', 100, cfg).state
     expect(next.cities.chengdu!.food).toBe(400 - 100)
     expect(next.cities.chengdu!.gold).toBe(500 + 200)
   })
 
   it('卖出城金不封顶（可超 30000）', () => {
     const s = withCity(createInitialState(1), 'chengdu', { gold: 29900, food: 1000 })
-    expect(trade(s, 'zhugeliang', 'sell', 1000, cfg).cities.chengdu!.gold).toBe(29900 + 2000)
+    expect(trade(s, 'zhugeliang', 'sell', 1000, cfg).state.cities.chengdu!.gold).toBe(29900 + 2000)
   })
 
-  it('非法下令 no-op（返回原状态）', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = createInitialState(1)
-    expect(trade(s, 'zhugeliang', 'buy', 101, cfg)).toBe(s)
+    const res = trade(s, 'zhugeliang', 'buy', 101, cfg)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('gold-insufficient')
   })
 })

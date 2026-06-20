@@ -2,6 +2,7 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { randInt } from '../shared/rng'
 import { DISASTER_PREVENTION_MAX, raisePrevention, setStatus, spendGold } from '../world/city'
 import { spendStamina } from '../world/officer'
@@ -25,15 +26,16 @@ export function canGovern(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (officer.lordId !== city.lordId) return { ok: false, reason: '俘虏不可治理' }
-  if (city.gold < config.governGoldCost) return { ok: false, reason: '城金不足' }
-  if (officer.stamina < config.governStaminaCost) return { ok: false, reason: '体力不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (officer.lordId !== city.lordId) return { ok: false, reason: 'is-captive' }
+  if (city.gold < config.governGoldCost) return { ok: false, reason: 'gold-insufficient' }
+  if (officer.stamina < config.governStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
   if (city.status === 'normal' && city.disasterPrevention >= DISASTER_PREVENTION_MAX) {
-    return { ok: false, reason: '城已正常且防灾值已满' }
+    return { ok: false, reason: 'prevention-capped' }
   }
   return { ok: true }
 }
@@ -43,8 +45,13 @@ export function canGovern(
  * 占用武将由入队 govern 命令派生（queries.isBusy），出队即释放；月末分支无效果。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
-export function govern(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
-  if (!canGovern(state, officerId, config).ok) return state
+export function govern(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): WithCheck<GameState> {
+  const check = canGovern(state, officerId, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
@@ -60,11 +67,20 @@ export function govern(state: GameState, officerId: OfficerId, config: GameConfi
   )
   const nextOfficer = spendStamina(officer, config.governStaminaCost)
 
-  return {
+  const next: GameState = {
     ...state,
     rng: nextRng,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'govern', officerId }],
   }
+  return commandOk(next, [
+    {
+      kind: 'govern-done',
+      officerId,
+      cityId: officer.cityId,
+      newPrevention: nextCity.disasterPrevention,
+      delta: nextCity.disasterPrevention - city.disasterPrevention,
+    },
+  ])
 }

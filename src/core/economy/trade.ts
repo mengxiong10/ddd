@@ -2,6 +2,7 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { addFood, addGold, spendFood, spendGold } from '../world/city'
 import { spendStamina } from '../world/officer'
 import { isBusy, isCaptive } from '../world/queries'
@@ -32,15 +33,17 @@ export function canTrade(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可交易' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (officer.stamina < config.tradeStaminaCost) return { ok: false, reason: '体力不足' }
-  if (!Number.isInteger(amount) || amount < 0) return { ok: false, reason: '数量非法' }
-  if (mode === 'buy' && amount > buyMaxFood(city.gold)) return { ok: false, reason: '城金不足' }
-  if (mode === 'sell' && amount > city.food) return { ok: false, reason: '城粮不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (officer.stamina < config.tradeStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
+  if (!Number.isInteger(amount) || amount < 0) return { ok: false, reason: 'invalid-amount' }
+  if (mode === 'buy' && amount > buyMaxFood(city.gold))
+    return { ok: false, reason: 'gold-insufficient' }
+  if (mode === 'sell' && amount > city.food) return { ok: false, reason: 'food-insufficient' }
   return { ok: true }
 }
 
@@ -55,8 +58,9 @@ export function trade(
   mode: TradeMode,
   amount: number,
   config: GameConfig
-): GameState {
-  if (!canTrade(state, officerId, mode, amount, config).ok) return state
+): WithCheck<GameState> {
+  const check = canTrade(state, officerId, mode, amount, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city0 = state.cities[officer.cityId]!
@@ -66,10 +70,10 @@ export function trade(
       : addGold(spendFood(city0, amount), amount * TRADE_SELL_GOLD_PER_FOOD)
   const nextOfficer = spendStamina(officer, config.tradeStaminaCost)
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'trade', officerId }],
-  }
+  })
 }

@@ -1,5 +1,6 @@
 import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
+import type { WithEvents } from '../shared/outcome'
 import { randInt } from '../shared/rng'
 import { resolveCampaignOutcome } from './aftermath'
 
@@ -31,7 +32,7 @@ export function quickResolveCampaign(
   defenderIds: readonly OfficerId[],
   targetCityId: CityId,
   provisions: number
-): GameState {
+): WithEvents<GameState> {
   const target = state.cities[targetCityId]!
   const sumTroops = (ids: readonly OfficerId[]): number =>
     ids.reduce((s, id) => s + (state.officers[id]?.troops ?? 0), 0)

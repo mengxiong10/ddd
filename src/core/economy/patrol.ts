@@ -2,6 +2,7 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { randInt } from '../shared/rng'
 import { addPopulation, gainLoyalty, spendGold } from '../world/city'
 import { spendStamina } from '../world/officer'
@@ -25,13 +26,14 @@ export function canPatrol(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (officer.lordId !== city.lordId) return { ok: false, reason: '俘虏不可出巡' }
-  if (city.gold < config.patrolGoldCost) return { ok: false, reason: '城金不足' }
-  if (officer.stamina < config.patrolStaminaCost) return { ok: false, reason: '体力不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (officer.lordId !== city.lordId) return { ok: false, reason: 'is-captive' }
+  if (city.gold < config.patrolGoldCost) return { ok: false, reason: 'gold-insufficient' }
+  if (officer.stamina < config.patrolStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
   return { ok: true }
 }
 
@@ -40,8 +42,13 @@ export function canPatrol(
  * 占用武将由入队 patrol 命令派生（queries.isBusy），出队即释放；月末分支无效果。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
-export function patrol(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
-  if (!canPatrol(state, officerId, config).ok) return state
+export function patrol(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): WithCheck<GameState> {
+  const check = canPatrol(state, officerId, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
@@ -57,11 +64,20 @@ export function patrol(state: GameState, officerId: OfficerId, config: GameConfi
   )
   const nextOfficer = spendStamina(officer, config.patrolStaminaCost)
 
-  return {
+  const next: GameState = {
     ...state,
     rng: nextRng,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'patrol', officerId }],
   }
+  return commandOk(next, [
+    {
+      kind: 'patrol-done',
+      officerId,
+      cityId: officer.cityId,
+      newLoyalty: nextCity.loyalty,
+      loyaltyDelta: nextCity.loyalty - city.loyalty,
+    },
+  ])
 }

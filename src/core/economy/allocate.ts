@@ -1,6 +1,7 @@
 import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import type { City } from '../world/city'
 import type { Officer } from '../world/officer'
 import { addReserveTroops } from '../world/city'
@@ -18,14 +19,14 @@ export function allocateMaxTroops(officer: Officer, city: City): number {
  */
 export function canAllocate(state: GameState, officerId: OfficerId, amount: number): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
 
-  if (amount < 0) return { ok: false, reason: '目标兵力不可为负' }
+  if (amount < 0) return { ok: false, reason: 'invalid-amount' }
   if (amount > allocateMaxTroops(effectiveOfficer(state, officerId), city))
-    return { ok: false, reason: '超过可分配上限' }
+    return { ok: false, reason: 'exceeds-allocatable' }
   return { ok: true }
 }
 
@@ -34,8 +35,13 @@ export function canAllocate(state: GameState, officerId: OfficerId, amount: numb
  * 后备兵 += (武将原兵 − N)；武将兵 = N。不占人、不扣体力/金、不动 RNG。
  * 前置条件不满足时为 no-op，原样返回 state。
  */
-export function allocate(state: GameState, officerId: OfficerId, amount: number): GameState {
-  if (!canAllocate(state, officerId, amount).ok) return state
+export function allocate(
+  state: GameState,
+  officerId: OfficerId,
+  amount: number
+): WithCheck<GameState> {
+  const check = canAllocate(state, officerId, amount)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
@@ -43,9 +49,9 @@ export function allocate(state: GameState, officerId: OfficerId, amount: number)
   const nextCity = addReserveTroops(city, officer.troops - amount)
   const nextOfficer = setTroops(officer, amount)
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
-  }
+  })
 }

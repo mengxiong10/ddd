@@ -69,7 +69,7 @@ describe('govern 下令（即时）', () => {
       disasterPrevention: 30,
     })
     const [expectedGain] = randInt(s.rng, 1, 4)
-    const next = govern(s, 'zhugeliang', cfg)
+    const next = govern(s, 'zhugeliang', cfg).state
     expect(next.cities.chengdu!.status).toBe('normal')
     expect(next.cities.chengdu!.disasterPrevention).toBe(30 + expectedGain)
     expect(next.cities.chengdu!.gold).toBe(500 - 50)
@@ -81,11 +81,29 @@ describe('govern 下令（即时）', () => {
 
   it('防灾接近上限时不超过 100', () => {
     const s = withCity(createInitialState(1), 'chengdu', { status: 'riot', disasterPrevention: 99 })
-    expect(govern(s, 'zhugeliang', cfg).cities.chengdu!.disasterPrevention).toBe(100)
+    expect(govern(s, 'zhugeliang', cfg).state.cities.chengdu!.disasterPrevention).toBe(100)
   })
 
   it('非法下令 no-op（返回原状态）', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 })
-    expect(govern(s, 'zhugeliang', cfg)).toBe(s)
+    expect(govern(s, 'zhugeliang', cfg).state).toBe(s)
+  })
+
+  it('产出 govern-done 事件（防灾新值/增量）', () => {
+    const s = withCity(createInitialState(1), 'chengdu', {
+      status: 'flood',
+      disasterPrevention: 30,
+    })
+    const { state, events } = govern(s, 'zhugeliang', cfg)
+    const newPrevention = state.cities.chengdu!.disasterPrevention
+    expect(events).toEqual([
+      {
+        kind: 'govern-done',
+        officerId: 'zhugeliang',
+        cityId: 'chengdu',
+        newPrevention,
+        delta: newPrevention - 30,
+      },
+    ])
   })
 })

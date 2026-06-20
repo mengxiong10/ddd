@@ -66,7 +66,7 @@ function behave(state: GameState, cityId: CityId, rng: Rng): readonly [GameState
   const captives = captivesInCity(state, cityId)
   if (captives.length === 0) return [state, rng]
   const [cap, next] = pickRandom(rng, captives)
-  return [behead(state, cap.id), next]
+  return [behead(state, cap.id).state, next]
 }
 
 /** 池非空则随机选目标入队对应外交命令（置 busy）；池空跳过。 */

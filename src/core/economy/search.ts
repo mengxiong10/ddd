@@ -2,6 +2,13 @@ import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import {
+  withEvents,
+  commandOk,
+  commandFail,
+  type WithEvents,
+  type WithCheck,
+} from '../shared/outcome'
 import type { Rng } from '../shared/rng'
 import { randInt } from '../shared/rng'
 import { spendStamina } from '../world/officer'
@@ -40,10 +47,11 @@ export function canSearch(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可搜寻' }
-  if (officer.stamina < config.searchStaminaCost) return { ok: false, reason: '体力不足' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
+  if (officer.stamina < config.searchStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
   return { ok: true }
 }
 
@@ -51,46 +59,57 @@ export function canSearch(
  * 下令搜寻：效果延到月末（见 executeSearch）。下令仅扣体力、入队（占用由队列派生）；不改城、不动 RNG。
  * 前置不满足为 no-op。
  */
-export function search(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
-  if (!canSearch(state, officerId, config).ok) return state
+export function search(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): WithCheck<GameState> {
+  const check = canSearch(state, officerId, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const nextOfficer = spendStamina(officer, config.searchStaminaCost)
-  return {
+  return commandOk({
     ...state,
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'search', officerId }],
-  }
+  })
 }
 
 /**
  * 月末执行单条搜寻（供 turn 分派，非 campaign 趟）。本城 = 执行人所在城；智力取有效智力。
  * 四分支各 1/4，发现分支再做过筛/找谁/选候选/成败——RNG 调用次序固定（见各步注释），保可复现。
  */
-export function executeSearch(state: GameState, officerId: OfficerId): GameState {
+export function executeSearch(state: GameState, officerId: OfficerId): WithEvents<GameState> {
   const officer = state.officers[officerId]
-  if (!officer) return state
+  if (!officer) return withEvents(state)
   const cityId = officer.cityId
   const intel = effectiveOfficer(state, officerId).intelligence
+  const none = (s: GameState): WithEvents<GameState> =>
+    withEvents(s, [{ kind: 'search-none', officerId, cityId }])
 
   // ① 分支
   const [branch, rng1] = randInt(state.rng, 0, 3)
-  if (branch === 0) return { ...state, rng: rng1 } // 无事发生
+  if (branch === 0) return none({ ...state, rng: rng1 }) // 无事发生
   if (branch === 2 || branch === 3) {
     // ② 金/粮：上限 = max(10, 智力×2)
     const cap = Math.max(SEARCH_GAIN_MIN, intel * SEARCH_GAIN_INTEL_FACTOR)
     const [amount, rng2] = randInt(rng1, SEARCH_GAIN_MIN, cap)
     const city = state.cities[cityId]!
+    const resource = branch === 2 ? 'gold' : 'food'
     const nextCity =
       branch === 2
         ? { ...city, gold: Math.min(city.gold + amount, SEARCH_RESOURCE_CAP) }
         : { ...city, food: Math.min(city.food + amount, SEARCH_RESOURCE_CAP) }
-    return { ...state, rng: rng2, cities: { ...state.cities, [cityId]: nextCity } }
+    const gained = branch === 2 ? nextCity.gold - city.gold : nextCity.food - city.food
+    return withEvents({ ...state, rng: rng2, cities: { ...state.cities, [cityId]: nextCity } }, [
+      { kind: 'search-resource', officerId, cityId, resource, amount: gained },
+    ])
   }
 
   // branch === 1：发现 —— ③ 过筛
   const [sieve, rng2] = randInt(rng1, 0, SEARCH_SIEVE_MAX)
-  if (sieve >= intel) return { ...state, rng: rng2 } // 未过筛 -> 无事
+  if (sieve >= intel) return none({ ...state, rng: rng2 }) // 未过筛 -> 无事
   const [kind, rng3] = randInt(rng2, 0, 1) // 0 武将 / 1 道具
   return kind === 0
     ? discoverOfficer(state, officerId, cityId, intel, rng3)
@@ -104,20 +123,28 @@ function discoverOfficer(
   cityId: CityId,
   intel: number,
   rng: Rng
-): GameState {
+): WithEvents<GameState> {
   const candidates = wanderingOfficersInCity(state, cityId)
-  if (candidates.length === 0) return { ...state, rng }
+  if (candidates.length === 0)
+    return withEvents({ ...state, rng }, [{ kind: 'search-none', officerId, cityId }])
 
   const [pick, rngP] = randInt(rng, 0, candidates.length - 1)
   const target = candidates[pick]!
   const executorLord = state.officers[officerId]!.lordId
+  const recruited = (s: GameState): WithEvents<GameState> =>
+    withEvents(s, [{ kind: 'search-recruited', officerId, cityId, targetId: target.id }])
+  const notRecruited = (s: GameState): WithEvents<GameState> =>
+    withEvents(s, [{ kind: 'search-found-not-recruited', officerId, cityId, targetId: target.id }])
 
-  if (target.recruiterId === officerId) return recruit(state, target.id, executorLord, rngP) // 伯乐本人必中
+  if (target.recruiterId === officerId)
+    return recruited(recruit(state, target.id, executorLord, rngP)) // 伯乐本人必中
   if (target.recruiterId === null) {
     const [roll, rngR] = randInt(rngP, 0, RECRUIT_ROLL_MAX)
-    return roll < intel ? recruit(state, target.id, executorLord, rngR) : { ...state, rng: rngR }
+    return roll < intel
+      ? recruited(recruit(state, target.id, executorLord, rngR))
+      : notRecruited({ ...state, rng: rngR })
   }
-  return { ...state, rng: rngP } // 伯乐是别人 -> 必败
+  return notRecruited({ ...state, rng: rngP }) // 伯乐是别人 -> 必败
 }
 
 /** 招募成功：目标归执行人君主、忠诚 RandInt(70,99)，cityId/troops 不变。 */
@@ -132,15 +159,25 @@ function recruit(
   return { ...state, rng: nextRng, officers: { ...state.officers, [targetId]: target } }
 }
 
-/** 搜到道具：随机选一件未发现候选，伯乐=null 或执行人本人 -> 发现。候选空 -> 无事（不改找武将）。 */
-function discoverItem(state: GameState, officerId: OfficerId, cityId: CityId, rng: Rng): GameState {
+/** 搜到道具：随机选一件未发现候选，伯乐=null 或执行人本人 -> 发现。候选空/别人伯乐 -> 无事。 */
+function discoverItem(
+  state: GameState,
+  officerId: OfficerId,
+  cityId: CityId,
+  rng: Rng
+): WithEvents<GameState> {
+  const none = (s: GameState): WithEvents<GameState> =>
+    withEvents(s, [{ kind: 'search-none', officerId, cityId }])
   const candidates = undiscoveredItemsInCity(state, cityId)
-  if (candidates.length === 0) return { ...state, rng }
+  if (candidates.length === 0) return none({ ...state, rng })
 
   const [pick, rngP] = randInt(rng, 0, candidates.length - 1)
   const target = candidates[pick]!
   if (target.recruiterId === null || target.recruiterId === officerId) {
-    return { ...state, rng: rngP, items: { ...state.items, [target.id]: discover(target) } }
+    return withEvents(
+      { ...state, rng: rngP, items: { ...state.items, [target.id]: discover(target) } },
+      [{ kind: 'search-item', officerId, cityId, itemId: target.id }]
+    )
   }
-  return { ...state, rng: rngP } // 伯乐是别人 -> 失败
+  return none({ ...state, rng: rngP }) // 伯乐是别人 -> 失败
 }

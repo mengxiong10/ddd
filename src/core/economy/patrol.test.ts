@@ -52,7 +52,7 @@ describe('patrol 下令（即时）', () => {
   it('民忠 +=RandInt(1,4) 封顶100、人口+100、扣体力8、扣城金50、占用(入队 patrol)、推进RNG', () => {
     const s = createInitialState(1)
     const [expectedGain] = randInt(s.rng, 1, 4)
-    const next = patrol(s, 'zhugeliang', cfg)
+    const next = patrol(s, 'zhugeliang', cfg).state
     expect(next.cities.chengdu!.loyalty).toBe(50 + expectedGain)
     expect(next.cities.chengdu!.population).toBe(30000 + 100)
     expect(next.cities.chengdu!.gold).toBe(500 - 50)
@@ -64,11 +64,26 @@ describe('patrol 下令（即时）', () => {
 
   it('民忠接近上限时不超过 100', () => {
     const s = withCity(createInitialState(1), 'chengdu', { loyalty: 99 })
-    expect(patrol(s, 'zhugeliang', cfg).cities.chengdu!.loyalty).toBe(100)
+    expect(patrol(s, 'zhugeliang', cfg).state.cities.chengdu!.loyalty).toBe(100)
   })
 
   it('非法下令 no-op（返回原状态）', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 7 })
-    expect(patrol(s, 'zhugeliang', cfg)).toBe(s)
+    expect(patrol(s, 'zhugeliang', cfg).state).toBe(s)
+  })
+
+  it('产出 patrol-done 事件（民忠新值/增量）', () => {
+    const s = createInitialState(1)
+    const { state, events } = patrol(s, 'zhugeliang', cfg)
+    const newLoyalty = state.cities.chengdu!.loyalty
+    expect(events).toEqual([
+      {
+        kind: 'patrol-done',
+        officerId: 'zhugeliang',
+        cityId: 'chengdu',
+        newLoyalty,
+        loyaltyDelta: newLoyalty - 50,
+      },
+    ])
   })
 })

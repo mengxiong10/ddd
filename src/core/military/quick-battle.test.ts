@@ -40,7 +40,7 @@ describe('attackerWinPercent 速算胜率表', () => {
 describe('quickResolveCampaign', () => {
   it('无守军（defenderIds 空）→ 直接占城、不掷骰（rng 不变）', () => {
     const s = createInitialState(1)
-    const out = quickResolveCampaign(s, ['guanyu'], [], 'xuchang', 50)
+    const out = quickResolveCampaign(s, ['guanyu'], [], 'xuchang', 50).state
     expect(out.cities.xuchang!.lordId).toBe('liubei')
     expect(out.cities.xuchang!.food).toBe(50 + 500) // provisions + 目标城原粮
     expect(out.rng).toEqual(s.rng) // 直接占城不消耗 RNG
@@ -53,8 +53,8 @@ describe('quickResolveCampaign', () => {
       ...s,
       officers: { ...s.officers, guanyu: { ...s.officers.guanyu!, cityId: 'jiangling' } },
     }
-    const a = quickResolveCampaign(s, ['guanyu'], ['simayi', 'zhangliao'], 'ye', 30)
-    const b = quickResolveCampaign(s, ['guanyu'], ['simayi', 'zhangliao'], 'ye', 30)
+    const a = quickResolveCampaign(s, ['guanyu'], ['simayi', 'zhangliao'], 'ye', 30).state
+    const b = quickResolveCampaign(s, ['guanyu'], ['simayi', 'zhangliao'], 'ye', 30).state
     expect(a).toEqual(b) // 确定性
     expect(a.rng).not.toEqual(s.rng) // 消耗 RNG
   })

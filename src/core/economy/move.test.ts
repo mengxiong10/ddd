@@ -33,7 +33,7 @@ describe('canMove 前置校验', () => {
 describe('move 下令（月末执行）', () => {
   it('占用(入队 move)；不扣体力/金，目标城与 cityId 不变', () => {
     const s = createInitialState(1)
-    const next = move(s, 'zhugeliang', 'jiangling')
+    const next = move(s, 'zhugeliang', 'jiangling').state
     expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.officers.zhugeliang!.cityId).toBe('chengdu')
     expect(next.officers.zhugeliang!.stamina).toBe(100)
@@ -42,9 +42,12 @@ describe('move 下令（月末执行）', () => {
     ])
   })
 
-  it('非法下令 no-op（返回原状态）', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = createInitialState(1)
-    expect(move(s, 'zhugeliang', 'chengdu')).toBe(s)
+    const res = move(s, 'zhugeliang', 'chengdu')
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('target-is-self-city')
   })
 })
 

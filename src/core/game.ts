@@ -2,6 +2,7 @@ import type { GameState } from './game-state'
 import type { CityId, ItemId, OfficerId } from './shared/ids'
 import type { GameConfig } from './shared/config'
 import type { CommandCheck } from './shared/command'
+import type { WithCheck } from './shared/outcome'
 import { DEFAULT_CONFIG } from './shared/config'
 import { canDevelop, develop } from './economy/develop'
 import { canRecruit, recruit } from './economy/recruit'
@@ -30,7 +31,7 @@ import {
 import { canBehead, behead, canBanish, banish } from './economy/captive'
 import { canGovern, govern } from './economy/govern'
 import {
-  endMonth,
+  endMonthWithEvents,
   resumeMonth,
   chooseSuccessor,
   chooseDefenders,
@@ -150,19 +151,30 @@ export function canApply(
     case 'chooseDefenders':
       return canChooseDefenders(state, action.officerIds)
     case 'endMonth':
-      if (state.activeBattle) return { ok: false, reason: '战斗进行中，请先结束战斗' }
-      if (state.pendingSuccession) return { ok: false, reason: '请先选定新君' }
-      if (state.pendingDefense) return { ok: false, reason: '请先选守军迎战' }
+      if (state.activeBattle) return { ok: false, reason: 'battle-in-progress' }
+      if (state.pendingSuccession) return { ok: false, reason: 'pending-succession' }
+      if (state.pendingDefense) return { ok: false, reason: 'pending-defense' }
       return { ok: true }
   }
 }
 
-/** 唯一状态变更入口：按 action 类型分派到对应领域服务，返回新状态（纯函数）。 */
-export function apply(
+/**
+ * 下令结果（`18-command-feedback`）：校验结果（ok/reason）与 状态/事件 并列。
+ * = CommandCheck & WithEvents<GameState> = { ok, reason?, state, events }。
+ */
+export type CommandResult = WithCheck<GameState>
+
+/**
+ * 富入口：按 action 分派，返回 CommandResult（ok/reason/state/events 一次到手，`18-command-feedback`）。
+ * 经营动作直接转发各 X 的**自报告** CommandResult（校验在 X 内只跑一次）；
+ * 5 个阶段动作（battle/resumeMonth/endMonth/chooseSuccessor/chooseDefenders）自身无 canX 自报告，
+ * 合并 canApply 取 ok/reason（与其内部守卫有一次轻量重复，按点击节奏调用可忽略）。
+ */
+export function applyWithEvents(
   state: GameState,
   action: Action,
   config: GameConfig = DEFAULT_CONFIG
-): GameState {
+): CommandResult {
   switch (action.type) {
     case 'reclaim':
       return develop(state, action.officerId, 'agriculture', config)
@@ -219,14 +231,33 @@ export function apply(
     case 'govern':
       return govern(state, action.officerId, config)
     case 'battle':
-      return reduceBattle(state, action.action)
+      return {
+        ...canApply(state, action, config),
+        state: reduceBattle(state, action.action),
+        events: [],
+      }
     case 'resumeMonth':
-      return resumeMonth(state, config)
+      return { ...canApply(state, action, config), ...resumeMonth(state, config) }
     case 'chooseSuccessor':
-      return chooseSuccessor(state, action.officerId, config)
+      return {
+        ...canApply(state, action, config),
+        ...chooseSuccessor(state, action.officerId, config),
+      }
     case 'chooseDefenders':
-      return chooseDefenders(state, action.officerIds, config)
+      return {
+        ...canApply(state, action, config),
+        ...chooseDefenders(state, action.officerIds, config),
+      }
     case 'endMonth':
-      return endMonth(state, config)
+      return { ...canApply(state, action, config), ...endMonthWithEvents(state, config) }
   }
+}
+
+/** 唯一状态变更入口（简化包装）：丢弃 ok/reason/事件、只取新状态；行为与既往逐字节一致。 */
+export function apply(
+  state: GameState,
+  action: Action,
+  config: GameConfig = DEFAULT_CONFIG
+): GameState {
+  return applyWithEvents(state, action, config).state
 }

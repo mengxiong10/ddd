@@ -1,5 +1,6 @@
 import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
+import { withEvents, type WithEvents, type OutcomeEvent } from '../shared/outcome'
 import { randInt } from '../shared/rng'
 import { applyBattleDamage } from '../world/city'
 import { discover, holdByCity } from '../world/item'
@@ -32,8 +33,12 @@ export interface CampaignOutcome {
  * 6) 目标城 food=mergedFood（覆盖式粮草合并）。
  * 占城（2）在败军处理（3）之前——故败方「逃跑」只能逃向其势力其余存活城。
  */
-export function resolveCampaignOutcome(state: GameState, o: CampaignOutcome): GameState {
+export function resolveCampaignOutcome(
+  state: GameState,
+  o: CampaignOutcome
+): WithEvents<GameState> {
   let next = state
+  const events: OutcomeEvent[] = []
 
   // 1. 胜方回城：胜方全部参战单位 cityId→目标城（含战中 0 兵未战死者）。
   const winnerIds = o.attackerWins ? o.attackerIds : o.defenderIds
@@ -59,9 +64,12 @@ export function resolveCampaignOutcome(state: GameState, o: CampaignOutcome): Ga
   const defeated = processDefeatedArmy(next, loserIds, o.targetCityId)
   next = defeated.state
 
-  // 4. 遭劫君主（按 id 定序）。
+  // 4. 遭劫君主（按 id 定序）：君主遭劫事件 + 处置（灭亡/挂起/换主）事件。
   for (const lordId of [...defeated.strickenLords].sort()) {
-    next = resolveStrickenLord(next, lordId)
+    events.push({ kind: 'lord-stricken', lordId })
+    const resolved = resolveStrickenLord(next, lordId)
+    next = resolved.state
+    events.push(...resolved.events)
   }
 
   // 5. 城市战损 + 6. 粮草合并（覆盖）。
@@ -70,7 +78,7 @@ export function resolveCampaignOutcome(state: GameState, o: CampaignOutcome): Ga
     ...next,
     cities: { ...next.cities, [o.targetCityId]: { ...damaged, food: o.mergedFood } },
   }
-  return next
+  return withEvents(next, events)
 }
 
 /**
@@ -153,11 +161,18 @@ function processDefeatedArmy(
  * lordId===playerLordId → 挂起 pendingSuccession（不换主，等玩家手动选）；
  * 否则（AI）→ promoteLord(pickSuccessor)。
  */
-function resolveStrickenLord(state: GameState, lordId: OfficerId): GameState {
-  if (citiesOfLord(state, lordId).length === 0) return state
-  if (successionCandidates(state, lordId).length === 0) return state
+function resolveStrickenLord(state: GameState, lordId: OfficerId): WithEvents<GameState> {
+  if (citiesOfLord(state, lordId).length === 0)
+    return withEvents(state, [{ kind: 'lord-eliminated', lordId }])
+  if (successionCandidates(state, lordId).length === 0)
+    return withEvents(state, [{ kind: 'lord-eliminated', lordId }])
   if (lordId === state.playerLordId) {
-    return { ...state, pendingSuccession: { lordId } }
+    return withEvents({ ...state, pendingSuccession: { lordId } }, [
+      { kind: 'succession-pending', lordId },
+    ])
   }
-  return promoteLord(state, lordId, pickSuccessor(state, lordId)!)
+  const successor = pickSuccessor(state, lordId)!
+  return withEvents(promoteLord(state, lordId, successor), [
+    { kind: 'lord-succeeded', oldLordId: lordId, newLordId: successor },
+  ])
 }

@@ -88,7 +88,7 @@ describe('canEntice / canAlienate（敌方在任非君主武将）', () => {
 describe('下令（占人 + 入队 + 不动 RNG）', () => {
   it('entice：扣体力20/城金50、占用(入队)、rng 不变', () => {
     const s = createInitialState(1)
-    const next = entice(s, 'guanyu', 'xunyu', cfg)
+    const next = entice(s, 'guanyu', 'xunyu', cfg).state
     expect(next.officers.guanyu!.stamina).toBe(s.officers.guanyu!.stamina - 20)
     expect(isBusy(next, 'guanyu')).toBe(true)
     expect(next.cities.jiangling!.gold).toBe(s.cities.jiangling!.gold - 50)
@@ -101,7 +101,7 @@ describe('下令（占人 + 入队 + 不动 RNG）', () => {
   })
   it('induce：扣体力10/城金50（城池压制满足时）', () => {
     const s = setCityLord(createInitialState(1), 'ye', 'liubei') // 刘备3城、曹操1城 -> 压制满足
-    const next = induce(s, 'guanyu', 'caocao', cfg)
+    const next = induce(s, 'guanyu', 'caocao', cfg).state
     expect(next.officers.guanyu!.stamina).toBe(s.officers.guanyu!.stamina - 10)
     expect(next.pendingCommands).toContainEqual({
       type: 'induce',
@@ -109,9 +109,12 @@ describe('下令（占人 + 入队 + 不动 RNG）', () => {
       targetOfficerId: 'caocao',
     })
   })
-  it('前置不满足 -> no-op', () => {
+  it('前置不满足 -> no-op（state 不变、自报告失败 reason）', () => {
     const s = withCity(createInitialState(1), 'jiangling', { gold: 0 })
-    expect(entice(s, 'guanyu', 'xunyu', cfg)).toBe(s)
+    const res = entice(s, 'guanyu', 'xunyu', cfg)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('gold-insufficient')
   })
 })
 
@@ -121,7 +124,7 @@ describe('executeEntice（招揽三关：无 +50 安全线）', () => {
     s = withOfficer(s, 'guanyu', { intelligence: 1 })
     s = withOfficer(s, 'xunyu', { intelligence: 100 })
     const [, rng1] = randInt(s.rng, 0, 99)
-    const next = executeEntice(s, 'guanyu', 'xunyu')
+    const next = executeEntice(s, 'guanyu', 'xunyu').state
     expect(next.officers.xunyu!.lordId).toBe('caocao')
     expect(next.officers.xunyu!.cityId).toBe('xuchang')
     expect(next.rng).toEqual(rng1)
@@ -132,7 +135,7 @@ describe('executeEntice（招揽三关：无 +50 安全线）', () => {
     let s = createInitialState(1)
     s = withOfficer(s, 'guanyu', { intelligence: 100 })
     s = withOfficer(s, 'xunyu', { intelligence: 1, loyalty: 0, personality: 3 })
-    const next = executeEntice(s, 'guanyu', 'xunyu')
+    const next = executeEntice(s, 'guanyu', 'xunyu').state
     expect(next.officers.xunyu!.lordId).toBe('liubei')
     expect(next.officers.xunyu!.cityId).toBe('jiangling')
     expect(isCaptive(next, 'xunyu')).toBe(false)
@@ -144,13 +147,38 @@ describe('executeEntice（招揽三关：无 +50 安全线）', () => {
     let s = createInitialState(1)
     s = withOfficer(s, 'guanyu', { intelligence: 100 })
     s = withOfficer(s, 'xunyu', { intelligence: 1, loyalty: 0, personality: 0 })
-    const next = executeEntice(s, 'guanyu', 'xunyu')
+    const next = executeEntice(s, 'guanyu', 'xunyu').state
     expect(next.officers.xunyu!.lordId).toBe('caocao')
   })
 
   it('守卫：目标已非合法（已归己）-> 原样返回', () => {
     const s = withOfficer(createInitialState(1), 'xunyu', { lordId: 'liubei' })
-    expect(executeEntice(s, 'guanyu', 'xunyu')).toBe(s)
+    expect(executeEntice(s, 'guanyu', 'xunyu').state).toBe(s)
+  })
+
+  it('产出 diplomacy-result 事件（成败）', () => {
+    let win = withOfficer(createInitialState(1), 'guanyu', { intelligence: 100 })
+    win = withOfficer(win, 'xunyu', { intelligence: 1, loyalty: 0, personality: 3 })
+    expect(executeEntice(win, 'guanyu', 'xunyu').events).toEqual([
+      {
+        kind: 'diplomacy-result',
+        command: 'entice',
+        officerId: 'guanyu',
+        targetOfficerId: 'xunyu',
+        success: true,
+      },
+    ])
+    let lose = withOfficer(createInitialState(1), 'guanyu', { intelligence: 1 })
+    lose = withOfficer(lose, 'xunyu', { intelligence: 100 })
+    expect(executeEntice(lose, 'guanyu', 'xunyu').events).toEqual([
+      {
+        kind: 'diplomacy-result',
+        command: 'entice',
+        officerId: 'guanyu',
+        targetOfficerId: 'xunyu',
+        success: false,
+      },
+    ])
   })
 })
 
@@ -160,7 +188,7 @@ describe('executeAlienate（离间：安全线+50，成功仅 −4）', () => {
     let s = createInitialState(1)
     s = withOfficer(s, 'guanyu', { intelligence: 100 })
     s = withOfficer(s, 'xunyu', { intelligence: 1, loyalty: 50, personality: 4 })
-    const next = executeAlienate(s, 'guanyu', 'xunyu')
+    const next = executeAlienate(s, 'guanyu', 'xunyu').state
     expect(next.officers.xunyu!.loyalty).toBe(46)
     expect(next.officers.xunyu!.lordId).toBe('caocao') // 不改归属
   })
@@ -168,7 +196,7 @@ describe('executeAlienate（离间：安全线+50，成功仅 −4）', () => {
     let s = createInitialState(1)
     s = withOfficer(s, 'guanyu', { intelligence: 100 })
     s = withOfficer(s, 'xunyu', { intelligence: 1, loyalty: 50, personality: 0 }) // 忠义coeff5, R3=19≥5
-    const next = executeAlienate(s, 'guanyu', 'xunyu')
+    const next = executeAlienate(s, 'guanyu', 'xunyu').state
     expect(next.officers.xunyu!.loyalty).toBe(50)
   })
 })
@@ -191,12 +219,27 @@ describe('executeInstigate（策反：自立为君）', () => {
     let s = createInitialState(1)
     s = withOfficer(s, 'guanyu', { intelligence: 120 })
     s = withOfficer(s, 'simayi', { loyalty: 0 }) // 性格=1 大志
-    const next = executeInstigate(s, 'guanyu', 'simayi')
+    const next = executeInstigate(s, 'guanyu', 'simayi').state
     expect(next.officers.simayi!.lordId).toBe('simayi')
     expect(next.cities.ye!.lordId).toBe('simayi')
     expect(next.officers.zhangliao!.lordId).toBe('simayi') // 同城原势力武将随之
     expect(next.officers.caocao!.lordId).toBe('caocao') // 许昌君主不受影响
     expect(next.cities.xuchang!.lordId).toBe('caocao')
+  })
+
+  it('成功额外产出 lord-instigated 系统事件', () => {
+    let s = withOfficer(createInitialState(1), 'guanyu', { intelligence: 120 })
+    s = withOfficer(s, 'simayi', { loyalty: 0 })
+    expect(executeInstigate(s, 'guanyu', 'simayi').events).toEqual([
+      {
+        kind: 'diplomacy-result',
+        command: 'instigate',
+        officerId: 'guanyu',
+        targetOfficerId: 'simayi',
+        success: true,
+      },
+      { kind: 'lord-instigated', officerId: 'simayi', fromLordId: 'caocao' },
+    ])
   })
 })
 
@@ -213,7 +256,7 @@ describe('canInduce / executeInduce（劝降敌君主，城池压制）', () => 
     // ye 划归刘备 -> 曹操仅许昌；seed5 rolls[84,1,16]；guanyu intel130 vs caocao90：阈值130-90+50=90≥84过；奸诈(coeff20)R2=1<20过
     let s = setCityLord(createInitialState(5), 'ye', 'liubei')
     s = withOfficer(s, 'guanyu', { intelligence: 130 })
-    const next = executeInduce(s, 'guanyu', 'caocao')
+    const next = executeInduce(s, 'guanyu', 'caocao').state
     expect(next.cities.xuchang!.lordId).toBe('liubei')
     expect(next.officers.caocao!.lordId).toBe('liubei') // 君主本人并入
     expect(next.officers.xunyu!.lordId).toBe('liubei')
@@ -223,12 +266,27 @@ describe('canInduce / executeInduce（劝降敌君主，城池压制）', () => 
     expect(next.officers.zhangliao!.lordId).toBeNull()
   })
 
+  it('成功额外产出 lord-surrendered 系统事件', () => {
+    let s = setCityLord(createInitialState(5), 'ye', 'liubei')
+    s = withOfficer(s, 'guanyu', { intelligence: 130 })
+    expect(executeInduce(s, 'guanyu', 'caocao').events).toEqual([
+      {
+        kind: 'diplomacy-result',
+        command: 'induce',
+        officerId: 'guanyu',
+        targetOfficerId: 'caocao',
+        success: true,
+      },
+      { kind: 'lord-surrendered', fromLordId: 'caocao', toLordId: 'liubei' },
+    ])
+  })
+
   it('玩家君主免疫：目标为玩家君主 -> 直接失败、不动 RNG', () => {
     // 让刘备仅 1 城（江陵），曹操 3 城 -> 压制满足；执行人=司马懿（曹操·邺城）
     let s = createInitialState(1)
     s = setCityLord(s, 'chengdu', 'caocao')
     s = withOfficer(s, 'liubei', { cityId: 'jiangling' }) // 刘备移江陵，仍为江陵之主、非俘虏
-    const next = executeInduce(s, 'simayi', 'liubei')
+    const next = executeInduce(s, 'simayi', 'liubei').state
     expect(next).toBe(s) // 免疫：原样返回（同引用）
   })
 })

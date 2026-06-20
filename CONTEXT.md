@@ -130,3 +130,9 @@
 - **AI 预估伤害（Estimated Damage）**：在候选落点上扫普攻范围内活着的玩家方单位——**主将在范围内无条件优先（视作无穷伤害**，击溃即 AI 胜），否则用普攻公式取最大扣兵。**只看普攻、不评估技能收益**。
 - **AI 攻击方式（按兵种派生）**：玄兵 = 技能优先 + 最佳选技；其余兵种 = 攻击优先 + 简单选技；不给 `Officer` 新增字段。攻击优先=先普攻再技能、回退普攻/休息；技能优先=先技能、回退普攻/休息。
 - **AI 放技能筛（Skill Gate）**：施法前过筛——禁咒不放；`RandInt(0,149) > 有效智力` 跳过（高智力更愿放）；非玄兵 `RandInt(0, floor(带兵量×1.5)) < 当前兵力` 跳过（兵多保留，玄兵免此筛）；再过 MP/天气/地形/范围合法；治疗类只给损失 ≥1/4 兵力的友军。**简单选技**=可用技能中随机抽一个、有目标即放；**最佳选技**=偏好高序号技能、取第一个有合法目标者。
+- **命令反馈（Command Feedback）**：`18-command-feedback` 起 `core` 对外给出的**零中文运行时**反馈，两轴——失败走 `reason code`、成功/月末结算/系统事件走 `结果事件`。本地化与多变体台词由 UI 据 `docs/business-command-rules.md` 映射，core 不挑台词、不掷骰。
+- **reason code（ReasonCode）**：`shared/command.ts` 的字符串字面量联合，替代 `CommandCheck.reason` 的中文串（如 `gold-insufficient`/`officer-not-found`/`is-captive`），跨命令复用、机器可读。
+- **结果事件（OutcomeEvent）**：`shared/outcome.ts` 的判别式联合，描述命令成功/月末结算/系统事件并携必要数据（如 `develop-done` 带 attr/newValue/delta、`city-disaster` 带城+灾种、`lord-succeeded` 带新旧君主）。**只为"携数据/决结果分支"产**；纯确认与 UI 已知量不产。
+- **事件并列通道（WithEvents）**：`WithEvents<S>={state,events}`——事件与 state **并列返回、绝不进 `GameState`**（瞬态反馈不污染持久聚合）。产事件的函数返回 `WithEvents<GameState>`，orchestrator 用 `step`/`lift` 组合子逐层 thread 拼接；事件**不消耗 `GameState.rng`**（确定性回归逐字节一致）。
+- **下令结果（CommandResult / WithCheck）**：`CommandResult = CommandCheck & WithEvents<GameState> = {ok, reason?, state, events}`（`shared/outcome.ts` 的泛型 `WithCheck<S>`，`game.ts` 别名 `CommandResult`）。所有下令函数 X **自报告**——返回 `CommandResult`，把内部本就计算的 `canX` 结果一并带出（失败 `commandFail(check,state)`：`reason`+`state` 不变+空事件；成功 `commandOk(next,events?)`：`ok:true`）。**校验只在 X 内跑一次**、`reason` 自然冒泡，统一 `develop`/`search` 等所有下令签名。
+- **applyWithEvents / apply**：`18-command-feedback` 的两个入口——`applyWithEvents(state,action,config)→CommandResult` 为富入口（一次调用即得 `ok/reason/state/events`：经营动作转发 X 的自报告结果、5 个阶段动作合并 `canApply`），`apply=applyWithEvents(...).state` 退化包装（丢弃 ok/reason/事件、行为逐字节不变）。store 平时用 `apply`，需提示时改用 `applyWithEvents`，二者都不持久化事件。

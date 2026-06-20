@@ -2,6 +2,7 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import type { City } from '../world/city'
 import { addReserveTroops, spendGold } from '../world/city'
 import { spendStamina } from '../world/officer'
@@ -36,15 +37,16 @@ export function canRecruit(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
 
-  if (city.gold < 1) return { ok: false, reason: '城金不足' }
-  if (officer.stamina < config.recruitStaminaCost) return { ok: false, reason: '体力不足' }
-  if (amount < 1) return { ok: false, reason: '征兵数须为正' }
-  if (amount > recruitMaxTroops(city)) return { ok: false, reason: '超过可征上限' }
+  if (city.gold < 1) return { ok: false, reason: 'gold-insufficient' }
+  if (officer.stamina < config.recruitStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
+  if (amount < 1) return { ok: false, reason: 'invalid-amount' }
+  if (amount > recruitMaxTroops(city)) return { ok: false, reason: 'exceeds-recruitable' }
   return { ok: true }
 }
 
@@ -58,8 +60,9 @@ export function recruit(
   officerId: OfficerId,
   amount: number,
   config: GameConfig
-): GameState {
-  if (!canRecruit(state, officerId, amount, config).ok) return state
+): WithCheck<GameState> {
+  const check = canRecruit(state, officerId, amount, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
@@ -67,10 +70,10 @@ export function recruit(
   const nextCity = spendGold(addReserveTroops(city, amount), recruitGoldCost(amount))
   const nextOfficer = spendStamina(officer, config.recruitStaminaCost)
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'recruit', officerId }],
-  }
+  })
 }

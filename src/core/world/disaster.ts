@@ -1,4 +1,5 @@
 import type { GameState } from '../game-state'
+import { withEvents, type WithEvents, type OutcomeEvent } from '../shared/outcome'
 import type { Rng } from '../shared/rng'
 import { randInt } from '../shared/rng'
 import type { City } from './city'
@@ -66,22 +67,28 @@ function recover(city: City, rng: Rng): readonly [City, Rng] {
  *  - 正常城：generate（判生成）。
  * 含 AI 城；无归属空城跳过（当前模型城恒有归属）。纯函数、可注入 RNG。
  */
-export function runDisasters(state: GameState): GameState {
+export function runDisasters(state: GameState): WithEvents<GameState> {
   const ids = Object.keys(state.cities).sort()
   let rng = state.rng
   const cities: Record<string, City> = { ...state.cities }
+  const events: OutcomeEvent[] = []
   for (const id of ids) {
     const city = cities[id]!
     if (city.status === 'normal') {
       const [next, r] = generate(city, rng)
       rng = r
       cities[id] = next
+      // 正常→异常：新发灾害事件（status 取四灾之一）。
+      if (next.status !== 'normal')
+        events.push({ kind: 'city-disaster', cityId: id, status: next.status })
     } else {
       const damaged = applyDisasterDamage(city, city.status)
       const [next, r] = recover(damaged, rng)
       rng = r
       cities[id] = next
+      // 异常→正常：灾情缓解事件。
+      if (next.status === 'normal') events.push({ kind: 'city-recovered', cityId: id })
     }
   }
-  return { ...state, rng, cities }
+  return withEvents({ ...state, rng, cities }, events)
 }

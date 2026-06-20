@@ -46,7 +46,7 @@ describe('canBanquet 前置校验', () => {
 describe('banquet 下令（即时·不占人）', () => {
   it('扣城金100、目标体力+50封顶100、非君主忠诚+1、不占用、不入队', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 30, loyalty: 50 })
-    const next = banquet(s, 'zhugeliang', cfg)
+    const next = banquet(s, 'zhugeliang', cfg).state
     expect(next.cities.chengdu!.gold).toBe(500 - 100)
     expect(next.officers.zhugeliang!.stamina).toBe(80)
     expect(next.officers.zhugeliang!.loyalty).toBe(51)
@@ -57,23 +57,26 @@ describe('banquet 下令（即时·不占人）', () => {
 
   it('体力接近上限时封顶 100', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 80 })
-    expect(banquet(s, 'zhugeliang', cfg).officers.zhugeliang!.stamina).toBe(100)
+    expect(banquet(s, 'zhugeliang', cfg).state.officers.zhugeliang!.stamina).toBe(100)
   })
 
   it('忠诚接近上限时封顶 100', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { loyalty: 100 })
-    expect(banquet(s, 'zhugeliang', cfg).officers.zhugeliang!.loyalty).toBe(100)
+    expect(banquet(s, 'zhugeliang', cfg).state.officers.zhugeliang!.loyalty).toBe(100)
   })
 
   it('目标为君主：忠诚不写存储（恒派生 100），体力照回', () => {
     const s = withOfficer(createInitialState(1), 'liubei', { stamina: 30, loyalty: 100 })
-    const next = banquet(s, 'liubei', cfg)
+    const next = banquet(s, 'liubei', cfg).state
     expect(next.officers.liubei!.stamina).toBe(80)
     expect(next.officers.liubei!.loyalty).toBe(100)
   })
 
-  it('非法下令 no-op（返回原状态）', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = withCity(createInitialState(1), 'chengdu', { gold: 99 })
-    expect(banquet(s, 'zhugeliang', cfg)).toBe(s)
+    const res = banquet(s, 'zhugeliang', cfg)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('gold-insufficient')
   })
 })

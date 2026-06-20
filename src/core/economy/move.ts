@@ -1,6 +1,7 @@
 import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { isBusy, isCaptive } from '../world/queries'
 
 /**
@@ -13,13 +14,13 @@ export function canMove(
   targetCityId: CityId
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可移动' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   const target = state.cities[targetCityId]
-  if (!target) return { ok: false, reason: '目标城不存在' }
-  if (targetCityId === officer.cityId) return { ok: false, reason: '目标城不能是本城' }
-  if (target.lordId !== officer.lordId) return { ok: false, reason: '只能移动到己方城' }
+  if (!target) return { ok: false, reason: 'target-city-not-found' }
+  if (targetCityId === officer.cityId) return { ok: false, reason: 'target-is-self-city' }
+  if (target.lordId !== officer.lordId) return { ok: false, reason: 'target-not-friendly-city' }
   return { ok: true }
 }
 
@@ -27,13 +28,18 @@ export function canMove(
  * 下令移动：入队（占用由队列派生），效果延到月末（见 executeMove）。不扣体力/金、不耗 RNG。
  * 前置不满足时为 no-op。
  */
-export function move(state: GameState, officerId: OfficerId, targetCityId: CityId): GameState {
-  if (!canMove(state, officerId, targetCityId).ok) return state
+export function move(
+  state: GameState,
+  officerId: OfficerId,
+  targetCityId: CityId
+): WithCheck<GameState> {
+  const check = canMove(state, officerId, targetCityId)
+  if (!check.ok) return commandFail(check, state)
 
-  return {
+  return commandOk({
     ...state,
     pendingCommands: [...state.pendingCommands, { type: 'move', officerId, targetCityId }],
-  }
+  })
 }
 
 /**

@@ -90,7 +90,7 @@ describe('canReward 前置校验', () => {
 describe('reward 赏赐', () => {
   it('道具转给武将、非君主忠诚 +8、不占人、即时、不耗 RNG', () => {
     const s = createInitialState(1)
-    const next = reward(s, 'zhugeliang', 'cixiongshuanggujian')
+    const next = reward(s, 'zhugeliang', 'cixiongshuanggujian').state
     expect(itemsOfOfficer(next, 'zhugeliang').map((i) => i.id)).toEqual(['cixiongshuanggujian'])
     expect(itemsInCity(next, 'chengdu')).toHaveLength(0)
     expect(next.officers.zhugeliang!.loyalty).toBe(58)
@@ -100,21 +100,28 @@ describe('reward 赏赐', () => {
   })
   it('忠诚封顶 100', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { loyalty: 95 })
-    expect(reward(s, 'zhugeliang', 'cixiongshuanggujian').officers.zhugeliang!.loyalty).toBe(100)
+    expect(reward(s, 'zhugeliang', 'cixiongshuanggujian').state.officers.zhugeliang!.loyalty).toBe(
+      100
+    )
   })
   it('赏赐给君主：道具照常转移、忠诚仍派生 100', () => {
     const s = createInitialState(1)
-    const next = reward(s, 'liubei', 'cixiongshuanggujian')
+    const next = reward(s, 'liubei', 'cixiongshuanggujian').state
     expect(itemsOfOfficer(next, 'liubei')).toHaveLength(1)
     expect(officerLoyalty(next, 'liubei')).toBe(100)
   })
   it('占用中武将仍可被赏赐（不校验占用）', () => {
     const s = occupy(createInitialState(1), 'zhugeliang')
-    expect(reward(s, 'zhugeliang', 'cixiongshuanggujian').officers.zhugeliang!.loyalty).toBe(58)
+    expect(reward(s, 'zhugeliang', 'cixiongshuanggujian').state.officers.zhugeliang!.loyalty).toBe(
+      58
+    )
   })
-  it('非法 no-op（返回原状态）', () => {
+  it('非法 no-op（state 不变、自报告失败 reason）', () => {
     const s = createInitialState(1)
-    expect(reward(s, 'zhugeliang', 'mengde-xinshu')).toBe(s)
+    const res = reward(s, 'zhugeliang', 'mengde-xinshu')
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('item-not-in-city')
   })
   it('连赏两件：equipSeq 递增（首件 0、次件 1），表达装备先后', () => {
     // 成都再放一件道具，使同城可连赏两件给诸葛亮
@@ -136,8 +143,8 @@ describe('reward 赏赐', () => {
         },
       },
     }
-    s = reward(s, 'zhugeliang', 'cixiongshuanggujian')
-    s = reward(s, 'zhugeliang', 'gem')
+    s = reward(s, 'zhugeliang', 'cixiongshuanggujian').state
+    s = reward(s, 'zhugeliang', 'gem').state
     const seqOf = (id: string) => {
       const h = s.items[id]!.holder
       return h.kind === 'officer' ? h.equipSeq : -1
@@ -166,7 +173,7 @@ describe('canConfiscate / confiscate 没收', () => {
       'zhugeliang',
       { loyalty: 50 }
     )
-    const next = confiscate(s, 'zhugeliang', 'cixiongshuanggujian')
+    const next = confiscate(s, 'zhugeliang', 'cixiongshuanggujian').state
     expect(itemsInCity(next, 'chengdu').map((i) => i.id)).toEqual(['cixiongshuanggujian'])
     expect(itemsOfOfficer(next, 'zhugeliang')).toHaveLength(0)
     expect(next.officers.zhugeliang!.loyalty).toBe(30)
@@ -178,16 +185,21 @@ describe('canConfiscate / confiscate 没收', () => {
       'zhugeliang',
       { loyalty: 10 }
     )
-    expect(confiscate(s, 'zhugeliang', 'cixiongshuanggujian').officers.zhugeliang!.loyalty).toBe(0)
+    expect(
+      confiscate(s, 'zhugeliang', 'cixiongshuanggujian').state.officers.zhugeliang!.loyalty
+    ).toBe(0)
   })
   it('没收君主道具：照常收回、忠诚派生仍 100', () => {
     const s = giveItem(createInitialState(1), 'cixiongshuanggujian', 'liubei')
-    const next = confiscate(s, 'liubei', 'cixiongshuanggujian')
+    const next = confiscate(s, 'liubei', 'cixiongshuanggujian').state
     expect(itemsInCity(next, 'chengdu')).toHaveLength(1)
     expect(officerLoyalty(next, 'liubei')).toBe(100)
   })
-  it('非法 no-op（返回原状态）', () => {
+  it('非法 no-op（state 不变、自报告失败 reason）', () => {
     const s = createInitialState(1)
-    expect(confiscate(s, 'zhugeliang', 'cixiongshuanggujian')).toBe(s)
+    const res = confiscate(s, 'zhugeliang', 'cixiongshuanggujian')
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('item-not-held-by-officer')
   })
 })

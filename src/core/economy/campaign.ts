@@ -1,6 +1,7 @@
 import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { spendFood } from '../world/city'
 import { areAdjacent } from '../world/adjacency'
 import { isBusy, isCaptive } from '../world/queries'
@@ -21,31 +22,32 @@ export function canCampaign(
   provisions: number
 ): CommandCheck {
   if (officerIds.length < 1 || officerIds.length > MAX_CAMPAIGN_OFFICERS) {
-    return { ok: false, reason: `出征武将数须为 1~${MAX_CAMPAIGN_OFFICERS}` }
+    return { ok: false, reason: 'invalid-campaign-size' }
   }
-  if (new Set(officerIds).size !== officerIds.length) return { ok: false, reason: '出征武将重复' }
+  if (new Set(officerIds).size !== officerIds.length)
+    return { ok: false, reason: 'duplicate-officers' }
 
   const officers = officerIds.map((id) => state.officers[id])
-  if (officers.some((o) => !o)) return { ok: false, reason: '武将不存在' }
+  if (officers.some((o) => !o)) return { ok: false, reason: 'officer-not-found' }
   const sourceCityId = officers[0]!.cityId
   if (officers.some((o) => o!.cityId !== sourceCityId))
-    return { ok: false, reason: '出征武将须同处一城' }
+    return { ok: false, reason: 'officers-not-same-city' }
   if (officers.some((o) => isBusy(state, o!.id) || isCaptive(state, o!.id)))
-    return { ok: false, reason: '武将不在任' }
+    return { ok: false, reason: 'officer-not-available' }
 
   const source = state.cities[sourceCityId]
-  if (!source) return { ok: false, reason: '本城不存在' }
-  if (source.food < 1) return { ok: false, reason: '城粮不足' }
+  if (!source) return { ok: false, reason: 'city-not-found' }
+  if (source.food < 1) return { ok: false, reason: 'food-insufficient' }
   if (!Number.isInteger(provisions) || provisions < 1 || provisions > source.food) {
-    return { ok: false, reason: '随军粮草越界' }
+    return { ok: false, reason: 'invalid-provisions' }
   }
 
   const target = state.cities[targetCityId]
-  if (!target) return { ok: false, reason: '目标城不存在' }
-  if (targetCityId === sourceCityId) return { ok: false, reason: '不能出征本城' }
-  if (target.lordId === source.lordId) return { ok: false, reason: '不能出征己方城' }
+  if (!target) return { ok: false, reason: 'target-city-not-found' }
+  if (targetCityId === sourceCityId) return { ok: false, reason: 'target-is-self-city' }
+  if (target.lordId === source.lordId) return { ok: false, reason: 'target-is-friendly-city' }
   if (!areAdjacent(state.adjacency, sourceCityId, targetCityId))
-    return { ok: false, reason: '目标城不相邻' }
+    return { ok: false, reason: 'target-not-adjacent' }
   return { ok: true }
 }
 
@@ -58,17 +60,18 @@ export function campaign(
   officerIds: readonly OfficerId[],
   targetCityId: CityId,
   provisions: number
-): GameState {
-  if (!canCampaign(state, officerIds, targetCityId, provisions).ok) return state
+): WithCheck<GameState> {
+  const check = canCampaign(state, officerIds, targetCityId, provisions)
+  if (!check.ok) return commandFail(check, state)
 
   const sourceCityId = state.officers[officerIds[0]!]!.cityId
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [sourceCityId]: spendFood(state.cities[sourceCityId]!, provisions) },
     pendingCommands: [
       ...state.pendingCommands,
       { type: 'campaign', officerIds, targetCityId, provisions },
     ],
-  }
+  })
 }

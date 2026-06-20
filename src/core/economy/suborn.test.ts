@@ -73,7 +73,7 @@ describe('canSuborn', () => {
 describe('suborn 下令', () => {
   it('扣体力15/城金100、占用(入队 suborn)，不动 RNG', () => {
     const s = setup(1)
-    const next = suborn(s, 'guanyu', 'caocao', cfg)
+    const next = suborn(s, 'guanyu', 'caocao', cfg).state
     expect(next.officers.guanyu!.stamina).toBe(s.officers.guanyu!.stamina - 15)
     expect(isBusy(next, 'guanyu')).toBe(true)
     expect(next.cities.xuchang!.gold).toBe(s.cities.xuchang!.gold - 100)
@@ -84,9 +84,12 @@ describe('suborn 下令', () => {
     })
     expect(next.rng).toEqual(s.rng)
   })
-  it('前置不满足 -> no-op', () => {
+  it('前置不满足 -> no-op（state 不变、自报告失败 reason）', () => {
     const s = withCity(setup(1), 'xuchang', { gold: 0 })
-    expect(suborn(s, 'guanyu', 'caocao', cfg)).toBe(s)
+    const res = suborn(s, 'guanyu', 'caocao', cfg)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('gold-insufficient')
   })
 })
 
@@ -96,7 +99,7 @@ describe('executeSuborn 四关', () => {
     s = withOfficer(s, 'guanyu', { intelligence: 1 })
     s = withOfficer(s, 'caocao', { intelligence: 100, loyalty: 50 })
     const [, rng1] = randInt(s.rng, 0, 99)
-    const next = executeSuborn(s, 'guanyu', 'caocao')
+    const next = executeSuborn(s, 'guanyu', 'caocao').state
     expect(next.officers.caocao!.loyalty).toBe(50)
     expect(isCaptive(next, 'caocao')).toBe(true)
     expect(next.rng).toEqual(rng1) // 仅消耗一次
@@ -106,7 +109,7 @@ describe('executeSuborn 四关', () => {
     let s = setup(1)
     s = withOfficer(s, 'guanyu', { intelligence: 100 }) // 智力关必过
     s = withOfficer(s, 'caocao', { intelligence: 1, loyalty: 80 })
-    const next = executeSuborn(s, 'guanyu', 'caocao')
+    const next = executeSuborn(s, 'guanyu', 'caocao').state
     expect(next.officers.caocao!.loyalty).toBe(72) // 80 - floor(80/10)=8
     expect(isCaptive(next, 'caocao')).toBe(true)
     expect(next.officers.caocao!.lordId).toBe('caocao')
@@ -116,7 +119,7 @@ describe('executeSuborn 四关', () => {
     let s = setup(1)
     s = withOfficer(s, 'guanyu', { intelligence: 100 })
     s = withOfficer(s, 'caocao', { intelligence: 1, loyalty: 0, personality: 0 })
-    const next = executeSuborn(s, 'guanyu', 'caocao')
+    const next = executeSuborn(s, 'guanyu', 'caocao').state
     expect(next.officers.caocao!.lordId).toBe('liubei') // 归执行人君主
     expect(isCaptive(next, 'caocao')).toBe(false)
     expect(next.officers.caocao!.loyalty).toBeGreaterThanOrEqual(40)
@@ -131,7 +134,7 @@ describe('executeSuborn 四关', () => {
     const [r2] = randInt(rng1, 0, 99)
     const lowered = 50 - Math.floor(50 / 10) // 45
     const failThreshold = Math.floor(lowered / 1) // 45
-    const next = executeSuborn(s, 'guanyu', 'caocao')
+    const next = executeSuborn(s, 'guanyu', 'caocao').state
     if (r2 < failThreshold) {
       expect(isCaptive(next, 'caocao')).toBe(true)
       expect(next.officers.caocao!.loyalty).toBe(45) // 失败也持久化扣减
@@ -143,6 +146,22 @@ describe('executeSuborn 四关', () => {
   it('守卫：目标已非俘虏 -> 原样返回、不动 RNG', () => {
     let s = setup(1)
     s = withOfficer(s, 'caocao', { lordId: 'liubei' }) // 已归己，不再是俘虏
-    expect(executeSuborn(s, 'guanyu', 'caocao')).toBe(s)
+    expect(executeSuborn(s, 'guanyu', 'caocao').state).toBe(s)
+  })
+
+  it('成功/失败产出 suborn-result 事件', () => {
+    let win = setup(1)
+    win = withOfficer(win, 'guanyu', { intelligence: 100 })
+    win = withOfficer(win, 'caocao', { intelligence: 1, loyalty: 0, personality: 0 })
+    expect(executeSuborn(win, 'guanyu', 'caocao').events).toEqual([
+      { kind: 'suborn-result', officerId: 'guanyu', captiveId: 'caocao', success: true },
+    ])
+
+    let lose = setup(1)
+    lose = withOfficer(lose, 'guanyu', { intelligence: 1 })
+    lose = withOfficer(lose, 'caocao', { intelligence: 100, loyalty: 50 })
+    expect(executeSuborn(lose, 'guanyu', 'caocao').events).toEqual([
+      { kind: 'suborn-result', officerId: 'guanyu', captiveId: 'caocao', success: false },
+    ])
   })
 })

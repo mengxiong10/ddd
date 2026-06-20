@@ -1,5 +1,6 @@
 import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
+import { withEvents, type WithEvents } from '../shared/outcome'
 import type { Position } from '../shared/position'
 import { effectiveOfficer, governorOf } from '../world/queries'
 import type { BattleMap } from './battle-map'
@@ -223,9 +224,9 @@ export function reduceBattle(state: GameState, action: BattleAction): GameState 
  * 交 resolveCampaignOutcome 做完整战后处理；清空 activeBattle。
  * 要求 battle.outcome 非空。
  */
-export function concludeBattle(state: GameState): GameState {
+export function concludeBattle(state: GameState): WithEvents<GameState> {
   const battle = state.activeBattle
-  if (!battle || !battle.outcome) return state
+  if (!battle || !battle.outcome) return withEvents(state)
 
   const officers = { ...state.officers }
   for (const u of Object.values(battle.units)) {

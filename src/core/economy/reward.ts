@@ -1,6 +1,7 @@
 import type { GameState } from '../game-state'
 import type { ItemId, OfficerId } from '../shared/ids'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { MAX_ITEMS_PER_OFFICER, holdByCity, holdByOfficer } from '../world/item'
 import { adjustLoyalty } from '../world/officer'
 import { isCaptive, itemsOfOfficer } from '../world/queries'
@@ -34,16 +35,16 @@ function nextEquipSeq(state: GameState, officerId: OfficerId): number {
  */
 export function canReward(state: GameState, officerId: OfficerId, itemId: ItemId): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可赏赐' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   const item = state.items[itemId]
-  if (!item) return { ok: false, reason: '道具不存在' }
+  if (!item) return { ok: false, reason: 'item-not-found' }
   if (!(item.holder.kind === 'city' && item.holder.cityId === officer.cityId)) {
-    return { ok: false, reason: '道具不属于该城' }
+    return { ok: false, reason: 'item-not-in-city' }
   }
-  if (!item.discovered) return { ok: false, reason: '道具未被发现' }
+  if (!item.discovered) return { ok: false, reason: 'item-undiscovered' }
   if (itemsOfOfficer(state, officerId).length >= MAX_ITEMS_PER_OFFICER) {
-    return { ok: false, reason: '武将道具已满' }
+    return { ok: false, reason: 'officer-items-full' }
   }
   return { ok: true }
 }
@@ -52,17 +53,22 @@ export function canReward(state: GameState, officerId: OfficerId, itemId: ItemId
  * 赏赐：把作用城的道具转给该城非俘虏武将。即时、不占人、不耗 RNG。
  * 道具 holder→该武将；非君主忠诚 +8（封顶）。非法 no-op。
  */
-export function reward(state: GameState, officerId: OfficerId, itemId: ItemId): GameState {
-  if (!canReward(state, officerId, itemId).ok) return state
+export function reward(
+  state: GameState,
+  officerId: OfficerId,
+  itemId: ItemId
+): WithCheck<GameState> {
+  const check = canReward(state, officerId, itemId)
+  if (!check.ok) return commandFail(check, state)
 
   const items = {
     ...state.items,
     [itemId]: holdByOfficer(state.items[itemId]!, officerId, nextEquipSeq(state, officerId)),
   }
-  if (isLord(state, officerId)) return { ...state, items }
+  if (isLord(state, officerId)) return commandOk({ ...state, items })
 
   const officer = adjustLoyalty(state.officers[officerId]!, REWARD_LOYALTY_GAIN)
-  return { ...state, items, officers: { ...state.officers, [officerId]: officer } }
+  return commandOk({ ...state, items, officers: { ...state.officers, [officerId]: officer } })
 }
 
 /**
@@ -74,12 +80,12 @@ export function canConfiscate(
   itemId: ItemId
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可没收' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   const item = state.items[itemId]
-  if (!item) return { ok: false, reason: '道具不存在' }
+  if (!item) return { ok: false, reason: 'item-not-found' }
   if (!(item.holder.kind === 'officer' && item.holder.officerId === officerId)) {
-    return { ok: false, reason: '道具不属于该武将' }
+    return { ok: false, reason: 'item-not-held-by-officer' }
   }
   return { ok: true }
 }
@@ -88,13 +94,18 @@ export function canConfiscate(
  * 没收：把武将所持道具收回其所在城。即时、不占人、不耗 RNG。
  * 道具 holder→officer.cityId；非君主忠诚 −20（下限 0）。非法 no-op。
  */
-export function confiscate(state: GameState, officerId: OfficerId, itemId: ItemId): GameState {
-  if (!canConfiscate(state, officerId, itemId).ok) return state
+export function confiscate(
+  state: GameState,
+  officerId: OfficerId,
+  itemId: ItemId
+): WithCheck<GameState> {
+  const check = canConfiscate(state, officerId, itemId)
+  if (!check.ok) return commandFail(check, state)
 
   const officer0 = state.officers[officerId]!
   const items = { ...state.items, [itemId]: holdByCity(state.items[itemId]!, officer0.cityId) }
-  if (isLord(state, officerId)) return { ...state, items }
+  if (isLord(state, officerId)) return commandOk({ ...state, items })
 
   const officer = adjustLoyalty(officer0, -CONFISCATE_LOYALTY_LOSS)
-  return { ...state, items, officers: { ...state.officers, [officerId]: officer } }
+  return commandOk({ ...state, items, officers: { ...state.officers, [officerId]: officer } })
 }

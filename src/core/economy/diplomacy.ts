@@ -2,6 +2,13 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import {
+  withEvents,
+  commandOk,
+  commandFail,
+  type WithEvents,
+  type WithCheck,
+} from '../shared/outcome'
 import type { Rng } from '../shared/rng'
 import { randInt } from '../shared/rng'
 import { spendGold } from '../world/city'
@@ -63,13 +70,13 @@ function checkExecutor(
   goldCost: number
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可下令' }
-  if (officer.stamina < staminaCost) return { ok: false, reason: '体力不足' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
+  if (officer.stamina < staminaCost) return { ok: false, reason: 'stamina-insufficient' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (city.gold < goldCost) return { ok: false, reason: '城金不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (city.gold < goldCost) return { ok: false, reason: 'gold-insufficient' }
   return { ok: true }
 }
 
@@ -126,7 +133,7 @@ export function canEntice(
   const base = checkExecutor(state, officerId, config.enticeStaminaCost, config.enticeGoldCost)
   if (!base.ok) return base
   if (!isEnemyServingNonLord(state, state.officers[officerId]!.lordId, targetOfficerId))
-    return { ok: false, reason: '目标须为敌方在任非君主武将' }
+    return { ok: false, reason: 'target-not-enemy-officer' }
   return { ok: true }
 }
 
@@ -136,15 +143,18 @@ export function entice(
   officerId: OfficerId,
   targetOfficerId: OfficerId,
   config: GameConfig
-): GameState {
-  if (!canEntice(state, officerId, targetOfficerId, config).ok) return state
-  return enqueueDiplomacy(
-    state,
-    officerId,
-    targetOfficerId,
-    config.enticeStaminaCost,
-    config.enticeGoldCost,
-    'entice'
+): WithCheck<GameState> {
+  const check = canEntice(state, officerId, targetOfficerId, config)
+  if (!check.ok) return commandFail(check, state)
+  return commandOk(
+    enqueueDiplomacy(
+      state,
+      officerId,
+      targetOfficerId,
+      config.enticeStaminaCost,
+      config.enticeGoldCost,
+      'entice'
+    )
   )
 }
 
@@ -156,12 +166,17 @@ export function executeEntice(
   state: GameState,
   officerId: OfficerId,
   targetOfficerId: OfficerId
-): GameState {
+): WithEvents<GameState> {
   const officer = state.officers[officerId]
-  if (!officer || !isEnemyServingNonLord(state, officer.lordId, targetOfficerId)) return state
+  if (!officer || !isEnemyServingNonLord(state, officer.lordId, targetOfficerId))
+    return withEvents(state)
+  const result = (s: GameState, success: boolean): WithEvents<GameState> =>
+    withEvents(s, [
+      { kind: 'diplomacy-result', command: 'entice', officerId, targetOfficerId, success },
+    ])
 
   const [passed, rng] = runThreeGates(state, officerId, targetOfficerId, 0, ENTICE_COEFF)
-  if (!passed) return { ...state, rng }
+  if (!passed) return result({ ...state, rng }, false)
 
   const [loyalty, rng2] = randInt(rng, ENTICE_OK_LOYALTY_MIN, ENTICE_OK_LOYALTY_MAX)
   const target = {
@@ -170,7 +185,10 @@ export function executeEntice(
     lordId: officer.lordId,
     loyalty,
   }
-  return { ...state, rng: rng2, officers: { ...state.officers, [targetOfficerId]: target } }
+  return result(
+    { ...state, rng: rng2, officers: { ...state.officers, [targetOfficerId]: target } },
+    true
+  )
 }
 
 // —— 离间（Alienate）——
@@ -183,7 +201,7 @@ export function canAlienate(
   const base = checkExecutor(state, officerId, config.alienateStaminaCost, config.alienateGoldCost)
   if (!base.ok) return base
   if (!isEnemyServingNonLord(state, state.officers[officerId]!.lordId, targetOfficerId))
-    return { ok: false, reason: '目标须为敌方在任非君主武将' }
+    return { ok: false, reason: 'target-not-enemy-officer' }
   return { ok: true }
 }
 
@@ -193,15 +211,18 @@ export function alienate(
   officerId: OfficerId,
   targetOfficerId: OfficerId,
   config: GameConfig
-): GameState {
-  if (!canAlienate(state, officerId, targetOfficerId, config).ok) return state
-  return enqueueDiplomacy(
-    state,
-    officerId,
-    targetOfficerId,
-    config.alienateStaminaCost,
-    config.alienateGoldCost,
-    'alienate'
+): WithCheck<GameState> {
+  const check = canAlienate(state, officerId, targetOfficerId, config)
+  if (!check.ok) return commandFail(check, state)
+  return commandOk(
+    enqueueDiplomacy(
+      state,
+      officerId,
+      targetOfficerId,
+      config.alienateStaminaCost,
+      config.alienateGoldCost,
+      'alienate'
+    )
   )
 }
 
@@ -210,9 +231,14 @@ export function executeAlienate(
   state: GameState,
   officerId: OfficerId,
   targetOfficerId: OfficerId
-): GameState {
+): WithEvents<GameState> {
   const officer = state.officers[officerId]
-  if (!officer || !isEnemyServingNonLord(state, officer.lordId, targetOfficerId)) return state
+  if (!officer || !isEnemyServingNonLord(state, officer.lordId, targetOfficerId))
+    return withEvents(state)
+  const result = (s: GameState, success: boolean): WithEvents<GameState> =>
+    withEvents(s, [
+      { kind: 'diplomacy-result', command: 'alienate', officerId, targetOfficerId, success },
+    ])
 
   const [passed, rng] = runThreeGates(
     state,
@@ -221,10 +247,10 @@ export function executeAlienate(
     INTEL_SAFETY,
     ALIENATE_COEFF
   )
-  if (!passed) return { ...state, rng }
+  if (!passed) return result({ ...state, rng }, false)
 
   const target = adjustLoyalty(state.officers[targetOfficerId]!, -ALIENATE_LOYALTY_DROP)
-  return { ...state, rng, officers: { ...state.officers, [targetOfficerId]: target } }
+  return result({ ...state, rng, officers: { ...state.officers, [targetOfficerId]: target } }, true)
 }
 
 // —— 策反（Instigate）——
@@ -242,7 +268,7 @@ export function canInstigate(
   )
   if (!base.ok) return base
   if (!isInstigateTarget(state, state.officers[officerId]!.lordId, targetOfficerId))
-    return { ok: false, reason: '目标须为敌方太守（非君主）' }
+    return { ok: false, reason: 'target-not-enemy-governor' }
   return { ok: true }
 }
 
@@ -252,15 +278,18 @@ export function instigate(
   officerId: OfficerId,
   targetOfficerId: OfficerId,
   config: GameConfig
-): GameState {
-  if (!canInstigate(state, officerId, targetOfficerId, config).ok) return state
-  return enqueueDiplomacy(
-    state,
-    officerId,
-    targetOfficerId,
-    config.instigateStaminaCost,
-    config.instigateGoldCost,
-    'instigate'
+): WithCheck<GameState> {
+  const check = canInstigate(state, officerId, targetOfficerId, config)
+  if (!check.ok) return commandFail(check, state)
+  return commandOk(
+    enqueueDiplomacy(
+      state,
+      officerId,
+      targetOfficerId,
+      config.instigateStaminaCost,
+      config.instigateGoldCost,
+      'instigate'
+    )
   )
 }
 
@@ -273,9 +302,10 @@ export function executeInstigate(
   state: GameState,
   officerId: OfficerId,
   targetOfficerId: OfficerId
-): GameState {
+): WithEvents<GameState> {
   const officer = state.officers[officerId]
-  if (!officer || !isInstigateTarget(state, officer.lordId, targetOfficerId)) return state
+  if (!officer || !isInstigateTarget(state, officer.lordId, targetOfficerId))
+    return withEvents(state)
 
   const [passed, rng] = runThreeGates(
     state,
@@ -284,7 +314,16 @@ export function executeInstigate(
     INTEL_SAFETY,
     INSTIGATE_COEFF
   )
-  if (!passed) return { ...state, rng }
+  if (!passed)
+    return withEvents({ ...state, rng }, [
+      {
+        kind: 'diplomacy-result',
+        command: 'instigate',
+        officerId,
+        targetOfficerId,
+        success: false,
+      },
+    ])
 
   const target = state.officers[targetOfficerId]!
   const oldLord = target.lordId
@@ -298,7 +337,10 @@ export function executeInstigate(
     ...state.cities,
     [cityId]: { ...state.cities[cityId]!, lordId: targetOfficerId },
   }
-  return { ...state, rng, officers, cities }
+  return withEvents({ ...state, rng, officers, cities }, [
+    { kind: 'diplomacy-result', command: 'instigate', officerId, targetOfficerId, success: true },
+    { kind: 'lord-instigated', officerId: targetOfficerId, fromLordId: oldLord! },
+  ])
 }
 
 // —— 劝降（Induce）——
@@ -312,15 +354,15 @@ export function canInduce(
   if (!base.ok) return base
   const officer = state.officers[officerId]!
   const target = state.officers[targetOfficerId]
-  if (!target) return { ok: false, reason: '目标不存在' }
+  if (!target) return { ok: false, reason: 'target-not-found' }
   if (target.lordId !== target.id || isCaptive(state, targetOfficerId))
-    return { ok: false, reason: '目标须为敌方君主' }
-  if (target.lordId === officer.lordId) return { ok: false, reason: '不能对己方君主劝降' }
+    return { ok: false, reason: 'target-not-enemy-lord' }
+  if (target.lordId === officer.lordId) return { ok: false, reason: 'cannot-induce-own-lord' }
   if (
     citiesOfLord(state, officer.lordId!).length <
     citiesOfLord(state, target.id).length * INDUCE_CITY_RATIO
   )
-    return { ok: false, reason: '城池压制不足（需达敌方两倍）' }
+    return { ok: false, reason: 'city-power-insufficient' }
   return { ok: true }
 }
 
@@ -330,15 +372,18 @@ export function induce(
   officerId: OfficerId,
   targetOfficerId: OfficerId,
   config: GameConfig
-): GameState {
-  if (!canInduce(state, officerId, targetOfficerId, config).ok) return state
-  return enqueueDiplomacy(
-    state,
-    officerId,
-    targetOfficerId,
-    config.induceStaminaCost,
-    config.induceGoldCost,
-    'induce'
+): WithCheck<GameState> {
+  const check = canInduce(state, officerId, targetOfficerId, config)
+  if (!check.ok) return commandFail(check, state)
+  return commandOk(
+    enqueueDiplomacy(
+      state,
+      officerId,
+      targetOfficerId,
+      config.induceStaminaCost,
+      config.induceGoldCost,
+      'induce'
+    )
   )
 }
 
@@ -352,9 +397,9 @@ export function executeInduce(
   state: GameState,
   officerId: OfficerId,
   targetOfficerId: OfficerId
-): GameState {
+): WithEvents<GameState> {
   const officer = state.officers[officerId]
-  if (!officer) return state
+  if (!officer) return withEvents(state)
   const target = state.officers[targetOfficerId]
   if (
     !target ||
@@ -362,10 +407,14 @@ export function executeInduce(
     target.lordId === officer.lordId ||
     isCaptive(state, targetOfficerId)
   )
-    return state
+    return withEvents(state)
+  const fail = (s: GameState): WithEvents<GameState> =>
+    withEvents(s, [
+      { kind: 'diplomacy-result', command: 'induce', officerId, targetOfficerId, success: false },
+    ])
 
   // ① 玩家君主免疫（防 AI 劝降玩家君主）
-  if (target.id === state.playerLordId) return state
+  if (target.id === state.playerLordId) return fail(state)
 
   const execLord = officer.lordId!
   const targetLord = target.id
@@ -374,17 +423,17 @@ export function executeInduce(
     citiesOfLord(state, execLord).length <
     citiesOfLord(state, targetLord).length * INDUCE_CITY_RATIO
   )
-    return state
+    return fail(state)
 
   // ③ 智力差关
   const [r1, rng1] = randInt(state.rng, 0, ROLL_MAX)
   const execIntel = effectiveOfficer(state, officerId).intelligence
   const targetIntel = effectiveOfficer(state, targetOfficerId).intelligence
-  if (r1 > execIntel - targetIntel + INTEL_SAFETY) return { ...state, rng: rng1 }
+  if (r1 > execIntel - targetIntel + INTEL_SAFETY) return fail({ ...state, rng: rng1 })
 
   // ④ 君主性格关
   const [r2, rng2] = randInt(rng1, 0, ROLL_MAX)
-  if (r2 >= INDUCE_COEFF[target.personality]!) return { ...state, rng: rng2 }
+  if (r2 >= INDUCE_COEFF[target.personality]!) return fail({ ...state, rng: rng2 })
 
   // 成功：按原势力快照吸收
   const cityIdSet = new Set(citiesOfLord(state, targetLord).map((c) => c.id))
@@ -395,5 +444,8 @@ export function executeInduce(
     if (o.lordId === targetLord)
       officers[o.id] = { ...o, lordId: cityIdSet.has(o.cityId) ? execLord : null }
   }
-  return { ...state, rng: rng2, officers, cities }
+  return withEvents({ ...state, rng: rng2, officers, cities }, [
+    { kind: 'diplomacy-result', command: 'induce', officerId, targetOfficerId, success: true },
+    { kind: 'lord-surrendered', fromLordId: targetLord, toLordId: execLord },
+  ])
 }

@@ -2,6 +2,7 @@ import type { GameState } from '../game-state'
 import type { OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { spendGold } from '../world/city'
 import { adjustLoyalty, recoverStamina } from '../world/officer'
 import { isBusy, isCaptive } from '../world/queries'
@@ -23,12 +24,12 @@ export function canBanquet(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
-  if (isCaptive(state, officerId)) return { ok: false, reason: '俘虏不可宴请' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
+  if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (city.gold < config.banquetGoldCost) return { ok: false, reason: '城金不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (city.gold < config.banquetGoldCost) return { ok: false, reason: 'gold-insufficient' }
   return { ok: true }
 }
 
@@ -36,8 +37,13 @@ export function canBanquet(
  * 执行宴请：即时、不占人、不耗 RNG。扣本城金，目标体力 +50（封顶），非君主忠诚 +1（封顶）。
  * 君主跳过忠诚写入（君主忠诚派生恒 100）。前置不满足时为 no-op。
  */
-export function banquet(state: GameState, officerId: OfficerId, config: GameConfig): GameState {
-  if (!canBanquet(state, officerId, config).ok) return state
+export function banquet(
+  state: GameState,
+  officerId: OfficerId,
+  config: GameConfig
+): WithCheck<GameState> {
+  const check = canBanquet(state, officerId, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer0 = state.officers[officerId]!
   const city = spendGold(state.cities[officer0.cityId]!, config.banquetGoldCost)
@@ -45,9 +51,9 @@ export function banquet(state: GameState, officerId: OfficerId, config: GameConf
   const recovered = recoverStamina(officer0, BANQUET_STAMINA_GAIN)
   const officer = isLord ? recovered : adjustLoyalty(recovered, BANQUET_LOYALTY_GAIN)
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [officer0.cityId]: city },
     officers: { ...state.officers, [officerId]: officer },
-  }
+  })
 }

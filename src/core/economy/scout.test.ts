@@ -64,7 +64,7 @@ describe('canScout 前置校验', () => {
 describe('scout 侦察（即时）', () => {
   it('扣体力 10、扣本城金 20、占用(入队 scout)；RNG 不变', () => {
     const s = createInitialState(1)
-    const next = scout(s, 'zhugeliang', 'xuchang', cfg)
+    const next = scout(s, 'zhugeliang', 'xuchang', cfg).state
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 10)
     expect(isBusy(next, 'zhugeliang')).toBe(true)
     expect(next.cities.chengdu!.gold).toBe(500 - 20)
@@ -74,8 +74,11 @@ describe('scout 侦察（即时）', () => {
     expect(next.cities.xuchang).toEqual(s.cities.xuchang)
   })
 
-  it('非法下令 no-op（返回原状态）', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = withOfficer(createInitialState(1), 'zhugeliang', { stamina: 9 })
-    expect(scout(s, 'zhugeliang', 'xuchang', cfg)).toBe(s)
+    const res = scout(s, 'zhugeliang', 'xuchang', cfg)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('stamina-insufficient')
   })
 })

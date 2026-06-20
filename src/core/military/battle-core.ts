@@ -154,32 +154,32 @@ export function checkImmediateVictory(battle: BattleState, map: BattleMap): Batt
 /** 校验一个战斗 action 是否合法（供 canApply 与玩家 act 路径共用）；仍要求 unit.side==='player'。 */
 export function canBattle(state: GameState, action: BattleAction): CommandCheck {
   const battle = state.activeBattle
-  if (!battle) return { ok: false, reason: '无进行中的战斗' }
-  if (battle.outcome) return { ok: false, reason: '战斗已结束' }
+  if (!battle) return { ok: false, reason: 'no-active-battle' }
+  if (battle.outcome) return { ok: false, reason: 'battle-ended' }
   if (action.type !== 'act') return { ok: true }
 
   const unit = battle.units[action.officerId]
-  if (!unit || unit.status === 'dead') return { ok: false, reason: '单位不存在或已击溃' }
-  if (unit.side !== 'player') return { ok: false, reason: '只能操作玩家方单位' }
-  if (unit.acted) return { ok: false, reason: '该单位本日已行动' }
-  if (!canActWithStatus(unit.status)) return { ok: false, reason: '混乱/石阵中，无法行动' }
+  if (!unit || unit.status === 'dead') return { ok: false, reason: 'unit-not-found-or-routed' }
+  if (unit.side !== 'player') return { ok: false, reason: 'not-player-unit' }
+  if (unit.acted) return { ok: false, reason: 'unit-already-acted' }
+  if (!canActWithStatus(unit.status)) return { ok: false, reason: 'cannot-act-status' }
 
   const map = BATTLE_MAPS[battle.mapId]!
   if (
     action.moveTo &&
     !reachableTiles(state, battle, action.officerId).some((p) => samePos(p, action.moveTo!))
   ) {
-    return { ok: false, reason: '移动目标不可达' }
+    return { ok: false, reason: 'move-unreachable' }
   }
   const from = action.moveTo ?? unit.pos
   if (action.terminal.kind === 'attack') {
     const target = action.terminal.target
     const troopType = effectiveTroopType(state, action.officerId)
     if (!attackableTiles(map, from, troopType).some((p) => samePos(p, target))) {
-      return { ok: false, reason: '攻击目标超出范围' }
+      return { ok: false, reason: 'attack-out-of-range' }
     }
     const enemy = unitAt(battle, target)
-    if (!enemy || enemy.side === unit.side) return { ok: false, reason: '目标格无敌方单位' }
+    if (!enemy || enemy.side === unit.side) return { ok: false, reason: 'no-enemy-at-target' }
   }
   if (action.terminal.kind === 'cast') {
     return canCast(state, battle, map, unit, from, action.terminal)
@@ -196,9 +196,9 @@ export function canCast(
   from: Position,
   term: { skillId: SkillId; target?: Position }
 ): CommandCheck {
-  if (!canCastWithStatus(caster.status)) return { ok: false, reason: '禁咒中，无法施法' }
+  if (!canCastWithStatus(caster.status)) return { ok: false, reason: 'cannot-cast-status' }
   const def: SkillDef | undefined = SKILL_DEFS[term.skillId]
-  if (!def) return { ok: false, reason: '技能不存在' }
+  if (!def) return { ok: false, reason: 'skill-not-found' }
   const officer = state.officers[caster.officerId]!
   const isLord = officer.lordId === officer.id
   const avail = availableSkills(
@@ -207,29 +207,29 @@ export function canCast(
     officer.personalSkills,
     isLord
   )
-  if (!avail.has(def.id)) return { ok: false, reason: '未掌握该技能' }
-  if (caster.mp < def.mp) return { ok: false, reason: 'MP 不足' }
+  if (!avail.has(def.id)) return { ok: false, reason: 'skill-not-learned' }
+  if (caster.mp < def.mp) return { ok: false, reason: 'mp-insufficient' }
   const casterTerrain = terrainAt(map, from)
   if (def.target === 'self') {
     return skillGatesPass(def, battle.weather, casterTerrain)
       ? { ok: true }
-      : { ok: false, reason: '天气/地形不允许' }
+      : { ok: false, reason: 'weather-terrain-forbidden' }
   }
-  if (!term.target) return { ok: false, reason: '需选择目标' }
+  if (!term.target) return { ok: false, reason: 'target-required' }
   if (!skillTargetTiles(map, from, def.id).some((p) => samePos(p, term.target!))) {
-    return { ok: false, reason: '目标超出技能范围' }
+    return { ok: false, reason: 'skill-out-of-range' }
   }
   const tu = unitAt(battle, term.target)
-  if (!tu) return { ok: false, reason: '目标格无单位' }
+  if (!tu) return { ok: false, reason: 'no-unit-at-target' }
   if (def.target === 'enemy' && tu.side === caster.side)
-    return { ok: false, reason: '该技能须对敌方' }
+    return { ok: false, reason: 'skill-needs-enemy' }
   if (def.target === 'ally' && tu.side !== caster.side)
-    return { ok: false, reason: '该技能须对友方' }
+    return { ok: false, reason: 'skill-needs-ally' }
   const gate = skillGatesPass(def, battle.weather, casterTerrain, {
     terrain: terrainAt(map, tu.pos),
     troop: effectiveTroopType(state, tu.officerId),
   })
-  return gate ? { ok: true } : { ok: false, reason: '天气/地形/兵种不允许' }
+  return gate ? { ok: true } : { ok: false, reason: 'weather-terrain-troop-forbidden' }
 }
 
 /**

@@ -9,6 +9,7 @@ import type { GameState } from '../game-state'
 import type { BattleState } from '../military/battle'
 import {
   endMonth,
+  endMonthWithEvents,
   resumeMonth,
   chooseSuccessor,
   advanceCampaigns,
@@ -34,6 +35,19 @@ describe('endMonth 月末编排', () => {
     expect(next.year).toBe(189)
   })
 
+  it('月末执行的掠夺事件经 endMonthWithEvents 冒泡（与 .state 同步）', () => {
+    const queued = plunder(createInitialState(1), 'zhugeliang', cfg).state
+    const { state, events } = endMonthWithEvents(queued, cfg)
+    expect(events).toContainEqual({
+      kind: 'plunder-done',
+      officerId: 'zhugeliang',
+      cityId: 'chengdu',
+      goldGained: 300,
+      foodGained: 750,
+    })
+    expect(state).toEqual(endMonth(queued, cfg))
+  })
+
   it('12 月跨年到次年 1 月', () => {
     const next = endMonth({ ...createInitialState(1), month: 12 }, cfg)
     expect(next.month).toBe(1)
@@ -41,7 +55,7 @@ describe('endMonth 月末编排', () => {
   })
 
   it('占用武将月末释放占用、体力 +4 封顶', () => {
-    const afterCmd = develop(createInitialState(1), 'zhugeliang', 'agriculture', cfg)
+    const afterCmd = develop(createInitialState(1), 'zhugeliang', 'agriculture', cfg).state
     expect(isBusy(afterCmd, 'zhugeliang')).toBe(true)
     expect(afterCmd.officers.zhugeliang!.stamina).toBe(92)
 
@@ -64,7 +78,7 @@ describe('endMonth 月末编排', () => {
 
   it('掠夺先于收粮/收税：收粮月按减半后的农业/商业结算，队列清空、执行人回城', () => {
     // 6 月（收粮+收税）：先掠夺成都（农 300->150、商 200->100），收益粮+750/金+300，再按减半后收粮 floor(150/4)=37、收税 floor(100/2)=50
-    const queued = plunder({ ...createInitialState(1), month: 6 }, 'zhugeliang', cfg)
+    const queued = plunder({ ...createInitialState(1), month: 6 }, 'zhugeliang', cfg).state
     const next = endMonth(queued, cfg)
     const c = next.cities.chengdu!
     expect(c.agriculture).toBe(150)
@@ -78,7 +92,7 @@ describe('endMonth 月末编排', () => {
 
   it('玩家出征：endMonth 挂起为交互式战斗，不立即占城/不推进月份', () => {
     const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
-    const queued = campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120)
+    const queued = campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120).state
     const next = endMonth(queued, cfg)
 
     expect(next.activeBattle).not.toBeNull()
@@ -91,12 +105,12 @@ describe('endMonth 月末编排', () => {
   it('resumeMonth：战斗玩家胜→占城 + 被俘君主重选 + 续完月末（进驻、释放占用、月份+1、队列清空）', () => {
     let boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
     boosted = withOfficer(boosted, 'caocao', { intelligence: 0 }) // 战败必被俘（barring r1==0）
-    const suspended = endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
+    const suspended = endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120).state, cfg)
     const won: GameState = {
       ...suspended,
       activeBattle: { ...(suspended.activeBattle as BattleState), outcome: 'playerWin' },
     }
-    const next = resumeMonth(won, cfg)
+    const next = resumeMonth(won, cfg).state
 
     expect(next.activeBattle).toBeNull()
     expect(next.cities.xuchang!.lordId).toBe('liubei')
@@ -113,12 +127,12 @@ describe('endMonth 月末编排', () => {
 
   it('resumeMonth：战斗玩家败→不占城、败方武将走命运判定，仍续完月末', () => {
     const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
-    const suspended = endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
+    const suspended = endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120).state, cfg)
     const lost: GameState = {
       ...suspended,
       activeBattle: { ...(suspended.activeBattle as BattleState), outcome: 'playerLose' },
     }
-    const next = resumeMonth(lost, cfg)
+    const next = resumeMonth(lost, cfg).state
 
     expect(next.activeBattle).toBeNull()
     expect(next.cities.xuchang!.lordId).toBe('caocao') // 败，未占城
@@ -130,19 +144,19 @@ describe('endMonth 月末编排', () => {
   it('resumeMonth：玩家君主随军被俘→挂起待选新君；chooseSuccessor 兑现换主并续完月末', () => {
     // 刘备(智力设0→必被俘)单独从江陵出征许昌、战败
     const s = withOfficer(createInitialState(1), 'liubei', { cityId: 'jiangling', intelligence: 0 })
-    const suspended = endMonth(campaign(s, ['liubei'], 'xuchang', 50), cfg)
+    const suspended = endMonth(campaign(s, ['liubei'], 'xuchang', 50).state, cfg)
     const lost: GameState = {
       ...suspended,
       activeBattle: { ...(suspended.activeBattle as BattleState), outcome: 'playerLose' },
     }
-    const paused = resumeMonth(lost, cfg)
+    const paused = resumeMonth(lost, cfg).state
 
     expect(paused.pendingSuccession).toEqual({ lordId: 'liubei' })
     expect(paused.month).toBe(1) // 挂起、未推进
     expect(paused.activeBattle).toBeNull()
     expect(isCaptive(paused, 'liubei')).toBe(true)
 
-    const done = chooseSuccessor(paused, 'guanyu', cfg) // 玩家选关羽为新君
+    const done = chooseSuccessor(paused, 'guanyu', cfg).state // 玩家选关羽为新君
     expect(done.pendingSuccession).toBeNull()
     expect(done.playerLordId).toBe('guanyu')
     expect(done.cities.jiangling!.lordId).toBe('guanyu')
@@ -152,7 +166,7 @@ describe('endMonth 月末编排', () => {
 
   it('挂起战斗确定性可复现', () => {
     const boosted = withOfficer(createInitialState(1), 'guanyu', { troops: 500 })
-    const run = () => endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120), cfg)
+    const run = () => endMonth(campaign(boosted, ['guanyu', 'zhangfei'], 'xuchang', 120).state, cfg)
     expect(run()).toEqual(run())
   })
 })
@@ -234,7 +248,7 @@ describe('advanceCampaigns 三类分流', () => {
     let s = withOfficer(createInitialState(1), 'simayi', { cityId: 'xuchang' })
     s = withOfficer(s, 'zhangliao', { cityId: 'xuchang' })
     s = enqueue(s, { type: 'campaign', officerIds: ['guanyu'], targetCityId: 'ye', provisions: 50 })
-    const out = advanceCampaigns(s, cfg)
+    const out = advanceCampaigns(s, cfg).state
     expect(out.cities.ye!.lordId).toBe('liubei') // 直接占城
     expect(out.activeBattle).toBeNull()
     expect(out.pendingDefense).toBeNull()
@@ -249,7 +263,7 @@ describe('advanceCampaigns 三类分流', () => {
       targetCityId: 'xuchang',
       provisions: 50,
     })
-    const out = advanceCampaigns(s, cfg)
+    const out = advanceCampaigns(s, cfg).state
     expect(out.activeBattle).not.toBeNull()
     expect(out.activeBattle!.mode).toBe('attack')
     expect(out.month).toBe(1)
@@ -262,7 +276,7 @@ describe('advanceCampaigns 三类分流', () => {
       targetCityId: 'jiangling',
       provisions: 50,
     })
-    const out = advanceCampaigns(s, cfg)
+    const out = advanceCampaigns(s, cfg).state
     expect(out.pendingDefense).toEqual({ targetCityId: 'jiangling' })
     expect(out.activeBattle).toBeNull()
     expect(out.month).toBe(1)
@@ -273,7 +287,7 @@ describe('advanceCampaigns 三类分流', () => {
     let s = makeIndependentLord(createInitialState(7), 'ye', 'simayi', ['simayi', 'zhangliao'])
     s = withOfficer(s, 'caocao', { troops: 8000 })
     s = enqueue(s, { type: 'campaign', officerIds: ['caocao'], targetCityId: 'ye', provisions: 40 })
-    const out = advanceCampaigns(s, cfg)
+    const out = advanceCampaigns(s, cfg).state
     expect(out.activeBattle).toBeNull()
     expect(out.pendingDefense).toBeNull()
     expect(out.pendingSuccession).toBeNull()
@@ -290,11 +304,11 @@ describe('chooseDefenders 玩家防守选守军', () => {
       targetCityId: 'jiangling',
       provisions: 50,
     })
-    return advanceCampaigns(s, cfg) // 挂起 pendingDefense
+    return advanceCampaigns(s, cfg).state // 挂起 pendingDefense
   }
 
   it('选 ≥1 守军 → 进 defend 交互式战斗、清空 pendingDefense', () => {
-    const out = chooseDefenders(pending(), ['guanyu'], cfg)
+    const out = chooseDefenders(pending(), ['guanyu'], cfg).state
     expect(out.pendingDefense).toBeNull()
     expect(out.activeBattle).not.toBeNull()
     expect(out.activeBattle!.mode).toBe('defend')
@@ -302,7 +316,7 @@ describe('chooseDefenders 玩家防守选守军', () => {
   })
 
   it('选 0 名（弃守）→ 直接被占、续跑到月末', () => {
-    const out = chooseDefenders(pending(), [], cfg)
+    const out = chooseDefenders(pending(), [], cfg).state
     expect(out.cities.jiangling!.lordId).toBe('caocao')
     expect(out.pendingDefense).toBeNull()
     expect(out.activeBattle).toBeNull()
@@ -317,7 +331,7 @@ describe('chooseDefenders 玩家防守选守军', () => {
     expect(canChooseDefenders(pd, ['caocao']).ok).toBe(false) // 非江陵守军
     expect(canChooseDefenders(pd, ['guanyu', 'zhangfei']).ok).toBe(true)
     expect(canChooseDefenders(pd, []).ok).toBe(true) // 弃守合法
-    expect(chooseDefenders(pd, ['caocao'], cfg)).toEqual(pd) // 非法 no-op
+    expect(chooseDefenders(pd, ['caocao'], cfg).state).toEqual(pd) // 非法 no-op
   })
 
   it('pendingDefense 非空时 endMonth 拒推进', () => {

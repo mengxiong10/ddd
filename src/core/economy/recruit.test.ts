@@ -75,7 +75,7 @@ describe('canRecruit 前置校验', () => {
 describe('recruit 征兵', () => {
   it('后备兵 += N、城金 -= ceil(N/10)、体力 -= 12、占用(入队 recruit)；RNG 不变', () => {
     const s = createInitialState(1)
-    const next = recruit(s, 'zhugeliang', 100, cfg)
+    const next = recruit(s, 'zhugeliang', 100, cfg).state
     expect(next.cities.chengdu!.reserveTroops).toBe(100)
     expect(next.cities.chengdu!.gold).toBe(500 - 10)
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 12)
@@ -85,7 +85,7 @@ describe('recruit 征兵', () => {
   })
 
   it('N < 10 仍至少扣 1 金', () => {
-    const next = recruit(createInitialState(1), 'zhugeliang', 5, cfg)
+    const next = recruit(createInitialState(1), 'zhugeliang', 5, cfg).state
     expect(next.cities.chengdu!.gold).toBe(500 - 1)
     expect(next.cities.chengdu!.reserveTroops).toBe(5)
   })
@@ -94,12 +94,15 @@ describe('recruit 征兵', () => {
     const next = recruit(createInitialState(1), 'zhugeliang', 100, {
       ...cfg,
       recruitStaminaCost: 20,
-    })
+    }).state
     expect(next.officers.zhugeliang!.stamina).toBe(100 - 20)
   })
 
-  it('非法下令 no-op（返回原状态）', () => {
+  it('非法下令 no-op（state 不变、自报告失败 reason）', () => {
     const s = occupy(createInitialState(1), 'zhugeliang')
-    expect(recruit(s, 'zhugeliang', 100, cfg)).toBe(s)
+    const res = recruit(s, 'zhugeliang', 100, cfg)
+    expect(res.state).toBe(s)
+    expect(res.ok).toBe(false)
+    expect(res.reason).toBe('officer-busy')
   })
 })

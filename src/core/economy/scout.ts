@@ -2,6 +2,7 @@ import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
 import type { GameConfig } from '../shared/config'
 import type { CommandCheck } from '../shared/command'
+import { commandOk, commandFail, type WithCheck } from '../shared/outcome'
 import { spendGold } from '../world/city'
 import { spendStamina } from '../world/officer'
 import { isBusy } from '../world/queries'
@@ -18,16 +19,17 @@ export function canScout(
   config: GameConfig
 ): CommandCheck {
   const officer = state.officers[officerId]
-  if (!officer) return { ok: false, reason: '武将不存在' }
-  if (isBusy(state, officerId)) return { ok: false, reason: '武将本月已被占用' }
+  if (!officer) return { ok: false, reason: 'officer-not-found' }
+  if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   const city = state.cities[officer.cityId]
-  if (!city) return { ok: false, reason: '城不存在' }
-  if (city.gold < config.scoutGoldCost) return { ok: false, reason: '城金不足' }
-  if (officer.stamina < config.scoutStaminaCost) return { ok: false, reason: '体力不足' }
+  if (!city) return { ok: false, reason: 'city-not-found' }
+  if (city.gold < config.scoutGoldCost) return { ok: false, reason: 'gold-insufficient' }
+  if (officer.stamina < config.scoutStaminaCost)
+    return { ok: false, reason: 'stamina-insufficient' }
 
   const target = state.cities[targetCityId]
-  if (!target) return { ok: false, reason: '目标城不存在' }
-  if (target.lordId === officer.lordId) return { ok: false, reason: '只能侦察非己方城' }
+  if (!target) return { ok: false, reason: 'target-city-not-found' }
+  if (target.lordId === officer.lordId) return { ok: false, reason: 'target-not-enemy-city' }
   return { ok: true }
 }
 
@@ -42,18 +44,19 @@ export function scout(
   officerId: OfficerId,
   targetCityId: CityId,
   config: GameConfig
-): GameState {
-  if (!canScout(state, officerId, targetCityId, config).ok) return state
+): WithCheck<GameState> {
+  const check = canScout(state, officerId, targetCityId, config)
+  if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
   const city = state.cities[officer.cityId]!
   const nextCity = spendGold(city, config.scoutGoldCost)
   const nextOfficer = spendStamina(officer, config.scoutStaminaCost)
 
-  return {
+  return commandOk({
     ...state,
     cities: { ...state.cities, [officer.cityId]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'scout', officerId }],
-  }
+  })
 }

@@ -53,9 +53,9 @@ export function promoteLord(
 /** 校验玩家选新君（供 canApply）：pendingSuccession 非空 + officerId 为其候选。 */
 export function canChooseSuccessor(state: GameState, officerId: OfficerId): CommandCheck {
   const pending = state.pendingSuccession
-  if (!pending) return { ok: false, reason: '当前无待选新君' }
+  if (!pending) return { ok: false, reason: 'no-pending-succession' }
   if (!successionCandidates(state, pending.lordId).some((o) => o.id === officerId)) {
-    return { ok: false, reason: '该武将不是合法的新君候选' }
+    return { ok: false, reason: 'invalid-successor' }
   }
   return { ok: true }
 }
