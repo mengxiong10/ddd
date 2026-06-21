@@ -49,26 +49,26 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 
 ## 功能列表
 
-| 功能                               | PRD                                 | 开发文档                            | 状态  |
-| ---------------------------------- | ----------------------------------- | ----------------------------------- | ----- |
-| 经营循环 economy-loop              | specs/01-economy-loop/prd.md        | specs/01-economy-loop/dev.md        | done  |
-| 兵力系统 troops                    | specs/02-troops/prd.md              | specs/02-troops/dev.md              | done  |
-| 掠夺/侦察 plunder-scout            | specs/03-plunder-scout/prd.md       | specs/03-plunder-scout/dev.md       | done  |
-| 出征 campaign                      | specs/04-campaign/prd.md            | specs/04-campaign/dev.md            | done  |
-| 道具系统 items                     | specs/05-items/prd.md               | specs/05-items/dev.md               | done  |
-| 登场与搜寻 debut-search            | specs/06-debut-search/prd.md        | specs/06-debut-search/dev.md        | done  |
-| 城务指令 city-commands             | specs/07-city-commands/prd.md       | specs/07-city-commands/dev.md       | done  |
-| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | done  |
-| 城市灾害 city-disaster             | specs/09-city-disaster/prd.md       | specs/09-city-disaster/dev.md       | done  |
-| 外交 diplomacy                     | specs/10-diplomacy/prd.md           | specs/10-diplomacy/dev.md           | done  |
-| 兵种系统 troop-types               | specs/11-troop-types/prd.md         | specs/11-troop-types/dev.md         | done  |
-| 战斗系统 battle                    | specs/12-battle/prd.md              | specs/12-battle/dev.md              | done  |
-| 战斗技能 battle-skills             | specs/13-battle-skills/prd.md       | specs/13-battle-skills/dev.md       | done  |
-| 完整战后处理 campaign-aftermath    | specs/14-campaign-aftermath/prd.md  | specs/14-campaign-aftermath/dev.md  | done  |
-| AI 经营 ai-economy                 | specs/15-ai-economy/prd.md          | specs/15-ai-economy/dev.md          | done  |
-| AI 出征 ai-campaign                | specs/16-ai-campaign/prd.md         | specs/16-ai-campaign/dev.md         | ready |
-| 战斗 AI battle-ai                  | specs/17-battle-ai/prd.md           | specs/17-battle-ai/dev.md           | done  |
-| 命令反馈 command-feedback          | specs/18-command-feedback/prd.md    | specs/18-command-feedback/dev.md    | done  |
-| store/UI 接入 store-ui             | specs/19-store-ui/prd.md            | specs/19-store-ui/dev.md            | done  |
+| 功能                               | PRD                                 | 开发文档                            | 状态 |
+| ---------------------------------- | ----------------------------------- | ----------------------------------- | ---- |
+| 经营循环 economy-loop              | specs/01-economy-loop/prd.md        | specs/01-economy-loop/dev.md        | done |
+| 兵力系统 troops                    | specs/02-troops/prd.md              | specs/02-troops/dev.md              | done |
+| 掠夺/侦察 plunder-scout            | specs/03-plunder-scout/prd.md       | specs/03-plunder-scout/dev.md       | done |
+| 出征 campaign                      | specs/04-campaign/prd.md            | specs/04-campaign/dev.md            | done |
+| 道具系统 items                     | specs/05-items/prd.md               | specs/05-items/dev.md               | done |
+| 登场与搜寻 debut-search            | specs/06-debut-search/prd.md        | specs/06-debut-search/dev.md        | done |
+| 城务指令 city-commands             | specs/07-city-commands/prd.md       | specs/07-city-commands/dev.md       | done |
+| 性格与俘虏流转 personality-captive | specs/08-personality-captive/prd.md | specs/08-personality-captive/dev.md | done |
+| 城市灾害 city-disaster             | specs/09-city-disaster/prd.md       | specs/09-city-disaster/dev.md       | done |
+| 外交 diplomacy                     | specs/10-diplomacy/prd.md           | specs/10-diplomacy/dev.md           | done |
+| 兵种系统 troop-types               | specs/11-troop-types/prd.md         | specs/11-troop-types/dev.md         | done |
+| 战斗系统 battle                    | specs/12-battle/prd.md              | specs/12-battle/dev.md              | done |
+| 战斗技能 battle-skills             | specs/13-battle-skills/prd.md       | specs/13-battle-skills/dev.md       | done |
+| 完整战后处理 campaign-aftermath    | specs/14-campaign-aftermath/prd.md  | specs/14-campaign-aftermath/dev.md  | done |
+| AI 经营 ai-economy                 | specs/15-ai-economy/prd.md          | specs/15-ai-economy/dev.md          | done |
+| AI 出征 ai-campaign                | specs/16-ai-campaign/prd.md         | specs/16-ai-campaign/dev.md         | done |
+| 战斗 AI battle-ai                  | specs/17-battle-ai/prd.md           | specs/17-battle-ai/dev.md           | done |
+| 命令反馈 command-feedback          | specs/18-command-feedback/prd.md    | specs/18-command-feedback/dev.md    | done |
+| store/UI 接入 store-ui             | specs/19-store-ui/prd.md            | specs/19-store-ui/dev.md            | done |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）
