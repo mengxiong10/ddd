@@ -28,7 +28,7 @@ export function recruitGoldCost(amount: number): number {
 
 /**
  * 校验征兵前置条件（不修改状态），供 UI 置灰/提示与 recruit 内部守卫复用。
- * 作用城 = 武将所在城（officer.cityId）。武将存在且未占用 → 城金 ≥ 1 → 体力 ≥ recruitStaminaCost → 1 ≤ amount ≤ 可征上限。
+ * 作用城 = 武将所在城（officer.cityId!）。武将存在且未占用 → 城金 ≥ 1 → 体力 ≥ recruitStaminaCost → 1 ≤ amount ≤ 可征上限。
  */
 export function canRecruit(
   state: GameState,
@@ -39,7 +39,7 @@ export function canRecruit(
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
 
   if (city.gold < 1) return { ok: false, reason: 'gold-insufficient' }
@@ -65,14 +65,14 @@ export function recruit(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city = state.cities[officer.cityId]!
+  const city = state.cities[officer.cityId!]!
 
   const nextCity = spendGold(addReserveTroops(city, amount), recruitGoldCost(amount))
   const nextOfficer = spendStamina(officer, config.recruitStaminaCost)
 
   return commandOk({
     ...state,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'recruit', officerId }],
   })

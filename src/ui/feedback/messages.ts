@@ -1,5 +1,13 @@
 import type { FeedbackItem } from '../../store/game-store'
-import type { Action, GameState, OutcomeEvent, ReasonCode } from '../../store/selectors'
+import type {
+  Action,
+  CityId,
+  GameState,
+  ItemId,
+  OfficerId,
+  OutcomeEvent,
+  ReasonCode,
+} from '../../store/selectors'
 
 /**
  * 反馈 → 中文（`19-store-ui`）：core/store 零中文，本模块是中文运行时文案的**唯一**落点。
@@ -88,9 +96,10 @@ export function reasonText(reason: ReasonCode): string {
 const pick = (variants: readonly string[]): string =>
   variants[Math.floor(Math.random() * variants.length)]!
 
-const officerName = (game: GameState, id: string): string => game.officers[id]?.name ?? id
-const cityName = (game: GameState, id: string): string => game.cities[id]?.name ?? id
-const itemName = (game: GameState, id: string): string => game.items[id]?.name ?? id
+const officerName = (game: GameState, id: OfficerId): string =>
+  game.officers[id]?.name ?? String(id)
+const cityName = (game: GameState, id: CityId): string => game.cities[id]?.name ?? String(id)
+const itemName = (game: GameState, id: ItemId): string => game.items[id]?.name ?? String(id)
 
 const STATUS_TEXT: Record<'famine' | 'drought' | 'flood' | 'riot', string> = {
   famine: '饥荒',
@@ -185,7 +194,7 @@ function issuedText(action: Action, game: GameState): string | null {
 /** 事件是否与玩家相关（决定是否弹 toast）。系统级重大事件恒可见。 */
 function isPlayerRelevant(event: OutcomeEvent, game: GameState): boolean {
   const player = game.playerLordId
-  const ownedBy = (officerId: string) => game.officers[officerId]?.lordId === player
+  const ownedBy = (officerId: OfficerId) => game.officers[officerId]?.lordId === player
   switch (event.kind) {
     case 'develop-done':
     case 'govern-done':

@@ -7,10 +7,10 @@
 export type TroopType = 'cavalry' | 'infantry' | 'archer' | 'navy' | 'elite' | 'mystic'
 
 /**
- * 道具「改兵种」字段：0 不改 / 1 水军 / 2 玄兵（智力>105）/ 3 极兵（武力>105）。
- * 只能改成水军/玄兵/极兵；骑兵/步兵/弓兵只来自基础兵种。
+ * 道具「改兵种」字段：0 不改 / 1 水军 / 2 玄兵（智力>105）/ 3 极兵（武力>105）/
+ * 4 骑兵 / 5 步兵 / 6 弓兵。仅玄兵、极兵有属性门槛。
  */
-export type TroopTypeOverride = 0 | 1 | 2 | 3
+export type TroopTypeOverride = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 /** 各兵种基础移动力（规则身份，内联常量）。 */
 export const BASE_MOVEMENT: Record<TroopType, number> = {
@@ -47,6 +47,12 @@ export function resolveOverride(
       return effIntel > MYSTIC_INTEL_REQUIREMENT ? 'mystic' : null
     case 3:
       return effForce > ELITE_FORCE_REQUIREMENT ? 'elite' : null
+    case 4:
+      return 'cavalry'
+    case 5:
+      return 'infantry'
+    case 6:
+      return 'archer'
     default:
       return null
   }

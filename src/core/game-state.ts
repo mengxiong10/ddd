@@ -59,26 +59,6 @@ export type PendingCommand =
   | { readonly type: 'recruit'; readonly officerId: OfficerId }
 
 /**
- * 待登场池条目（判别式）：未登场武将/道具的承载，登场前不进 officers/items。
- * 除「落城才能定」的字段外存全量——officer 用 Omit<…,'cityId'>（lordId 已为 null）、
- * item 用 Omit<…,'holder'>（discovered 已为 false）；登场时由 world/debut 补全落城字段。
- * debutYear/targetCityId 为调度元数据（targetCityId=null 表示随机落城）。
- */
-export type DebutEntry =
-  | {
-      readonly type: 'officer'
-      readonly debutYear: number
-      readonly targetCityId: CityId | null
-      readonly officer: Omit<Officer, 'cityId'>
-    }
-  | {
-      readonly type: 'item'
-      readonly debutYear: number
-      readonly targetCityId: CityId | null
-      readonly item: Omit<Item, 'holder'>
-    }
-
-/**
  * 对局根状态：唯一的可变态容器，由 apply 纯函数推进。
  * 不含配置（在 GameConfig），含 RNG seed 以保证可复现。
  */
@@ -106,11 +86,6 @@ export interface GameState {
    * 即时生效指令的月末分支为空操作（仅作占用标记，出队即释放）。
    */
   readonly pendingCommands: readonly PendingCommand[]
-  /**
-   * 未登场武将/道具池（独立于 officers/items）；月末「月份+1」后到达登场年者登场并出池。
-   * 见 world/debut.runDebuts。
-   */
-  readonly pendingDebuts: readonly DebutEntry[]
   /**
    * 进行中的战斗（交互式子对局）；非 null 表示月末挂起在战斗中、经 BattleAction 推进。
    * 分胜负后由 turn.resumeMonth 写回并清空、续跑月末。普通态恒为 null。

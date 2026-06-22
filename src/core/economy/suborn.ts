@@ -33,7 +33,7 @@ const SUBORN_OK_LOYALTY_MAX = 79
 const ROLL_MAX = 99
 
 /**
- * 校验招降前置（不修改状态）。本城 = 执行人所在城（officer.cityId）。
+ * 校验招降前置（不修改状态）。本城 = 执行人所在城（officer.cityId!）。
  * 执行人存在且未占用 → captiveId 为本城俘虏 → 体力 ≥ subornStaminaCost → 城金 ≥ subornGoldCost。
  */
 export function canSuborn(
@@ -47,11 +47,11 @@ export function canSuborn(
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   const captive = state.officers[captiveId]
   if (!captive) return { ok: false, reason: 'captive-not-found' }
-  if (captive.cityId !== officer.cityId) return { ok: false, reason: 'captive-not-in-city' }
+  if (captive.cityId !== officer.cityId!) return { ok: false, reason: 'captive-not-in-city' }
   if (!isCaptive(state, captiveId)) return { ok: false, reason: 'target-not-captive' }
   if (officer.stamina < config.subornStaminaCost)
     return { ok: false, reason: 'stamina-insufficient' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
   if (city.gold < config.subornGoldCost) return { ok: false, reason: 'gold-insufficient' }
   return { ok: true }
@@ -71,13 +71,13 @@ export function suborn(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city = state.cities[officer.cityId]!
+  const city = state.cities[officer.cityId!]!
   const nextOfficer = spendStamina(officer, config.subornStaminaCost)
   const nextCity = spendGold(city, config.subornGoldCost)
 
   return commandOk({
     ...state,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'suborn', officerId, captiveId }],
   })

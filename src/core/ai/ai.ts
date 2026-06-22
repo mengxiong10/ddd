@@ -42,7 +42,7 @@ export function pickStrategy(personality: Personality, roll: number): AiStrategy
 export function aiTakeTurn(state: GameState, config: GameConfig): GameState {
   let next = runAiLevelUp(runAiBottomLine(state), config)
   const aiCities = Object.values(next.cities)
-    .filter((c) => c.lordId !== next.playerLordId)
+    .filter((c) => c.lordId !== null && c.lordId !== next.playerLordId)
     .sort(byId)
   for (const c of aiCities) next = runCityStrategy(next, c.id)
   return next
@@ -50,7 +50,9 @@ export function aiTakeTurn(state: GameState, config: GameConfig): GameState {
 
 /** 单座 AI 城：掷一次骰按君主性格选路径，委派对应叶模块。 */
 function runCityStrategy(state: GameState, cityId: CityId): GameState {
-  const lord = state.officers[state.cities[cityId]!.lordId]
+  const lordId = state.cities[cityId]!.lordId
+  if (lordId === null) return state
+  const lord = state.officers[lordId]
   if (!lord) return state
   const [roll, rng] = randInt(state.rng, 0, ROLL_MAX)
   const seeded = { ...state, rng }
@@ -71,7 +73,7 @@ function runCityStrategy(state: GameState, cityId: CityId): GameState {
 export function runAiBottomLine(state: GameState): GameState {
   const cities = { ...state.cities }
   for (const c of Object.values(state.cities)) {
-    if (c.lordId === state.playerLordId) continue
+    if (c.lordId === null || c.lordId === state.playerLordId) continue
     const normalized = raisePrevention(setStatus(c, 'normal'), AI_PREVENTION_GAIN)
     cities[c.id] =
       normalized.food < AI_FOOD_FLOOR ? { ...normalized, food: AI_FOOD_REFILL } : normalized

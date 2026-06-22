@@ -83,7 +83,7 @@ export function search(
 export function executeSearch(state: GameState, officerId: OfficerId): WithEvents<GameState> {
   const officer = state.officers[officerId]
   if (!officer) return withEvents(state)
-  const cityId = officer.cityId
+  const cityId = officer.cityId!
   const intel = effectiveOfficer(state, officerId).intelligence
   const none = (s: GameState): WithEvents<GameState> =>
     withEvents(s, [{ kind: 'search-none', officerId, cityId }])
@@ -136,9 +136,9 @@ function discoverOfficer(
   const notRecruited = (s: GameState): WithEvents<GameState> =>
     withEvents(s, [{ kind: 'search-found-not-recruited', officerId, cityId, targetId: target.id }])
 
-  if (target.recruiterId === officerId)
+  if (target.appearanceConditions.recruiterId === officerId)
     return recruited(recruit(state, target.id, executorLord, rngP)) // 伯乐本人必中
-  if (target.recruiterId === null) {
+  if (target.appearanceConditions.recruiterId === null) {
     const [roll, rngR] = randInt(rngP, 0, RECRUIT_ROLL_MAX)
     return roll < intel
       ? recruited(recruit(state, target.id, executorLord, rngR))
@@ -173,7 +173,10 @@ function discoverItem(
 
   const [pick, rngP] = randInt(rng, 0, candidates.length - 1)
   const target = candidates[pick]!
-  if (target.recruiterId === null || target.recruiterId === officerId) {
+  if (
+    target.appearanceConditions.recruiterId === null ||
+    target.appearanceConditions.recruiterId === officerId
+  ) {
     return withEvents(
       { ...state, rng: rngP, items: { ...state.items, [target.id]: discover(target) } },
       [{ kind: 'search-item', officerId, cityId, itemId: target.id }]

@@ -25,7 +25,10 @@ function unitAt(battle: BattleState, p: Position) {
 }
 
 /** 敌方接敌停步区：所有存活敌方单位的上下左右四格之并。 */
-function zocTiles(battle: BattleState, mySide: BattleState['units'][string]['side']): Set<string> {
+function zocTiles(
+  battle: BattleState,
+  mySide: BattleState['units'][OfficerId]['side']
+): Set<string> {
   const zoc = new Set<string>()
   for (const u of Object.values(battle.units)) {
     if (u.status === 'dead' || u.side === mySide) continue

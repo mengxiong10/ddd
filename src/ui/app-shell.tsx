@@ -1,6 +1,15 @@
 import { useState } from 'react'
-import { useGameStore } from '../store/game-store'
-import type { Action, City, Officer, Personality, TroopType, CityStatus } from '../store/selectors'
+import { useCurrentGame, useGameStore } from '../store/game-store'
+import type {
+  Action,
+  City,
+  CityId,
+  Officer,
+  OfficerId,
+  Personality,
+  TroopType,
+  CityStatus,
+} from '../store/selectors'
 import {
   playerCities,
   officersInCity,
@@ -91,8 +100,8 @@ function CityList({
   onSelect,
 }: {
   cities: City[]
-  selected: string
-  onSelect: (id: string) => void
+  selected: CityId
+  onSelect: (id: CityId) => void
 }) {
   return (
     <div className="panel city-list">
@@ -111,7 +120,7 @@ function CityList({
 }
 
 function CityInfo({ city }: { city: City }) {
-  const game = useGameStore((s) => s.game)
+  const game = useCurrentGame()
   const gov = governorOf(game, city.id)
   return (
     <div className="panel city-info">
@@ -141,11 +150,11 @@ function OfficerList({
   selected,
   onSelect,
 }: {
-  cityId: string
-  selected: string | null
-  onSelect: (id: string) => void
+  cityId: CityId
+  selected: OfficerId | null
+  onSelect: (id: OfficerId) => void
 }) {
-  const game = useGameStore((s) => s.game)
+  const game = useCurrentGame()
   const all = officersInCity(game, cityId)
   return (
     <div className="panel officer-list">
@@ -178,7 +187,7 @@ function OfficerList({
 }
 
 function OfficerDetail({ officer }: { officer: Officer }) {
-  const game = useGameStore((s) => s.game)
+  const game = useCurrentGame()
   const eff = effectiveOfficer(game, officer.id)
   const items = itemsOfOfficer(game, officer.id)
   return (
@@ -201,7 +210,7 @@ function OfficerDetail({ officer }: { officer: Officer }) {
 
 /** 选中武将的指令面板：即时类 / 数值类 / 道具类 / 处置类。 */
 function CommandPanel({ officer, city }: { officer: Officer; city: City }) {
-  const game = useGameStore((s) => s.game)
+  const game = useCurrentGame()
   const cityItems = itemsInCity(game, city.id).filter((i) => i.discovered)
   const heldItems = itemsOfOfficer(game, officer.id)
   const captives = captivesInCity(game, city.id)
@@ -281,17 +290,25 @@ function CommandPanel({ officer, city }: { officer: Officer; city: City }) {
   )
 }
 
-export function GameScreen() {
-  const game = useGameStore((s) => s.game)
+export interface GameScreenProps {
+  readonly onNewGame: () => void
+}
+
+export function GameScreen({ onNewGame }: GameScreenProps) {
+  const game = useCurrentGame()
   const dispatch = useGameStore((s) => s.dispatch)
-  const newGame = useGameStore((s) => s.newGame)
   const cities = playerCities(game)
 
-  const [cityId, setCityId] = useState<string>(() => cities[0]?.id ?? '')
-  const [officerId, setOfficerId] = useState<string | null>(null)
+  const [selection, setSelection] = useState(() => ({
+    game,
+    cityId: cities[0]?.id ?? 0,
+    officerId: null as OfficerId | null,
+  }))
+  const current =
+    selection.game === game ? selection : { game, cityId: cities[0]?.id ?? 0, officerId: null }
 
-  const city = game.cities[cityId] ?? cities[0]
-  const officer = officerId ? game.officers[officerId] : undefined
+  const city = game.cities[current.cityId] ?? cities[0]
+  const officer = current.officerId ? game.officers[current.officerId] : undefined
   const lord = game.officers[game.playerLordId]
 
   return (
@@ -304,22 +321,27 @@ export function GameScreen() {
         <button className="endmonth" onClick={() => dispatch({ type: 'endMonth' })}>
           结束策略（月末）
         </button>
-        <button className="newgame" onClick={() => newGame(Date.now() >>> 0)}>
+        <button className="newgame" onClick={onNewGame}>
           新游戏
         </button>
       </header>
       <div className="layout">
         <CityList
           cities={cities}
-          selected={city?.id ?? ''}
+          selected={city?.id ?? 0}
           onSelect={(id) => {
-            setCityId(id)
-            setOfficerId(null)
+            setSelection({ game, cityId: id, officerId: null })
           }}
         />
         <div className="center">
           {city && <CityInfo city={city} />}
-          {city && <OfficerList cityId={city.id} selected={officerId} onSelect={setOfficerId} />}
+          {city && (
+            <OfficerList
+              cityId={city.id}
+              selected={current.officerId}
+              onSelect={(id) => setSelection({ game, cityId: city.id, officerId: id })}
+            />
+          )}
         </div>
         <div className="right">
           {officer && <OfficerDetail officer={officer} />}

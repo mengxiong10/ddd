@@ -1,0 +1,8060 @@
+{
+  "appearance_conditions": {
+    "period_1": [
+      {
+        "id": 1,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 2,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 3,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 4,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 5,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 6,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 7,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 8,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 9,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 10,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 11,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 12,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 13,
+        "birth": 0,
+        "bole": 0,
+        "city": 38
+      },
+      {
+        "id": 14,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 15,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 16,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 17,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 18,
+        "birth": 0,
+        "bole": 0,
+        "city": 3
+      },
+      {
+        "id": 19,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 20,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 21,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 22,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 23,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 24,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 25,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 26,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 27,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 28,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 29,
+        "birth": 180,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 30,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 31,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 32,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 33,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 34,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 35,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 36,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 37,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 38,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 39,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 40,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 41,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 42,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 43,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 44,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 45,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 46,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 47,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 48,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 49,
+        "birth": 176,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 50,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 51,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 52,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 53,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 54,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 55,
+        "birth": 175,
+        "bole": 5,
+        "city": 34
+      },
+      {
+        "id": 56,
+        "birth": 182,
+        "bole": 5,
+        "city": 34
+      },
+      {
+        "id": 57,
+        "birth": 0,
+        "bole": 0,
+        "city": 1
+      },
+      {
+        "id": 58,
+        "birth": 0,
+        "bole": 0,
+        "city": 1
+      },
+      {
+        "id": 59,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 60,
+        "birth": 176,
+        "bole": 0,
+        "city": 4
+      },
+      {
+        "id": 61,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 62,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 63,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 64,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 65,
+        "birth": 0,
+        "bole": 0,
+        "city": 4
+      },
+      {
+        "id": 66,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 67,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 68,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 69,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 70,
+        "birth": 197,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 71,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 72,
+        "birth": 0,
+        "bole": 0,
+        "city": 18
+      },
+      {
+        "id": 73,
+        "birth": 0,
+        "bole": 0,
+        "city": 19
+      },
+      {
+        "id": 74,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 75,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 76,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 77,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 78,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 79,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 80,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 81,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 82,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 83,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 84,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 85,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 86,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 87,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 88,
+        "birth": 0,
+        "bole": 0,
+        "city": 38
+      },
+      {
+        "id": 89,
+        "birth": 0,
+        "bole": 0,
+        "city": 38
+      },
+      {
+        "id": 90,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 91,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 92,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 93,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 94,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 95,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 96,
+        "birth": 0,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 97,
+        "birth": 0,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 98,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 99,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 100,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 101,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 102,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 103,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 104,
+        "birth": 0,
+        "bole": 0,
+        "city": 3
+      },
+      {
+        "id": 105,
+        "birth": 0,
+        "bole": 0,
+        "city": 3
+      },
+      {
+        "id": 106,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 107,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 108,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 109,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 110,
+        "birth": 189,
+        "bole": 0,
+        "city": 29
+      },
+      {
+        "id": 111,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 112,
+        "birth": 175,
+        "bole": 127,
+        "city": 13
+      },
+      {
+        "id": 113,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 114,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 115,
+        "birth": 176,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 116,
+        "birth": 183,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 117,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 118,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 119,
+        "birth": 178,
+        "bole": 0,
+        "city": 29
+      },
+      {
+        "id": 120,
+        "birth": 193,
+        "bole": 0,
+        "city": 26
+      },
+      {
+        "id": 121,
+        "birth": 192,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 122,
+        "birth": 187,
+        "bole": 147,
+        "city": 27
+      },
+      {
+        "id": 123,
+        "birth": 190,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 124,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 125,
+        "birth": 179,
+        "bole": 158,
+        "city": 27
+      },
+      {
+        "id": 126,
+        "birth": 187,
+        "bole": 90,
+        "city": 6
+      },
+      {
+        "id": 127,
+        "birth": 0,
+        "bole": 117,
+        "city": 13
+      },
+      {
+        "id": 128,
+        "birth": 0,
+        "bole": 0,
+        "city": 35
+      },
+      {
+        "id": 129,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 130,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 131,
+        "birth": 0,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 132,
+        "birth": 178,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 133,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 134,
+        "birth": 0,
+        "bole": 5,
+        "city": 34
+      },
+      {
+        "id": 135,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 136,
+        "birth": 180,
+        "bole": 14,
+        "city": 27
+      },
+      {
+        "id": 137,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 138,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 139,
+        "birth": 0,
+        "bole": 2,
+        "city": 12
+      },
+      {
+        "id": 140,
+        "birth": 176,
+        "bole": 0,
+        "city": 38
+      },
+      {
+        "id": 141,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 142,
+        "birth": 0,
+        "bole": 0,
+        "city": 31
+      },
+      {
+        "id": 143,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 144,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 145,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 146,
+        "birth": 175,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 147,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 148,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 149,
+        "birth": 179,
+        "bole": 3,
+        "city": 7
+      },
+      {
+        "id": 150,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 151,
+        "birth": 176,
+        "bole": 3,
+        "city": 7
+      },
+      {
+        "id": 152,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 153,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 154,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 155,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 156,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 157,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 158,
+        "birth": 181,
+        "bole": 14,
+        "city": 27
+      },
+      {
+        "id": 159,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 160,
+        "birth": 190,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 161,
+        "birth": 177,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 162,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 163,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 164,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 165,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 166,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 167,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 168,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 169,
+        "birth": 192,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 170,
+        "birth": 175,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 171,
+        "birth": 177,
+        "bole": 0,
+        "city": 20
+      },
+      {
+        "id": 172,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 173,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 174,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 175,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 176,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 177,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 178,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 179,
+        "birth": 178,
+        "bole": 0,
+        "city": 30
+      },
+      {
+        "id": 180,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 181,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 182,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 183,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 184,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 185,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 186,
+        "birth": 0,
+        "bole": 72,
+        "city": 31
+      },
+      {
+        "id": 187,
+        "birth": 0,
+        "bole": 72,
+        "city": 36
+      },
+      {
+        "id": 188,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 189,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 190,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 191,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 192,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 193,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 194,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 195,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 196,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 197,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 198,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 199,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 200,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      }
+    ],
+    "period_2": [
+      {
+        "id": 1,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 2,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 3,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 4,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 5,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 6,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 7,
+        "birth": 0,
+        "bole": 0,
+        "city": 38
+      },
+      {
+        "id": 8,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 9,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 10,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 11,
+        "birth": 0,
+        "bole": 0,
+        "city": 3
+      },
+      {
+        "id": 12,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 13,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 14,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 15,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 16,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 17,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 18,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 19,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 20,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 21,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 22,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 23,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 24,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 25,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 26,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 27,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 28,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 29,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 30,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 31,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 32,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 33,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 34,
+        "birth": 0,
+        "bole": 0,
+        "city": 18
+      },
+      {
+        "id": 35,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 36,
+        "birth": 0,
+        "bole": 0,
+        "city": 19
+      },
+      {
+        "id": 37,
+        "birth": 0,
+        "bole": 0,
+        "city": 19
+      },
+      {
+        "id": 38,
+        "birth": 0,
+        "bole": 0,
+        "city": 18
+      },
+      {
+        "id": 39,
+        "birth": 0,
+        "bole": 0,
+        "city": 18
+      },
+      {
+        "id": 40,
+        "birth": 0,
+        "bole": 0,
+        "city": 19
+      },
+      {
+        "id": 41,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 42,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 43,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 44,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 45,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 46,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 47,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 48,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 49,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 50,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 51,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 52,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 53,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 54,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 55,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 56,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 57,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 58,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 59,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 60,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 61,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 62,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 63,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 64,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 65,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 66,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 67,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 68,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 69,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 70,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 71,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 72,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 73,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 74,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 75,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 76,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 77,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 78,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 79,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 80,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 81,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 82,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 83,
+        "birth": 0,
+        "bole": 0,
+        "city": 38
+      },
+      {
+        "id": 84,
+        "birth": 0,
+        "bole": 0,
+        "city": 38
+      },
+      {
+        "id": 85,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 86,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 87,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 88,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 89,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 90,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 91,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 92,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 93,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 94,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 95,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 96,
+        "birth": 0,
+        "bole": 0,
+        "city": 34
+      },
+      {
+        "id": 97,
+        "birth": 0,
+        "bole": 0,
+        "city": 3
+      },
+      {
+        "id": 98,
+        "birth": 0,
+        "bole": 0,
+        "city": 3
+      },
+      {
+        "id": 99,
+        "birth": 0,
+        "bole": 0,
+        "city": 1
+      },
+      {
+        "id": 100,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 101,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 102,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 103,
+        "birth": 0,
+        "bole": 0,
+        "city": 4
+      },
+      {
+        "id": 104,
+        "birth": 0,
+        "bole": 0,
+        "city": 4
+      },
+      {
+        "id": 105,
+        "birth": 0,
+        "bole": 0,
+        "city": 1
+      },
+      {
+        "id": 106,
+        "birth": 0,
+        "bole": 0,
+        "city": 1
+      },
+      {
+        "id": 107,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 108,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 109,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 110,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 111,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 112,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 113,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 114,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 115,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 116,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 117,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 118,
+        "birth": 0,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 119,
+        "birth": 0,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 120,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 121,
+        "birth": 0,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 122,
+        "birth": 0,
+        "bole": 0,
+        "city": 28
+      },
+      {
+        "id": 123,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 124,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 125,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 126,
+        "birth": 0,
+        "bole": 0,
+        "city": 20
+      },
+      {
+        "id": 127,
+        "birth": 0,
+        "bole": 0,
+        "city": 26
+      },
+      {
+        "id": 128,
+        "birth": 0,
+        "bole": 0,
+        "city": 26
+      },
+      {
+        "id": 129,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 130,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 131,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 132,
+        "birth": 0,
+        "bole": 0,
+        "city": 20
+      },
+      {
+        "id": 133,
+        "birth": 0,
+        "bole": 0,
+        "city": 20
+      },
+      {
+        "id": 134,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 135,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 136,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 137,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 138,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 139,
+        "birth": 0,
+        "bole": 0,
+        "city": 15
+      },
+      {
+        "id": 140,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 141,
+        "birth": 0,
+        "bole": 30,
+        "city": 0
+      },
+      {
+        "id": 142,
+        "birth": 0,
+        "bole": 141,
+        "city": 0
+      },
+      {
+        "id": 143,
+        "birth": 0,
+        "bole": 142,
+        "city": 0
+      },
+      {
+        "id": 144,
+        "birth": 0,
+        "bole": 142,
+        "city": 0
+      },
+      {
+        "id": 145,
+        "birth": 0,
+        "bole": 143,
+        "city": 0
+      },
+      {
+        "id": 146,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 147,
+        "birth": 0,
+        "bole": 29,
+        "city": 17
+      },
+      {
+        "id": 148,
+        "birth": 0,
+        "bole": 147,
+        "city": 17
+      },
+      {
+        "id": 149,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 150,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 151,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 152,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 153,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 154,
+        "birth": 192,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 155,
+        "birth": 193,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 156,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 157,
+        "birth": 190,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 158,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 159,
+        "birth": 191,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 160,
+        "birth": 0,
+        "bole": 3,
+        "city": 0
+      },
+      {
+        "id": 161,
+        "birth": 187,
+        "bole": 3,
+        "city": 0
+      },
+      {
+        "id": 162,
+        "birth": 190,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 163,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 164,
+        "birth": 0,
+        "bole": 3,
+        "city": 18
+      },
+      {
+        "id": 165,
+        "birth": 187,
+        "bole": 32,
+        "city": 0
+      },
+      {
+        "id": 166,
+        "birth": 0,
+        "bole": 32,
+        "city": 0
+      },
+      {
+        "id": 167,
+        "birth": 0,
+        "bole": 32,
+        "city": 0
+      },
+      {
+        "id": 168,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 169,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 170,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 171,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 172,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 173,
+        "birth": 195,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 174,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 175,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 176,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 177,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 178,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 179,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 180,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 181,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 182,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 183,
+        "birth": 183,
+        "bole": 3,
+        "city": 27
+      },
+      {
+        "id": 184,
+        "birth": 0,
+        "bole": 118,
+        "city": 19
+      },
+      {
+        "id": 185,
+        "birth": 0,
+        "bole": 10,
+        "city": 1
+      },
+      {
+        "id": 186,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 187,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 188,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 189,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 190,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 191,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 192,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 193,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 194,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 195,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 196,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 197,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 198,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 199,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 200,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      }
+    ],
+    "period_3": [
+      {
+        "id": 1,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 2,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 3,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 4,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 5,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 6,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 7,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 8,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 9,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 10,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 11,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 12,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 13,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 14,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 15,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 16,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 17,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 18,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 19,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 20,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 21,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 22,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 23,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 24,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 25,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 26,
+        "birth": 0,
+        "bole": 0,
+        "city": 6
+      },
+      {
+        "id": 27,
+        "birth": 0,
+        "bole": 0,
+        "city": 7
+      },
+      {
+        "id": 28,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 29,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 30,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 31,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 32,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 33,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 34,
+        "birth": 0,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 35,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 36,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 37,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 38,
+        "birth": 0,
+        "bole": 0,
+        "city": 2
+      },
+      {
+        "id": 39,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 40,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 41,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 42,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 43,
+        "birth": 0,
+        "bole": 0,
+        "city": 12
+      },
+      {
+        "id": 44,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 45,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 46,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 47,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 48,
+        "birth": 0,
+        "bole": 0,
+        "city": 8
+      },
+      {
+        "id": 49,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 50,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 51,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 52,
+        "birth": 0,
+        "bole": 0,
+        "city": 13
+      },
+      {
+        "id": 53,
+        "birth": 0,
+        "bole": 0,
+        "city": 16
+      },
+      {
+        "id": 54,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 55,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 56,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 57,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 58,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 59,
+        "birth": 0,
+        "bole": 0,
+        "city": 14
+      },
+      {
+        "id": 60,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 61,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 62,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 63,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 64,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 65,
+        "birth": 0,
+        "bole": 0,
+        "city": 5
+      },
+      {
+        "id": 66,
+        "birth": 0,
+        "bole": 0,
+        "city": 22
+      },
+      {
+        "id": 67,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 68,
+        "birth": 0,
+        "bole": 0,
+        "city": 21
+      },
+      {
+        "id": 69,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 70,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 71,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 72,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 73,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 74,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 75,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 76,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 77,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 78,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 79,
+        "birth": 0,
+        "bole": 0,
+        "city": 27
+      },
+      {
+        "id": 80,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 81,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 82,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 83,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 84,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 85,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 86,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 87,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 88,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 89,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 90,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 91,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 92,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 93,
+        "birth": 0,
+        "bole": 0,
+        "city": 29
+      },
+      {
+        "id": 94,
+        "birth": 0,
+        "bole": 0,
+        "city": 29
+      },
+      {
+        "id": 95,
+        "birth": 0,
+        "bole": 0,
+        "city": 29
+      },
+      {
+        "id": 96,
+        "birth": 0,
+        "bole": 0,
+        "city": 23
+      },
+      {
+        "id": 97,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 98,
+        "birth": 0,
+        "bole": 0,
+        "city": 30
+      },
+      {
+        "id": 99,
+        "birth": 0,
+        "bole": 0,
+        "city": 35
+      },
+      {
+        "id": 100,
+        "birth": 0,
+        "bole": 0,
+        "city": 35
+      },
+      {
+        "id": 101,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 102,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 103,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 104,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 105,
+        "birth": 0,
+        "bole": 0,
+        "city": 29
+      },
+      {
+        "id": 106,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 107,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 108,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 109,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 110,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 111,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 112,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 113,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 114,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 115,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 116,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 117,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 118,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 119,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 120,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 121,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 122,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 123,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 124,
+        "birth": 0,
+        "bole": 0,
+        "city": 1
+      },
+      {
+        "id": 125,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 126,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 127,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 128,
+        "birth": 0,
+        "bole": 0,
+        "city": 4
+      },
+      {
+        "id": 129,
+        "birth": 0,
+        "bole": 0,
+        "city": 4
+      },
+      {
+        "id": 130,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 131,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 132,
+        "birth": 0,
+        "bole": 0,
+        "city": 9
+      },
+      {
+        "id": 133,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 134,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 135,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 136,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 137,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 138,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 139,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 140,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 141,
+        "birth": 0,
+        "bole": 0,
+        "city": 20
+      },
+      {
+        "id": 142,
+        "birth": 0,
+        "bole": 0,
+        "city": 26
+      },
+      {
+        "id": 143,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 144,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 145,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 146,
+        "birth": 0,
+        "bole": 0,
+        "city": 26
+      },
+      {
+        "id": 147,
+        "birth": 0,
+        "bole": 0,
+        "city": 20
+      },
+      {
+        "id": 148,
+        "birth": 0,
+        "bole": 0,
+        "city": 20
+      },
+      {
+        "id": 149,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 150,
+        "birth": 0,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 151,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 152,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 153,
+        "birth": 0,
+        "bole": 0,
+        "city": 26
+      },
+      {
+        "id": 154,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 155,
+        "birth": 193,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 156,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 157,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 158,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 159,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 160,
+        "birth": 205,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 161,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 162,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 163,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 164,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 165,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 166,
+        "birth": 0,
+        "bole": 91,
+        "city": 27
+      },
+      {
+        "id": 167,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 168,
+        "birth": 197,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 169,
+        "birth": 225,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 170,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 171,
+        "birth": 206,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 172,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 173,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 174,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 175,
+        "birth": 226,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 176,
+        "birth": 212,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 177,
+        "birth": 205,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 178,
+        "birth": 194,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 179,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 180,
+        "birth": 194,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 181,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 182,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 183,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 184,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 185,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 186,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 187,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 188,
+        "birth": 0,
+        "bole": 176,
+        "city": 11
+      },
+      {
+        "id": 189,
+        "birth": 0,
+        "bole": 135,
+        "city": 32
+      },
+      {
+        "id": 190,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 191,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 192,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 193,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 194,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 195,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 196,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 197,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 198,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 199,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 200,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      }
+    ],
+    "period_4": [
+      {
+        "id": 1,
+        "birth": 0,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 2,
+        "birth": 0,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 3,
+        "birth": 0,
+        "bole": 0,
+        "city": 24
+      },
+      {
+        "id": 4,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 5,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 6,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 7,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 8,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 9,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 10,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 11,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 12,
+        "birth": 0,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 13,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 14,
+        "birth": 210,
+        "bole": 0,
+        "city": 1
+      },
+      {
+        "id": 15,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 16,
+        "birth": 210,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 17,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 18,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 19,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 20,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 21,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 22,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 23,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 24,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 25,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 26,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 27,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 28,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 29,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 30,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 31,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 32,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 33,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 34,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 35,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 36,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 37,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 38,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 39,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 40,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 41,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 42,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 43,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 44,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 45,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 46,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 47,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 48,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 49,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 50,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 51,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 52,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 53,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 54,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 55,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 56,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 57,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 58,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 59,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 60,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 61,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 62,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 63,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 64,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 65,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 66,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 67,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 68,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 69,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 70,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 71,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 72,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 73,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 74,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 75,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 76,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 77,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 78,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 79,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 80,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 81,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 82,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 83,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 84,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 85,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 86,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 87,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 88,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 89,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 90,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 91,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 92,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 93,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 94,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 95,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 96,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 97,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 98,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 99,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 100,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 101,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 102,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 103,
+        "birth": 210,
+        "bole": 0,
+        "city": 33
+      },
+      {
+        "id": 104,
+        "birth": 210,
+        "bole": 0,
+        "city": 32
+      },
+      {
+        "id": 105,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 106,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 107,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 108,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 109,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 110,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 111,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 112,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 113,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 114,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 115,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 116,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 117,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 118,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 119,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 120,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 121,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 122,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 123,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 124,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 125,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 126,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 127,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 128,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 129,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 130,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 131,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 132,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 133,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 134,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 135,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 136,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 137,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 138,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 139,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 140,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 141,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 142,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 143,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 144,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 145,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 146,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 147,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 148,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 149,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 150,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 151,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 152,
+        "birth": 225,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 153,
+        "birth": 210,
+        "bole": 0,
+        "city": 17
+      },
+      {
+        "id": 154,
+        "birth": 210,
+        "bole": 0,
+        "city": 11
+      },
+      {
+        "id": 155,
+        "birth": 221,
+        "bole": 0,
+        "city": 10
+      },
+      {
+        "id": 156,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 157,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 158,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 159,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 160,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 161,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 162,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 163,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 164,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 165,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 166,
+        "birth": 212,
+        "bole": 0,
+        "city": 25
+      },
+      {
+        "id": 167,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 168,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 169,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 170,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 171,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 172,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 173,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 174,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 175,
+        "birth": 210,
+        "bole": 2,
+        "city": 20
+      },
+      {
+        "id": 176,
+        "birth": 0,
+        "bole": 4,
+        "city": 5
+      },
+      {
+        "id": 177,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 178,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 179,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 180,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 181,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 182,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 183,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 184,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 185,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 186,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 187,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 188,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 189,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 190,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 191,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 192,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 193,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 194,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 195,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 196,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 197,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 198,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 199,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      },
+      {
+        "id": 200,
+        "birth": 0,
+        "bole": 0,
+        "city": 0
+      }
+    ]
+  },
+  "special_skill_ids": {
+    "period_1": [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30,
+      23, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    ],
+    "period_2": [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 22, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 23,
+      23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    ],
+    "period_3": [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30,
+      0, 23, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    ],
+    "period_4": [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    ]
+  },
+  "names": {
+    "period_1": [
+      {
+        "index": 1,
+        "value": "董卓"
+      },
+      {
+        "index": 2,
+        "value": "曹操"
+      },
+      {
+        "index": 3,
+        "value": "袁绍"
+      },
+      {
+        "index": 4,
+        "value": "袁术"
+      },
+      {
+        "index": 5,
+        "value": "孙坚"
+      },
+      {
+        "index": 6,
+        "value": "马腾"
+      },
+      {
+        "index": 7,
+        "value": "陶谦"
+      },
+      {
+        "index": 8,
+        "value": "孔融"
+      },
+      {
+        "index": 9,
+        "value": "刘岱"
+      },
+      {
+        "index": 10,
+        "value": "张杨"
+      },
+      {
+        "index": 11,
+        "value": "韩馥"
+      },
+      {
+        "index": 12,
+        "value": "王匡"
+      },
+      {
+        "index": 13,
+        "value": "张邈"
+      },
+      {
+        "index": 14,
+        "value": "刘备"
+      },
+      {
+        "index": 15,
+        "value": "刘表"
+      },
+      {
+        "index": 16,
+        "value": "刘焉"
+      },
+      {
+        "index": 17,
+        "value": "公孙瓒"
+      },
+      {
+        "index": 18,
+        "value": "公孙度"
+      },
+      {
+        "index": 19,
+        "value": "张鲁"
+      },
+      {
+        "index": 20,
+        "value": "李儒"
+      },
+      {
+        "index": 21,
+        "value": "吕布"
+      },
+      {
+        "index": 22,
+        "value": "华雄"
+      },
+      {
+        "index": 23,
+        "value": "张辽"
+      },
+      {
+        "index": 24,
+        "value": "张宏"
+      },
+      {
+        "index": 25,
+        "value": "郭汜"
+      },
+      {
+        "index": 26,
+        "value": "李肃"
+      },
+      {
+        "index": 27,
+        "value": "侯成"
+      },
+      {
+        "index": 28,
+        "value": "高顺"
+      },
+      {
+        "index": 29,
+        "value": "徐荣"
+      },
+      {
+        "index": 30,
+        "value": "牛辅"
+      },
+      {
+        "index": 31,
+        "value": "王允"
+      },
+      {
+        "index": 32,
+        "value": "荀攸"
+      },
+      {
+        "index": 33,
+        "value": "李决"
+      },
+      {
+        "index": 34,
+        "value": "夏侯渊"
+      },
+      {
+        "index": 35,
+        "value": "李典"
+      },
+      {
+        "index": 36,
+        "value": "乐进"
+      },
+      {
+        "index": 37,
+        "value": "曹洪"
+      },
+      {
+        "index": 38,
+        "value": "曹仁"
+      },
+      {
+        "index": 39,
+        "value": "颜良"
+      },
+      {
+        "index": 40,
+        "value": "文丑"
+      },
+      {
+        "index": 41,
+        "value": "淳于琼"
+      },
+      {
+        "index": 42,
+        "value": "逢纪"
+      },
+      {
+        "index": 43,
+        "value": "审配"
+      },
+      {
+        "index": 44,
+        "value": "田丰"
+      },
+      {
+        "index": 45,
+        "value": "沮授"
+      },
+      {
+        "index": 46,
+        "value": "许攸"
+      },
+      {
+        "index": 47,
+        "value": "纪灵"
+      },
+      {
+        "index": 48,
+        "value": "陈兰"
+      },
+      {
+        "index": 49,
+        "value": "雷薄"
+      },
+      {
+        "index": 50,
+        "value": "俞涉"
+      },
+      {
+        "index": 51,
+        "value": "程普"
+      },
+      {
+        "index": 52,
+        "value": "韩当"
+      },
+      {
+        "index": 53,
+        "value": "黄盖"
+      },
+      {
+        "index": 54,
+        "value": "祖茂"
+      },
+      {
+        "index": 55,
+        "value": "孙策"
+      },
+      {
+        "index": 56,
+        "value": "孙权"
+      },
+      {
+        "index": 57,
+        "value": "韩遂"
+      },
+      {
+        "index": 58,
+        "value": "马超"
+      },
+      {
+        "index": 59,
+        "value": "庞德"
+      },
+      {
+        "index": 60,
+        "value": "侯选"
+      },
+      {
+        "index": 61,
+        "value": "程银"
+      },
+      {
+        "index": 62,
+        "value": "李堪"
+      },
+      {
+        "index": 63,
+        "value": "张横"
+      },
+      {
+        "index": 64,
+        "value": "梁兴"
+      },
+      {
+        "index": 65,
+        "value": "成宜"
+      },
+      {
+        "index": 66,
+        "value": "马玩"
+      },
+      {
+        "index": 67,
+        "value": "杨秋"
+      },
+      {
+        "index": 68,
+        "value": "陈圭"
+      },
+      {
+        "index": 69,
+        "value": "陈登"
+      },
+      {
+        "index": 70,
+        "value": "孙乾"
+      },
+      {
+        "index": 71,
+        "value": "糜竺"
+      },
+      {
+        "index": 72,
+        "value": "糜芳"
+      },
+      {
+        "index": 73,
+        "value": "曹豹"
+      },
+      {
+        "index": 74,
+        "value": "太史慈"
+      },
+      {
+        "index": 75,
+        "value": "武安国"
+      },
+      {
+        "index": 76,
+        "value": "刘繇"
+      },
+      {
+        "index": 77,
+        "value": "乔瑁"
+      },
+      {
+        "index": 78,
+        "value": "袁遗"
+      },
+      {
+        "index": 79,
+        "value": "董昭"
+      },
+      {
+        "index": 80,
+        "value": "穆顺"
+      },
+      {
+        "index": 81,
+        "value": "潘凤"
+      },
+      {
+        "index": 82,
+        "value": "荀谌"
+      },
+      {
+        "index": 83,
+        "value": "辛评"
+      },
+      {
+        "index": 84,
+        "value": "关纯"
+      },
+      {
+        "index": 85,
+        "value": "耿武"
+      },
+      {
+        "index": 86,
+        "value": "方悦"
+      },
+      {
+        "index": 87,
+        "value": "陈宫"
+      },
+      {
+        "index": 88,
+        "value": "典韦"
+      },
+      {
+        "index": 89,
+        "value": "张超"
+      },
+      {
+        "index": 90,
+        "value": "关羽"
+      },
+      {
+        "index": 91,
+        "value": "张飞"
+      },
+      {
+        "index": 92,
+        "value": "蒯良"
+      },
+      {
+        "index": 93,
+        "value": "蒯越"
+      },
+      {
+        "index": 94,
+        "value": "蔡瑁"
+      },
+      {
+        "index": 95,
+        "value": "张允"
+      },
+      {
+        "index": 96,
+        "value": "黄祖"
+      },
+      {
+        "index": 97,
+        "value": "甘宁"
+      },
+      {
+        "index": 98,
+        "value": "张任"
+      },
+      {
+        "index": 99,
+        "value": "严颜"
+      },
+      {
+        "index": 100,
+        "value": "公孙越"
+      },
+      {
+        "index": 101,
+        "value": "严纲"
+      },
+      {
+        "index": 102,
+        "value": "王门"
+      },
+      {
+        "index": 103,
+        "value": "田楷"
+      },
+      {
+        "index": 104,
+        "value": "公孙康"
+      },
+      {
+        "index": 105,
+        "value": "公孙恭"
+      },
+      {
+        "index": 106,
+        "value": "张卫"
+      },
+      {
+        "index": 107,
+        "value": "杨松"
+      },
+      {
+        "index": 108,
+        "value": "杨任"
+      },
+      {
+        "index": 109,
+        "value": "阎圃"
+      },
+      {
+        "index": 110,
+        "value": "凌统"
+      },
+      {
+        "index": 111,
+        "value": "曹休"
+      },
+      {
+        "index": 112,
+        "value": "刘晔"
+      },
+      {
+        "index": 113,
+        "value": "陈群"
+      },
+      {
+        "index": 114,
+        "value": "刘璋"
+      },
+      {
+        "index": 115,
+        "value": "陈武"
+      },
+      {
+        "index": 116,
+        "value": "陆逊"
+      },
+      {
+        "index": 117,
+        "value": "程昱"
+      },
+      {
+        "index": 118,
+        "value": "吕范"
+      },
+      {
+        "index": 119,
+        "value": "吕蒙"
+      },
+      {
+        "index": 120,
+        "value": "费祎"
+      },
+      {
+        "index": 121,
+        "value": "董允"
+      },
+      {
+        "index": 122,
+        "value": "马良"
+      },
+      {
+        "index": 123,
+        "value": "马谡"
+      },
+      {
+        "index": 124,
+        "value": "满宠"
+      },
+      {
+        "index": 125,
+        "value": "庞统"
+      },
+      {
+        "index": 126,
+        "value": "关平"
+      },
+      {
+        "index": 127,
+        "value": "郭嘉"
+      },
+      {
+        "index": 128,
+        "value": "王朗"
+      },
+      {
+        "index": 129,
+        "value": "虞翻"
+      },
+      {
+        "index": 130,
+        "value": "华歆"
+      },
+      {
+        "index": 131,
+        "value": "蒋琬"
+      },
+      {
+        "index": 132,
+        "value": "文聘"
+      },
+      {
+        "index": 133,
+        "value": "贾诩"
+      },
+      {
+        "index": 134,
+        "value": "蒋钦"
+      },
+      {
+        "index": 135,
+        "value": "辛毗"
+      },
+      {
+        "index": 136,
+        "value": "徐庶"
+      },
+      {
+        "index": 137,
+        "value": "雷铜"
+      },
+      {
+        "index": 138,
+        "value": "许褚"
+      },
+      {
+        "index": 139,
+        "value": "荀或"
+      },
+      {
+        "index": 140,
+        "value": "法正"
+      },
+      {
+        "index": 141,
+        "value": "张松"
+      },
+      {
+        "index": 142,
+        "value": "孟达"
+      },
+      {
+        "index": 143,
+        "value": "李严"
+      },
+      {
+        "index": 144,
+        "value": "吴懿"
+      },
+      {
+        "index": 145,
+        "value": "黄权"
+      },
+      {
+        "index": 146,
+        "value": "杨修"
+      },
+      {
+        "index": 147,
+        "value": "伊籍"
+      },
+      {
+        "index": 148,
+        "value": "于禁"
+      },
+      {
+        "index": 149,
+        "value": "袁尚"
+      },
+      {
+        "index": 150,
+        "value": "袁谭"
+      },
+      {
+        "index": 151,
+        "value": "袁熙"
+      },
+      {
+        "index": 152,
+        "value": "夏侯敦"
+      },
+      {
+        "index": 153,
+        "value": "张昭"
+      },
+      {
+        "index": 154,
+        "value": "周仓"
+      },
+      {
+        "index": 155,
+        "value": "廖化"
+      },
+      {
+        "index": 156,
+        "value": "周泰"
+      },
+      {
+        "index": 157,
+        "value": "诸葛谨"
+      },
+      {
+        "index": 158,
+        "value": "诸葛亮"
+      },
+      {
+        "index": 159,
+        "value": "郭图"
+      },
+      {
+        "index": 160,
+        "value": "张南"
+      },
+      {
+        "index": 161,
+        "value": "朱桓"
+      },
+      {
+        "index": 162,
+        "value": "张绣"
+      },
+      {
+        "index": 163,
+        "value": "钟繇"
+      },
+      {
+        "index": 164,
+        "value": "徐晃"
+      },
+      {
+        "index": 165,
+        "value": "凌操"
+      },
+      {
+        "index": 166,
+        "value": "张合"
+      },
+      {
+        "index": 167,
+        "value": "赵云"
+      },
+      {
+        "index": 168,
+        "value": "臧霸"
+      },
+      {
+        "index": 169,
+        "value": "王平"
+      },
+      {
+        "index": 170,
+        "value": "魏延"
+      },
+      {
+        "index": 171,
+        "value": "王粲"
+      },
+      {
+        "index": 172,
+        "value": "鲁肃"
+      },
+      {
+        "index": 173,
+        "value": "丁奉"
+      },
+      {
+        "index": 174,
+        "value": "王威"
+      },
+      {
+        "index": 175,
+        "value": "王修"
+      },
+      {
+        "index": 176,
+        "value": "王累"
+      },
+      {
+        "index": 177,
+        "value": "简雍"
+      },
+      {
+        "index": 178,
+        "value": "向朗"
+      },
+      {
+        "index": 179,
+        "value": "阚泽"
+      },
+      {
+        "index": 180,
+        "value": "黄忠"
+      },
+      {
+        "index": 181,
+        "value": "高览"
+      },
+      {
+        "index": 182,
+        "value": "高干"
+      },
+      {
+        "index": 183,
+        "value": "王忠"
+      },
+      {
+        "index": 184,
+        "value": "管辂"
+      },
+      {
+        "index": 185,
+        "value": "华佗"
+      },
+      {
+        "index": 186,
+        "value": "通宵虫"
+      },
+      {
+        "index": 187,
+        "value": "南方小鬼"
+      },
+      {
+        "index": 188,
+        "value": ""
+      },
+      {
+        "index": 189,
+        "value": ""
+      },
+      {
+        "index": 190,
+        "value": ""
+      },
+      {
+        "index": 191,
+        "value": ""
+      },
+      {
+        "index": 192,
+        "value": ""
+      },
+      {
+        "index": 193,
+        "value": ""
+      },
+      {
+        "index": 194,
+        "value": ""
+      },
+      {
+        "index": 195,
+        "value": ""
+      },
+      {
+        "index": 196,
+        "value": ""
+      },
+      {
+        "index": 197,
+        "value": ""
+      },
+      {
+        "index": 198,
+        "value": ""
+      },
+      {
+        "index": 199,
+        "value": ""
+      },
+      {
+        "index": 200,
+        "value": ""
+      }
+    ],
+    "period_2": [
+      {
+        "index": 1,
+        "value": "张合"
+      },
+      {
+        "index": 2,
+        "value": "曹操"
+      },
+      {
+        "index": 3,
+        "value": "刘备"
+      },
+      {
+        "index": 4,
+        "value": "袁绍"
+      },
+      {
+        "index": 5,
+        "value": "袁术"
+      },
+      {
+        "index": 6,
+        "value": "孙策"
+      },
+      {
+        "index": 7,
+        "value": "张邈"
+      },
+      {
+        "index": 8,
+        "value": "张绣"
+      },
+      {
+        "index": 9,
+        "value": "吕布"
+      },
+      {
+        "index": 10,
+        "value": "韩玄"
+      },
+      {
+        "index": 11,
+        "value": "公孙度"
+      },
+      {
+        "index": 12,
+        "value": "马腾"
+      },
+      {
+        "index": 13,
+        "value": "刘表"
+      },
+      {
+        "index": 14,
+        "value": "刘璋"
+      },
+      {
+        "index": 15,
+        "value": "张鲁"
+      },
+      {
+        "index": 16,
+        "value": "孔融"
+      },
+      {
+        "index": 17,
+        "value": "李肃"
+      },
+      {
+        "index": 18,
+        "value": "郭汜"
+      },
+      {
+        "index": 19,
+        "value": "牛辅"
+      },
+      {
+        "index": 20,
+        "value": "李决"
+      },
+      {
+        "index": 21,
+        "value": "夏侯渊"
+      },
+      {
+        "index": 22,
+        "value": "李典"
+      },
+      {
+        "index": 23,
+        "value": "乐进"
+      },
+      {
+        "index": 24,
+        "value": "曹洪"
+      },
+      {
+        "index": 25,
+        "value": "曹仁"
+      },
+      {
+        "index": 26,
+        "value": "夏侯恩"
+      },
+      {
+        "index": 27,
+        "value": "刘岱"
+      },
+      {
+        "index": 28,
+        "value": "王忠"
+      },
+      {
+        "index": 29,
+        "value": "夏侯敦"
+      },
+      {
+        "index": 30,
+        "value": "荀或"
+      },
+      {
+        "index": 31,
+        "value": "荀攸"
+      },
+      {
+        "index": 32,
+        "value": "关羽"
+      },
+      {
+        "index": 33,
+        "value": "张飞"
+      },
+      {
+        "index": 34,
+        "value": "简雍"
+      },
+      {
+        "index": 35,
+        "value": "陈圭"
+      },
+      {
+        "index": 36,
+        "value": "陈登"
+      },
+      {
+        "index": 37,
+        "value": "孙乾"
+      },
+      {
+        "index": 38,
+        "value": "糜竺"
+      },
+      {
+        "index": 39,
+        "value": "糜芳"
+      },
+      {
+        "index": 40,
+        "value": "曹豹"
+      },
+      {
+        "index": 41,
+        "value": "颜良"
+      },
+      {
+        "index": 42,
+        "value": "文丑"
+      },
+      {
+        "index": 43,
+        "value": "张宏"
+      },
+      {
+        "index": 44,
+        "value": "淳于琼"
+      },
+      {
+        "index": 45,
+        "value": "高览"
+      },
+      {
+        "index": 46,
+        "value": "高干"
+      },
+      {
+        "index": 47,
+        "value": "郭淮"
+      },
+      {
+        "index": 48,
+        "value": "张南"
+      },
+      {
+        "index": 49,
+        "value": "袁谭"
+      },
+      {
+        "index": 50,
+        "value": "袁熙"
+      },
+      {
+        "index": 51,
+        "value": "张燕"
+      },
+      {
+        "index": 52,
+        "value": "袁尚"
+      },
+      {
+        "index": 53,
+        "value": "逢纪"
+      },
+      {
+        "index": 54,
+        "value": "审配"
+      },
+      {
+        "index": 55,
+        "value": "田丰"
+      },
+      {
+        "index": 56,
+        "value": "沮授"
+      },
+      {
+        "index": 57,
+        "value": "许攸"
+      },
+      {
+        "index": 58,
+        "value": "郭图"
+      },
+      {
+        "index": 59,
+        "value": "王修"
+      },
+      {
+        "index": 60,
+        "value": "辛评"
+      },
+      {
+        "index": 61,
+        "value": "辛毗"
+      },
+      {
+        "index": 62,
+        "value": "陈琳"
+      },
+      {
+        "index": 63,
+        "value": "陈震"
+      },
+      {
+        "index": 64,
+        "value": "荀谌"
+      },
+      {
+        "index": 65,
+        "value": "纪灵"
+      },
+      {
+        "index": 66,
+        "value": "陈兰"
+      },
+      {
+        "index": 67,
+        "value": "雷薄"
+      },
+      {
+        "index": 68,
+        "value": "俞涉"
+      },
+      {
+        "index": 69,
+        "value": "乔瑁"
+      },
+      {
+        "index": 70,
+        "value": "袁遗"
+      },
+      {
+        "index": 71,
+        "value": "太史慈"
+      },
+      {
+        "index": 72,
+        "value": "程普"
+      },
+      {
+        "index": 73,
+        "value": "黄盖"
+      },
+      {
+        "index": 74,
+        "value": "韩当"
+      },
+      {
+        "index": 75,
+        "value": "蒋钦"
+      },
+      {
+        "index": 76,
+        "value": "周泰"
+      },
+      {
+        "index": 77,
+        "value": "朱治"
+      },
+      {
+        "index": 78,
+        "value": "陈武"
+      },
+      {
+        "index": 79,
+        "value": "周瑜"
+      },
+      {
+        "index": 80,
+        "value": "张昭"
+      },
+      {
+        "index": 81,
+        "value": ""
+      },
+      {
+        "index": 82,
+        "value": "吕范"
+      },
+      {
+        "index": 83,
+        "value": "韩馥"
+      },
+      {
+        "index": 84,
+        "value": "张超"
+      },
+      {
+        "index": 85,
+        "value": "胡车儿"
+      },
+      {
+        "index": 86,
+        "value": "贾诩"
+      },
+      {
+        "index": 87,
+        "value": "张辽"
+      },
+      {
+        "index": 88,
+        "value": "臧霸"
+      },
+      {
+        "index": 89,
+        "value": "曹性"
+      },
+      {
+        "index": 90,
+        "value": "魏续"
+      },
+      {
+        "index": 91,
+        "value": "侯成"
+      },
+      {
+        "index": 92,
+        "value": "高顺"
+      },
+      {
+        "index": 93,
+        "value": "陈宫"
+      },
+      {
+        "index": 94,
+        "value": "黄忠"
+      },
+      {
+        "index": 95,
+        "value": "魏延"
+      },
+      {
+        "index": 96,
+        "value": "王朗"
+      },
+      {
+        "index": 97,
+        "value": "公孙康"
+      },
+      {
+        "index": 98,
+        "value": "公孙恭"
+      },
+      {
+        "index": 99,
+        "value": "韩遂"
+      },
+      {
+        "index": 100,
+        "value": "马超"
+      },
+      {
+        "index": 101,
+        "value": "马岱"
+      },
+      {
+        "index": 102,
+        "value": "庞德"
+      },
+      {
+        "index": 103,
+        "value": "侯选"
+      },
+      {
+        "index": 104,
+        "value": "程银"
+      },
+      {
+        "index": 105,
+        "value": "李堪"
+      },
+      {
+        "index": 106,
+        "value": "张横"
+      },
+      {
+        "index": 107,
+        "value": "梁兴"
+      },
+      {
+        "index": 108,
+        "value": "成宜"
+      },
+      {
+        "index": 109,
+        "value": "马玩"
+      },
+      {
+        "index": 110,
+        "value": "杨秋"
+      },
+      {
+        "index": 111,
+        "value": "蒯良"
+      },
+      {
+        "index": 112,
+        "value": "蒯越"
+      },
+      {
+        "index": 113,
+        "value": "韩嵩"
+      },
+      {
+        "index": 114,
+        "value": "伊籍"
+      },
+      {
+        "index": 115,
+        "value": "蔡瑁"
+      },
+      {
+        "index": 116,
+        "value": "刘琦"
+      },
+      {
+        "index": 117,
+        "value": "王粲"
+      },
+      {
+        "index": 118,
+        "value": "蔡中"
+      },
+      {
+        "index": 119,
+        "value": "蔡和"
+      },
+      {
+        "index": 120,
+        "value": "张允"
+      },
+      {
+        "index": 121,
+        "value": "黄祖"
+      },
+      {
+        "index": 122,
+        "value": "甘宁"
+      },
+      {
+        "index": 123,
+        "value": "文聘"
+      },
+      {
+        "index": 124,
+        "value": "王威"
+      },
+      {
+        "index": 125,
+        "value": "张任"
+      },
+      {
+        "index": 126,
+        "value": "严颜"
+      },
+      {
+        "index": 127,
+        "value": "吴懿"
+      },
+      {
+        "index": 128,
+        "value": "吴班"
+      },
+      {
+        "index": 129,
+        "value": "雷铜"
+      },
+      {
+        "index": 130,
+        "value": "吴兰"
+      },
+      {
+        "index": 131,
+        "value": "黄权"
+      },
+      {
+        "index": 132,
+        "value": "李严"
+      },
+      {
+        "index": 133,
+        "value": "孟达"
+      },
+      {
+        "index": 134,
+        "value": "张松"
+      },
+      {
+        "index": 135,
+        "value": "法正"
+      },
+      {
+        "index": 136,
+        "value": "张卫"
+      },
+      {
+        "index": 137,
+        "value": "杨松"
+      },
+      {
+        "index": 138,
+        "value": "杨任"
+      },
+      {
+        "index": 139,
+        "value": "阎圃"
+      },
+      {
+        "index": 140,
+        "value": "武安国"
+      },
+      {
+        "index": 141,
+        "value": "程昱"
+      },
+      {
+        "index": 142,
+        "value": "郭嘉"
+      },
+      {
+        "index": 143,
+        "value": "刘晔"
+      },
+      {
+        "index": 144,
+        "value": "满宠"
+      },
+      {
+        "index": 145,
+        "value": "毛玠"
+      },
+      {
+        "index": 146,
+        "value": "于禁"
+      },
+      {
+        "index": 147,
+        "value": "典韦"
+      },
+      {
+        "index": 148,
+        "value": "许褚"
+      },
+      {
+        "index": 149,
+        "value": "崔琰"
+      },
+      {
+        "index": 150,
+        "value": "车胄"
+      },
+      {
+        "index": 151,
+        "value": "徐晃"
+      },
+      {
+        "index": 152,
+        "value": "曹休"
+      },
+      {
+        "index": 153,
+        "value": "邓芝"
+      },
+      {
+        "index": 154,
+        "value": "董允"
+      },
+      {
+        "index": 155,
+        "value": "费祎"
+      },
+      {
+        "index": 156,
+        "value": "王累"
+      },
+      {
+        "index": 157,
+        "value": "郭攸之"
+      },
+      {
+        "index": 158,
+        "value": "向朗"
+      },
+      {
+        "index": 159,
+        "value": "泠苞"
+      },
+      {
+        "index": 160,
+        "value": "蒋琬"
+      },
+      {
+        "index": 161,
+        "value": "马良"
+      },
+      {
+        "index": 162,
+        "value": "马谡"
+      },
+      {
+        "index": 163,
+        "value": "王甫"
+      },
+      {
+        "index": 164,
+        "value": "赵云"
+      },
+      {
+        "index": 165,
+        "value": "关平"
+      },
+      {
+        "index": 166,
+        "value": "周仓"
+      },
+      {
+        "index": 167,
+        "value": "廖化"
+      },
+      {
+        "index": 168,
+        "value": "胡班"
+      },
+      {
+        "index": 169,
+        "value": "管辂"
+      },
+      {
+        "index": 170,
+        "value": "华佗"
+      },
+      {
+        "index": 171,
+        "value": "庞统"
+      },
+      {
+        "index": 172,
+        "value": "徐庶"
+      },
+      {
+        "index": 173,
+        "value": "刘琮"
+      },
+      {
+        "index": 174,
+        "value": "鲁肃"
+      },
+      {
+        "index": 175,
+        "value": "虞翻"
+      },
+      {
+        "index": 176,
+        "value": "阚泽"
+      },
+      {
+        "index": 177,
+        "value": "华歆"
+      },
+      {
+        "index": 178,
+        "value": "诸葛谨"
+      },
+      {
+        "index": 179,
+        "value": "丁奉"
+      },
+      {
+        "index": 180,
+        "value": "刘繇"
+      },
+      {
+        "index": 181,
+        "value": "吕旷"
+      },
+      {
+        "index": 182,
+        "value": "吕翔"
+      },
+      {
+        "index": 183,
+        "value": "诸葛亮"
+      },
+      {
+        "index": 184,
+        "value": "通宵虫"
+      },
+      {
+        "index": 185,
+        "value": "南方小鬼"
+      },
+      {
+        "index": 186,
+        "value": ""
+      },
+      {
+        "index": 187,
+        "value": ""
+      },
+      {
+        "index": 188,
+        "value": ""
+      },
+      {
+        "index": 189,
+        "value": ""
+      },
+      {
+        "index": 190,
+        "value": ""
+      },
+      {
+        "index": 191,
+        "value": ""
+      },
+      {
+        "index": 192,
+        "value": ""
+      },
+      {
+        "index": 193,
+        "value": ""
+      },
+      {
+        "index": 194,
+        "value": ""
+      },
+      {
+        "index": 195,
+        "value": ""
+      },
+      {
+        "index": 196,
+        "value": ""
+      },
+      {
+        "index": 197,
+        "value": ""
+      },
+      {
+        "index": 198,
+        "value": ""
+      },
+      {
+        "index": 199,
+        "value": ""
+      },
+      {
+        "index": 200,
+        "value": ""
+      }
+    ],
+    "period_3": [
+      {
+        "index": 1,
+        "value": "韩玄"
+      },
+      {
+        "index": 2,
+        "value": "刘度"
+      },
+      {
+        "index": 3,
+        "value": "赵范"
+      },
+      {
+        "index": 4,
+        "value": "金旋"
+      },
+      {
+        "index": 5,
+        "value": "曹操"
+      },
+      {
+        "index": 6,
+        "value": "刘备"
+      },
+      {
+        "index": 7,
+        "value": "孙权"
+      },
+      {
+        "index": 8,
+        "value": "马腾"
+      },
+      {
+        "index": 9,
+        "value": "张鲁"
+      },
+      {
+        "index": 10,
+        "value": "刘璋"
+      },
+      {
+        "index": 11,
+        "value": "公孙康"
+      },
+      {
+        "index": 12,
+        "value": "黄忠"
+      },
+      {
+        "index": 13,
+        "value": "魏延"
+      },
+      {
+        "index": 14,
+        "value": "杨龄"
+      },
+      {
+        "index": 15,
+        "value": "王朗"
+      },
+      {
+        "index": 16,
+        "value": "刘贤"
+      },
+      {
+        "index": 17,
+        "value": "刑道荣"
+      },
+      {
+        "index": 18,
+        "value": "陈应"
+      },
+      {
+        "index": 19,
+        "value": "鲍隆"
+      },
+      {
+        "index": 20,
+        "value": "巩志"
+      },
+      {
+        "index": 21,
+        "value": "徐庶"
+      },
+      {
+        "index": 22,
+        "value": "夏侯敦"
+      },
+      {
+        "index": 23,
+        "value": "夏侯渊"
+      },
+      {
+        "index": 24,
+        "value": "夏侯尚"
+      },
+      {
+        "index": 25,
+        "value": "夏侯德"
+      },
+      {
+        "index": 26,
+        "value": "夏侯霸"
+      },
+      {
+        "index": 27,
+        "value": "孔融"
+      },
+      {
+        "index": 28,
+        "value": "李典"
+      },
+      {
+        "index": 29,
+        "value": "杨修"
+      },
+      {
+        "index": 30,
+        "value": "乐进"
+      },
+      {
+        "index": 31,
+        "value": "曹洪"
+      },
+      {
+        "index": 32,
+        "value": "曹仁"
+      },
+      {
+        "index": 33,
+        "value": "牛金"
+      },
+      {
+        "index": 34,
+        "value": "曹休"
+      },
+      {
+        "index": 35,
+        "value": "曹丕"
+      },
+      {
+        "index": 36,
+        "value": "曹真"
+      },
+      {
+        "index": 37,
+        "value": "曹植"
+      },
+      {
+        "index": 38,
+        "value": "于禁"
+      },
+      {
+        "index": 39,
+        "value": "张合"
+      },
+      {
+        "index": 40,
+        "value": "荀攸"
+      },
+      {
+        "index": 41,
+        "value": "程昱"
+      },
+      {
+        "index": 42,
+        "value": "刘晔"
+      },
+      {
+        "index": 43,
+        "value": "陈群"
+      },
+      {
+        "index": 44,
+        "value": "满宠"
+      },
+      {
+        "index": 45,
+        "value": "毛玠"
+      },
+      {
+        "index": 46,
+        "value": "许褚"
+      },
+      {
+        "index": 47,
+        "value": "崔琰"
+      },
+      {
+        "index": 48,
+        "value": "徐晃"
+      },
+      {
+        "index": 49,
+        "value": "郭淮"
+      },
+      {
+        "index": 50,
+        "value": "蒋干"
+      },
+      {
+        "index": 51,
+        "value": "荀或"
+      },
+      {
+        "index": 52,
+        "value": "高览"
+      },
+      {
+        "index": 53,
+        "value": "高干"
+      },
+      {
+        "index": 54,
+        "value": "张南"
+      },
+      {
+        "index": 55,
+        "value": "张燕"
+      },
+      {
+        "index": 56,
+        "value": "王修"
+      },
+      {
+        "index": 57,
+        "value": "辛毗"
+      },
+      {
+        "index": 58,
+        "value": "陈琳"
+      },
+      {
+        "index": 59,
+        "value": "陈登"
+      },
+      {
+        "index": 60,
+        "value": "曹豹"
+      },
+      {
+        "index": 61,
+        "value": "张辽"
+      },
+      {
+        "index": 62,
+        "value": "臧霸"
+      },
+      {
+        "index": 63,
+        "value": "魏续"
+      },
+      {
+        "index": 64,
+        "value": "侯成"
+      },
+      {
+        "index": 65,
+        "value": "高顺"
+      },
+      {
+        "index": 66,
+        "value": "钟繇"
+      },
+      {
+        "index": 67,
+        "value": "马延"
+      },
+      {
+        "index": 68,
+        "value": "张绣"
+      },
+      {
+        "index": 69,
+        "value": "贾诩"
+      },
+      {
+        "index": 70,
+        "value": "蔡瑁"
+      },
+      {
+        "index": 71,
+        "value": "蒯越"
+      },
+      {
+        "index": 72,
+        "value": "韩嵩"
+      },
+      {
+        "index": 73,
+        "value": "董昭"
+      },
+      {
+        "index": 74,
+        "value": "王粲"
+      },
+      {
+        "index": 75,
+        "value": "蔡中"
+      },
+      {
+        "index": 76,
+        "value": "蔡和"
+      },
+      {
+        "index": 77,
+        "value": "张允"
+      },
+      {
+        "index": 78,
+        "value": "文聘"
+      },
+      {
+        "index": 79,
+        "value": "王威"
+      },
+      {
+        "index": 80,
+        "value": "关羽"
+      },
+      {
+        "index": 81,
+        "value": "张飞"
+      },
+      {
+        "index": 82,
+        "value": "赵云"
+      },
+      {
+        "index": 83,
+        "value": "关平"
+      },
+      {
+        "index": 84,
+        "value": "刘封"
+      },
+      {
+        "index": 85,
+        "value": "廖化"
+      },
+      {
+        "index": 86,
+        "value": "周仓"
+      },
+      {
+        "index": 87,
+        "value": "简雍"
+      },
+      {
+        "index": 88,
+        "value": "孙乾"
+      },
+      {
+        "index": 89,
+        "value": "糜竺"
+      },
+      {
+        "index": 90,
+        "value": "糜芳"
+      },
+      {
+        "index": 91,
+        "value": "诸葛亮"
+      },
+      {
+        "index": 92,
+        "value": "刘琦"
+      },
+      {
+        "index": 93,
+        "value": "太史慈"
+      },
+      {
+        "index": 94,
+        "value": "甘宁"
+      },
+      {
+        "index": 95,
+        "value": "黄盖"
+      },
+      {
+        "index": 96,
+        "value": "程普"
+      },
+      {
+        "index": 97,
+        "value": "韩当"
+      },
+      {
+        "index": 98,
+        "value": "蒋钦"
+      },
+      {
+        "index": 99,
+        "value": "周泰"
+      },
+      {
+        "index": 100,
+        "value": "丁奉"
+      },
+      {
+        "index": 101,
+        "value": "徐盛"
+      },
+      {
+        "index": 102,
+        "value": "陈武"
+      },
+      {
+        "index": 103,
+        "value": "潘璋"
+      },
+      {
+        "index": 104,
+        "value": "凌统"
+      },
+      {
+        "index": 105,
+        "value": "周瑜"
+      },
+      {
+        "index": 106,
+        "value": "张昭"
+      },
+      {
+        "index": 107,
+        "value": "张宏"
+      },
+      {
+        "index": 108,
+        "value": "朱治"
+      },
+      {
+        "index": 109,
+        "value": "董袭"
+      },
+      {
+        "index": 110,
+        "value": "吕范"
+      },
+      {
+        "index": 111,
+        "value": "鲁肃"
+      },
+      {
+        "index": 112,
+        "value": "虞翻"
+      },
+      {
+        "index": 113,
+        "value": "阚泽"
+      },
+      {
+        "index": 114,
+        "value": "华歆"
+      },
+      {
+        "index": 115,
+        "value": "诸葛谨"
+      },
+      {
+        "index": 116,
+        "value": "孙尚香"
+      },
+      {
+        "index": 117,
+        "value": "朱然"
+      },
+      {
+        "index": 118,
+        "value": "顾雍"
+      },
+      {
+        "index": 119,
+        "value": "严畯"
+      },
+      {
+        "index": 120,
+        "value": "朱桓"
+      },
+      {
+        "index": 121,
+        "value": "张温"
+      },
+      {
+        "index": 122,
+        "value": "吕蒙"
+      },
+      {
+        "index": 123,
+        "value": "陆逊"
+      },
+      {
+        "index": 124,
+        "value": "韩遂"
+      },
+      {
+        "index": 125,
+        "value": "马超"
+      },
+      {
+        "index": 126,
+        "value": "马岱"
+      },
+      {
+        "index": 127,
+        "value": "庞德"
+      },
+      {
+        "index": 128,
+        "value": "侯选"
+      },
+      {
+        "index": 129,
+        "value": "程银"
+      },
+      {
+        "index": 130,
+        "value": "李堪"
+      },
+      {
+        "index": 131,
+        "value": "张横"
+      },
+      {
+        "index": 132,
+        "value": "梁兴"
+      },
+      {
+        "index": 133,
+        "value": "成宜"
+      },
+      {
+        "index": 134,
+        "value": "马玩"
+      },
+      {
+        "index": 135,
+        "value": "杨秋"
+      },
+      {
+        "index": 136,
+        "value": "张卫"
+      },
+      {
+        "index": 137,
+        "value": "杨松"
+      },
+      {
+        "index": 138,
+        "value": "杨任"
+      },
+      {
+        "index": 139,
+        "value": "阎圃"
+      },
+      {
+        "index": 140,
+        "value": "张任"
+      },
+      {
+        "index": 141,
+        "value": "严颜"
+      },
+      {
+        "index": 142,
+        "value": "吴懿"
+      },
+      {
+        "index": 143,
+        "value": "吴班"
+      },
+      {
+        "index": 144,
+        "value": "雷铜"
+      },
+      {
+        "index": 145,
+        "value": "吴兰"
+      },
+      {
+        "index": 146,
+        "value": "王累"
+      },
+      {
+        "index": 147,
+        "value": "黄权"
+      },
+      {
+        "index": 148,
+        "value": "李恢"
+      },
+      {
+        "index": 149,
+        "value": "李严"
+      },
+      {
+        "index": 150,
+        "value": "孟达"
+      },
+      {
+        "index": 151,
+        "value": "张松"
+      },
+      {
+        "index": 152,
+        "value": "法正"
+      },
+      {
+        "index": 153,
+        "value": "邓芝"
+      },
+      {
+        "index": 154,
+        "value": "董允"
+      },
+      {
+        "index": 155,
+        "value": "费祎"
+      },
+      {
+        "index": 156,
+        "value": "郭攸之"
+      },
+      {
+        "index": 157,
+        "value": "向朗"
+      },
+      {
+        "index": 158,
+        "value": "泠苞"
+      },
+      {
+        "index": 159,
+        "value": "公孙恭"
+      },
+      {
+        "index": 160,
+        "value": "公孙渊"
+      },
+      {
+        "index": 161,
+        "value": "蒋琬"
+      },
+      {
+        "index": 162,
+        "value": "马良"
+      },
+      {
+        "index": 163,
+        "value": "马谡"
+      },
+      {
+        "index": 164,
+        "value": "王甫"
+      },
+      {
+        "index": 165,
+        "value": "潘浚"
+      },
+      {
+        "index": 166,
+        "value": "庞统"
+      },
+      {
+        "index": 167,
+        "value": "赵累"
+      },
+      {
+        "index": 168,
+        "value": "邓艾"
+      },
+      {
+        "index": 169,
+        "value": "钟会"
+      },
+      {
+        "index": 170,
+        "value": "司马懿"
+      },
+      {
+        "index": 171,
+        "value": "姜维"
+      },
+      {
+        "index": 172,
+        "value": "张嶷"
+      },
+      {
+        "index": 173,
+        "value": "陈式"
+      },
+      {
+        "index": 174,
+        "value": "陈震"
+      },
+      {
+        "index": 175,
+        "value": "陆抗"
+      },
+      {
+        "index": 176,
+        "value": "贾华"
+      },
+      {
+        "index": 177,
+        "value": "博士仁"
+      },
+      {
+        "index": 178,
+        "value": "董和"
+      },
+      {
+        "index": 179,
+        "value": "邓贤"
+      },
+      {
+        "index": 180,
+        "value": "庞仪"
+      },
+      {
+        "index": 181,
+        "value": "高沛"
+      },
+      {
+        "index": 182,
+        "value": "杨怀"
+      },
+      {
+        "index": 183,
+        "value": "典满"
+      },
+      {
+        "index": 184,
+        "value": "王双"
+      },
+      {
+        "index": 185,
+        "value": "诸葛均"
+      },
+      {
+        "index": 186,
+        "value": "华佗"
+      },
+      {
+        "index": 187,
+        "value": "管辂"
+      },
+      {
+        "index": 188,
+        "value": "通宵虫"
+      },
+      {
+        "index": 189,
+        "value": "南方小鬼"
+      },
+      {
+        "index": 190,
+        "value": ""
+      },
+      {
+        "index": 191,
+        "value": ""
+      },
+      {
+        "index": 192,
+        "value": ""
+      },
+      {
+        "index": 193,
+        "value": ""
+      },
+      {
+        "index": 194,
+        "value": ""
+      },
+      {
+        "index": 195,
+        "value": ""
+      },
+      {
+        "index": 196,
+        "value": ""
+      },
+      {
+        "index": 197,
+        "value": ""
+      },
+      {
+        "index": 198,
+        "value": ""
+      },
+      {
+        "index": 199,
+        "value": ""
+      },
+      {
+        "index": 200,
+        "value": ""
+      }
+    ],
+    "period_4": [
+      {
+        "index": 1,
+        "value": "曹丕"
+      },
+      {
+        "index": 2,
+        "value": "刘禅"
+      },
+      {
+        "index": 3,
+        "value": "孙权"
+      },
+      {
+        "index": 4,
+        "value": "孟获"
+      },
+      {
+        "index": 5,
+        "value": "公孙康"
+      },
+      {
+        "index": 6,
+        "value": "徐庶"
+      },
+      {
+        "index": 7,
+        "value": "杨龄"
+      },
+      {
+        "index": 8,
+        "value": "夏侯尚"
+      },
+      {
+        "index": 9,
+        "value": "夏侯德"
+      },
+      {
+        "index": 10,
+        "value": "夏侯霸"
+      },
+      {
+        "index": 11,
+        "value": "曹彰"
+      },
+      {
+        "index": 12,
+        "value": "曹真"
+      },
+      {
+        "index": 13,
+        "value": "曹植"
+      },
+      {
+        "index": 14,
+        "value": "庞德"
+      },
+      {
+        "index": 15,
+        "value": "李典"
+      },
+      {
+        "index": 16,
+        "value": "杨修"
+      },
+      {
+        "index": 17,
+        "value": "乐进"
+      },
+      {
+        "index": 18,
+        "value": "曹洪"
+      },
+      {
+        "index": 19,
+        "value": "曹仁"
+      },
+      {
+        "index": 20,
+        "value": "牛金"
+      },
+      {
+        "index": 21,
+        "value": "曹休"
+      },
+      {
+        "index": 22,
+        "value": "于禁"
+      },
+      {
+        "index": 23,
+        "value": "荀攸"
+      },
+      {
+        "index": 24,
+        "value": "程昱"
+      },
+      {
+        "index": 25,
+        "value": "刘晔"
+      },
+      {
+        "index": 26,
+        "value": "陈群"
+      },
+      {
+        "index": 27,
+        "value": "满宠"
+      },
+      {
+        "index": 28,
+        "value": "毛玠"
+      },
+      {
+        "index": 29,
+        "value": "许褚"
+      },
+      {
+        "index": 30,
+        "value": "崔琰"
+      },
+      {
+        "index": 31,
+        "value": "徐晃"
+      },
+      {
+        "index": 32,
+        "value": "郭淮"
+      },
+      {
+        "index": 33,
+        "value": "蒋干"
+      },
+      {
+        "index": 34,
+        "value": "张合"
+      },
+      {
+        "index": 35,
+        "value": "高览"
+      },
+      {
+        "index": 36,
+        "value": "高干"
+      },
+      {
+        "index": 37,
+        "value": "博士仁"
+      },
+      {
+        "index": 38,
+        "value": "张南"
+      },
+      {
+        "index": 39,
+        "value": "张燕"
+      },
+      {
+        "index": 40,
+        "value": "王修"
+      },
+      {
+        "index": 41,
+        "value": "辛毗"
+      },
+      {
+        "index": 42,
+        "value": "陈琳"
+      },
+      {
+        "index": 43,
+        "value": "陈登"
+      },
+      {
+        "index": 44,
+        "value": "曹豹"
+      },
+      {
+        "index": 45,
+        "value": "臧霸"
+      },
+      {
+        "index": 46,
+        "value": "魏续"
+      },
+      {
+        "index": 47,
+        "value": "王双"
+      },
+      {
+        "index": 48,
+        "value": "侯成"
+      },
+      {
+        "index": 49,
+        "value": "高顺"
+      },
+      {
+        "index": 50,
+        "value": "钟繇"
+      },
+      {
+        "index": 51,
+        "value": "王粲"
+      },
+      {
+        "index": 52,
+        "value": "马延"
+      },
+      {
+        "index": 53,
+        "value": "张绣"
+      },
+      {
+        "index": 54,
+        "value": "贾诩"
+      },
+      {
+        "index": 55,
+        "value": "蒯越"
+      },
+      {
+        "index": 56,
+        "value": "韩嵩"
+      },
+      {
+        "index": 57,
+        "value": "董昭"
+      },
+      {
+        "index": 58,
+        "value": "文聘"
+      },
+      {
+        "index": 59,
+        "value": "张卫"
+      },
+      {
+        "index": 60,
+        "value": "杨松"
+      },
+      {
+        "index": 61,
+        "value": "杨任"
+      },
+      {
+        "index": 62,
+        "value": "阎圃"
+      },
+      {
+        "index": 63,
+        "value": "孟达"
+      },
+      {
+        "index": 64,
+        "value": "司马懿"
+      },
+      {
+        "index": 65,
+        "value": "司马师"
+      },
+      {
+        "index": 66,
+        "value": "司马昭"
+      },
+      {
+        "index": 67,
+        "value": "王威"
+      },
+      {
+        "index": 68,
+        "value": "文钦"
+      },
+      {
+        "index": 69,
+        "value": "毋丘俭"
+      },
+      {
+        "index": 70,
+        "value": "典满"
+      },
+      {
+        "index": 71,
+        "value": "郝昭"
+      },
+      {
+        "index": 72,
+        "value": "王平"
+      },
+      {
+        "index": 73,
+        "value": "诸葛亮"
+      },
+      {
+        "index": 74,
+        "value": "赵云"
+      },
+      {
+        "index": 75,
+        "value": "魏延"
+      },
+      {
+        "index": 76,
+        "value": "马超"
+      },
+      {
+        "index": 77,
+        "value": "马岱"
+      },
+      {
+        "index": 78,
+        "value": "廖化"
+      },
+      {
+        "index": 79,
+        "value": "简雍"
+      },
+      {
+        "index": 80,
+        "value": "孙乾"
+      },
+      {
+        "index": 81,
+        "value": "糜竺"
+      },
+      {
+        "index": 82,
+        "value": "关兴"
+      },
+      {
+        "index": 83,
+        "value": "张苞"
+      },
+      {
+        "index": 84,
+        "value": "吴懿"
+      },
+      {
+        "index": 85,
+        "value": "吴班"
+      },
+      {
+        "index": 86,
+        "value": "李严"
+      },
+      {
+        "index": 87,
+        "value": "邓芝"
+      },
+      {
+        "index": 88,
+        "value": "董允"
+      },
+      {
+        "index": 89,
+        "value": "费祎"
+      },
+      {
+        "index": 90,
+        "value": "郭攸之"
+      },
+      {
+        "index": 91,
+        "value": "向朗"
+      },
+      {
+        "index": 92,
+        "value": "蒋琬"
+      },
+      {
+        "index": 93,
+        "value": "马谡"
+      },
+      {
+        "index": 94,
+        "value": "马忠"
+      },
+      {
+        "index": 95,
+        "value": "张嶷"
+      },
+      {
+        "index": 96,
+        "value": "陈式"
+      },
+      {
+        "index": 97,
+        "value": "陈震"
+      },
+      {
+        "index": 98,
+        "value": "董和"
+      },
+      {
+        "index": 99,
+        "value": "邓贤"
+      },
+      {
+        "index": 100,
+        "value": "庞仪"
+      },
+      {
+        "index": 101,
+        "value": "张翼"
+      },
+      {
+        "index": 102,
+        "value": "李恢"
+      },
+      {
+        "index": 103,
+        "value": "沙摩柯"
+      },
+      {
+        "index": 104,
+        "value": "甘宁"
+      },
+      {
+        "index": 105,
+        "value": "黄盖"
+      },
+      {
+        "index": 106,
+        "value": "程普"
+      },
+      {
+        "index": 107,
+        "value": "韩当"
+      },
+      {
+        "index": 108,
+        "value": "蒋钦"
+      },
+      {
+        "index": 109,
+        "value": "周泰"
+      },
+      {
+        "index": 110,
+        "value": "丁奉"
+      },
+      {
+        "index": 111,
+        "value": "徐盛"
+      },
+      {
+        "index": 112,
+        "value": "朱然"
+      },
+      {
+        "index": 113,
+        "value": "陈武"
+      },
+      {
+        "index": 114,
+        "value": "凌统"
+      },
+      {
+        "index": 115,
+        "value": "潘璋"
+      },
+      {
+        "index": 116,
+        "value": "张昭"
+      },
+      {
+        "index": 117,
+        "value": "张宏"
+      },
+      {
+        "index": 118,
+        "value": "朱治"
+      },
+      {
+        "index": 119,
+        "value": "董袭"
+      },
+      {
+        "index": 120,
+        "value": "吕范"
+      },
+      {
+        "index": 121,
+        "value": "鲁肃"
+      },
+      {
+        "index": 122,
+        "value": "虞翻"
+      },
+      {
+        "index": 123,
+        "value": "阚泽"
+      },
+      {
+        "index": 124,
+        "value": "华歆"
+      },
+      {
+        "index": 125,
+        "value": "诸葛谨"
+      },
+      {
+        "index": 126,
+        "value": "全琮"
+      },
+      {
+        "index": 127,
+        "value": "顾雍"
+      },
+      {
+        "index": 128,
+        "value": "严畯"
+      },
+      {
+        "index": 129,
+        "value": "朱桓"
+      },
+      {
+        "index": 130,
+        "value": "潘浚"
+      },
+      {
+        "index": 131,
+        "value": "张温"
+      },
+      {
+        "index": 132,
+        "value": "张休"
+      },
+      {
+        "index": 133,
+        "value": "吕蒙"
+      },
+      {
+        "index": 134,
+        "value": "陆逊"
+      },
+      {
+        "index": 135,
+        "value": "孙浩"
+      },
+      {
+        "index": 136,
+        "value": "陆抗"
+      },
+      {
+        "index": 137,
+        "value": "贾华"
+      },
+      {
+        "index": 138,
+        "value": "吕岱"
+      },
+      {
+        "index": 139,
+        "value": "诸葛恪"
+      },
+      {
+        "index": 140,
+        "value": "朵思大王"
+      },
+      {
+        "index": 141,
+        "value": "金环三结"
+      },
+      {
+        "index": 142,
+        "value": "朱褒"
+      },
+      {
+        "index": 143,
+        "value": "孟优"
+      },
+      {
+        "index": 144,
+        "value": "祝融夫人"
+      },
+      {
+        "index": 145,
+        "value": "带来洞主"
+      },
+      {
+        "index": 146,
+        "value": "董荼那"
+      },
+      {
+        "index": 147,
+        "value": "阿会喃"
+      },
+      {
+        "index": 148,
+        "value": "忙牙长"
+      },
+      {
+        "index": 149,
+        "value": "公孙恭"
+      },
+      {
+        "index": 150,
+        "value": "公孙渊"
+      },
+      {
+        "index": 151,
+        "value": "邓艾"
+      },
+      {
+        "index": 152,
+        "value": "钟会"
+      },
+      {
+        "index": 153,
+        "value": "华佗"
+      },
+      {
+        "index": 154,
+        "value": "管辂"
+      },
+      {
+        "index": 155,
+        "value": "羊祜"
+      },
+      {
+        "index": 156,
+        "value": "何晏"
+      },
+      {
+        "index": 157,
+        "value": "曹叡"
+      },
+      {
+        "index": 158,
+        "value": "姜维"
+      },
+      {
+        "index": 159,
+        "value": "诸葛均"
+      },
+      {
+        "index": 160,
+        "value": "王甫"
+      },
+      {
+        "index": 161,
+        "value": "雷铜"
+      },
+      {
+        "index": 162,
+        "value": "吴兰"
+      },
+      {
+        "index": 163,
+        "value": "黄权"
+      },
+      {
+        "index": 164,
+        "value": "高沛"
+      },
+      {
+        "index": 165,
+        "value": "杨怀"
+      },
+      {
+        "index": 166,
+        "value": "杨仪"
+      },
+      {
+        "index": 167,
+        "value": "泠苞"
+      },
+      {
+        "index": 168,
+        "value": "刘度"
+      },
+      {
+        "index": 169,
+        "value": "刘贤"
+      },
+      {
+        "index": 170,
+        "value": "刑道荣"
+      },
+      {
+        "index": 171,
+        "value": "赵范"
+      },
+      {
+        "index": 172,
+        "value": "陈应"
+      },
+      {
+        "index": 173,
+        "value": "鲍隆"
+      },
+      {
+        "index": 174,
+        "value": "巩志"
+      },
+      {
+        "index": 175,
+        "value": "通宵虫"
+      },
+      {
+        "index": 176,
+        "value": "南方小鬼"
+      },
+      {
+        "index": 177,
+        "value": ""
+      },
+      {
+        "index": 178,
+        "value": ""
+      },
+      {
+        "index": 179,
+        "value": ""
+      },
+      {
+        "index": 180,
+        "value": ""
+      },
+      {
+        "index": 181,
+        "value": ""
+      },
+      {
+        "index": 182,
+        "value": ""
+      },
+      {
+        "index": 183,
+        "value": ""
+      },
+      {
+        "index": 184,
+        "value": ""
+      },
+      {
+        "index": 185,
+        "value": ""
+      },
+      {
+        "index": 186,
+        "value": ""
+      },
+      {
+        "index": 187,
+        "value": ""
+      },
+      {
+        "index": 188,
+        "value": ""
+      },
+      {
+        "index": 189,
+        "value": ""
+      },
+      {
+        "index": 190,
+        "value": ""
+      },
+      {
+        "index": 191,
+        "value": ""
+      },
+      {
+        "index": 192,
+        "value": ""
+      },
+      {
+        "index": 193,
+        "value": ""
+      },
+      {
+        "index": 194,
+        "value": ""
+      },
+      {
+        "index": 195,
+        "value": ""
+      },
+      {
+        "index": 196,
+        "value": ""
+      },
+      {
+        "index": 197,
+        "value": ""
+      },
+      {
+        "index": 198,
+        "value": ""
+      },
+      {
+        "index": 199,
+        "value": ""
+      },
+      {
+        "index": 200,
+        "value": ""
+      }
+    ]
+  }
+}

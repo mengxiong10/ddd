@@ -7,7 +7,7 @@ import type { Action, CommandResult } from '../core/game'
 import { applyWithEvents, canApply } from '../core/game'
 import type { CommandCheck, ReasonCode } from '../core/shared/command'
 import type { OutcomeEvent } from '../core/shared/outcome'
-import { createInitialState } from '../core/world/fixture'
+import { createScenarioState, type CreateScenarioRequest } from '../core/world/scenario'
 
 /**
  * 瞬态反馈项（`19-store-ui`）：core 结构化反馈 + 自增 id（UI keying + 定时出队）。
@@ -27,7 +27,7 @@ export interface FeedbackItem {
  * 零规则、零中文——dispatch 转发 core 的 applyWithEvents、入队结构化反馈。
  */
 export interface GameStore {
-  readonly game: GameState
+  readonly game: GameState | null
   readonly config: GameConfig
   readonly feedback: readonly FeedbackItem[]
   /** 派发指令：成功更新 game + 逐条入队 events，失败入队 reason；恒返回 core 的 CommandResult。 */
@@ -38,16 +38,25 @@ export interface GameStore {
   dismiss(id: number): void
   /** 清空反馈队列。 */
   clearFeedback(): void
-  /** 重开局（fixture 播种）：替换 game、清空 feedback，可注入 seed/config。 */
-  newGame(seed: number, config?: GameConfig): void
+  /** 创建正式剧本对局：替换 game、清空 feedback，可同时替换配置。 */
+  newGame(request: CreateScenarioRequest, config?: GameConfig): void
 }
 
-/** 无头工厂：测试直接 createGameStore(seed).getState().dispatch(...)。 */
-export function createGameStore(
-  seed: number,
-  config: GameConfig = DEFAULT_CONFIG
-): StoreApi<GameStore> {
+export interface CreateGameStoreOptions {
+  readonly initialGame?: GameState | null
+  readonly config?: GameConfig
+}
+
+function requireGame(game: GameState | null): GameState {
+  if (!game) throw new Error('game has not started')
+  return game
+}
+
+/** 无头工厂：正式默认无对局；测试可显式注入 fixture。 */
+export function createGameStore(options: CreateGameStoreOptions = {}): StoreApi<GameStore> {
   let nextId = 1
+  const initialGame = options.initialGame ?? null
+  const initialConfig = options.config ?? DEFAULT_CONFIG
   const eventItem = (event: OutcomeEvent): FeedbackItem => ({
     id: nextId++,
     payload: { kind: 'event', event },
@@ -62,12 +71,12 @@ export function createGameStore(
   })
 
   return createStore<GameStore>((set, get) => ({
-    game: createInitialState(seed),
-    config,
+    game: initialGame,
+    config: initialConfig,
     feedback: [],
     dispatch(action) {
       const { game, config, feedback } = get()
-      const result = applyWithEvents(game, action, config)
+      const result = applyWithEvents(requireGame(game), action, config)
       if (result.ok) {
         set({
           game: result.state,
@@ -79,7 +88,7 @@ export function createGameStore(
       return result
     },
     canDispatch(action) {
-      return canApply(get().game, action, get().config)
+      return canApply(requireGame(get().game), action, get().config)
     },
     dismiss(id) {
       set({ feedback: get().feedback.filter((f) => f.id !== id) })
@@ -87,9 +96,9 @@ export function createGameStore(
     clearFeedback() {
       set({ feedback: [] })
     },
-    newGame(seed, config) {
+    newGame(request, config) {
       set({
-        game: createInitialState(seed),
+        game: createScenarioState(request),
         feedback: [],
         ...(config ? { config } : {}),
       })
@@ -97,10 +106,15 @@ export function createGameStore(
   }))
 }
 
-/** 默认单例（app 用）；seed 取启动时刻，整局可经 newGame 重置。 */
-export const gameStore = createGameStore(Date.now() >>> 0)
+/** 默认单例（app 用）：首次启动无对局，必须先走剧本选择。 */
+export const gameStore = createGameStore()
 
 /** React 绑定钩子：useGameStore(s => s.game) 订阅。 */
 export function useGameStore<T>(selector: (s: GameStore) => T): T {
   return useStore(gameStore, selector)
+}
+
+/** 仅供已确认存在对局的 UI 子树使用；误用即抛程序错误，不传播 nullable。 */
+export function useCurrentGame(): GameState {
+  return requireGame(useGameStore((state) => state.game))
 }

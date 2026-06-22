@@ -33,7 +33,7 @@ export function settle(state: GameState): GameState {
   if (!isHarvest && !isTax) return state
 
   const cities: Record<CityId, GameState['cities'][CityId]> = { ...state.cities }
-  for (const id of Object.keys(cities)) {
+  for (const id of Object.keys(cities).map(Number)) {
     let c = cities[id]!
     if (isHarvest) c = addFood(c, harvestAmount(c.agriculture))
     if (isTax) c = addGold(c, taxAmount(c.commerce))

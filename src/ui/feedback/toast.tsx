@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useGameStore } from '../../store/game-store'
+import { useCurrentGame, useGameStore } from '../../store/game-store'
 import type { FeedbackItem } from '../../store/game-store'
 import type { GameState } from '../../store/selectors'
 import { feedbackText } from './messages'
@@ -41,7 +41,7 @@ function ToastView({
 /** 反馈队列渲染区：订阅 store.feedback，逐条渲染 + 自动出队。 */
 export function ToastHost() {
   const feedback = useGameStore((s) => s.feedback)
-  const game = useGameStore((s) => s.game)
+  const game = useCurrentGame()
   const dismiss = useGameStore((s) => s.dismiss)
   return (
     <div className="toast-host">

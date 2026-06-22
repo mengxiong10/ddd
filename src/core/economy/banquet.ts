@@ -27,7 +27,7 @@ export function canBanquet(
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
   if (city.gold < config.banquetGoldCost) return { ok: false, reason: 'gold-insufficient' }
   return { ok: true }
@@ -46,14 +46,15 @@ export function banquet(
   if (!check.ok) return commandFail(check, state)
 
   const officer0 = state.officers[officerId]!
-  const city = spendGold(state.cities[officer0.cityId]!, config.banquetGoldCost)
+  const cityId = officer0.cityId!
+  const city = spendGold(state.cities[cityId]!, config.banquetGoldCost)
   const isLord = officer0.lordId === officer0.id
   const recovered = recoverStamina(officer0, BANQUET_STAMINA_GAIN)
   const officer = isLord ? recovered : adjustLoyalty(recovered, BANQUET_LOYALTY_GAIN)
 
   return commandOk({
     ...state,
-    cities: { ...state.cities, [officer0.cityId]: city },
+    cities: { ...state.cities, [cityId]: city },
     officers: { ...state.officers, [officerId]: officer },
   })
 }

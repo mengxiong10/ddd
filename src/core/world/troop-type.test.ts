@@ -30,4 +30,10 @@ describe('troop-type 兵种规则', () => {
     expect(resolveOverride(3, 105, 0)).toBeNull()
     expect(resolveOverride(3, 100, 200)).toBeNull()
   })
+
+  it('resolveOverride(4/5/6) 分别直接改为骑兵/步兵/弓兵', () => {
+    expect(resolveOverride(4, 0, 0)).toBe('cavalry')
+    expect(resolveOverride(5, 0, 0)).toBe('infantry')
+    expect(resolveOverride(6, 0, 0)).toBe('archer')
+  })
 })

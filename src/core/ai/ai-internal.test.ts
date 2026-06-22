@@ -6,13 +6,13 @@ import type { City } from '../world/city'
 import { isBusy } from '../world/queries'
 import { runAiInternal, pickMoveTarget } from './ai-internal'
 
-function withCity(s: GameState, id: string, patch: Partial<City>): GameState {
+function withCity(s: GameState, id: number, patch: Partial<City>): GameState {
   return { ...s, cities: { ...s.cities, [id]: { ...s.cities[id]!, ...patch } } }
 }
 function withOfficer(
   s: GameState,
-  id: string,
-  patch: Partial<GameState['officers'][string]>
+  id: number,
+  patch: Partial<GameState['officers'][number]>
 ): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
@@ -20,8 +20,8 @@ function withOfficer(
 /** ye 城单一在任武将 simayi（zhangliao 移出 ye 排除），便于镜像单次 RandInt(0,10)。 */
 function singleServing(seed: number): GameState {
   let s = createInitialState(seed)
-  s = withOfficer(s, 'zhangliao', { cityId: 'xuchang' })
-  s = withCity(s, 'ye', {
+  s = withOfficer(s, 10, { cityId: 3 })
+  s = withCity(s, 4, {
     status: 'flood',
     disasterPrevention: 50,
     agriculture: 300,
@@ -38,30 +38,30 @@ describe('runAiInternal 5.5.1 逐分支', () => {
     for (let seed = 1; seed <= 60; seed++) {
       const s = singleServing(seed)
       const [roll] = randInt(s.rng, 0, 10)
-      const out = runAiInternal(s, 'ye')
-      const ye = out.cities.ye!
+      const out = runAiInternal(s, 4)
+      const ye = out.cities[4]!
       expect(ye.gold).toBe(450) // 任何分支都不扣城金
 
       if (roll === 0) {
         expect(ye.agriculture).toBe(500)
-        expect(isBusy(out, 'simayi')).toBe(true)
+        expect(isBusy(out, 9)).toBe(true)
       } else if (roll === 1) {
         expect(ye.commerce).toBe(460)
-        expect(isBusy(out, 'simayi')).toBe(true)
+        expect(isBusy(out, 9)).toBe(true)
       } else if (roll === 2) {
-        expect(out.pendingCommands).toContainEqual({ type: 'search', officerId: 'simayi' })
-        expect(isBusy(out, 'simayi')).toBe(true)
+        expect(out.pendingCommands).toContainEqual({ type: 'search', officerId: 9 })
+        expect(isBusy(out, 9)).toBe(true)
       } else if (roll === 3) {
         expect(ye.loyalty).toBe(54)
         expect(ye.population).toBe(35100)
-        expect(isBusy(out, 'simayi')).toBe(true)
+        expect(isBusy(out, 9)).toBe(true)
       } else if (roll === 4) {
         expect(ye.status).toBe('normal')
         expect(ye.disasterPrevention).toBe(54)
-        expect(isBusy(out, 'simayi')).toBe(true)
+        expect(isBusy(out, 9)).toBe(true)
       } else {
         // 5/6/7/8/10 跳过；9 因 i=0<3 也跳过
-        expect(isBusy(out, 'simayi')).toBe(false)
+        expect(isBusy(out, 9)).toBe(false)
         expect(out.pendingCommands).toEqual([])
         expect(ye.agriculture).toBe(300)
         expect(ye.commerce).toBe(260)
@@ -74,15 +74,15 @@ describe('runAiInternal 5.5.1 逐分支', () => {
 describe('pickMoveTarget 移动选城', () => {
   it('i<3 → null 且不耗 RNG', () => {
     const s = createInitialState(1)
-    const [target, next] = pickMoveTarget(s, 'caocao', 2, s.rng)
+    const [target, next] = pickMoveTarget(s, 6, 2, s.rng)
     expect(target).toBeNull()
     expect(next.seed).toBe(s.rng.seed)
   })
 
   it('本势力城 <2 → null', () => {
     // 把 ye 划给 simayi，使 caocao 仅剩 xuchang 一城
-    const s = withCity(createInitialState(1), 'ye', { lordId: 'simayi' })
-    const [target, next] = pickMoveTarget(s, 'caocao', 3, s.rng)
+    const s = withCity(createInitialState(1), 4, { lordId: 9 })
+    const [target, next] = pickMoveTarget(s, 6, 3, s.rng)
     expect(target).toBeNull()
     expect(next.seed).toBe(s.rng.seed)
   })
@@ -91,11 +91,11 @@ describe('pickMoveTarget 移动选城', () => {
     const s = createInitialState(1)
     for (let seed = 1; seed <= 20; seed++) {
       const st = createInitialState(seed)
-      const [target] = pickMoveTarget(st, 'caocao', 3, st.rng)
-      expect(target).toBe('xuchang')
+      const [target] = pickMoveTarget(st, 6, 3, st.rng)
+      expect(target).toBe(3)
     }
     // 找到敌邻城时消耗一次 RandInt(0,1)
-    const [, next] = pickMoveTarget(s, 'caocao', 3, s.rng)
+    const [, next] = pickMoveTarget(s, 6, 3, s.rng)
     expect(next.seed).not.toBe(s.rng.seed)
   })
 
@@ -103,10 +103,10 @@ describe('pickMoveTarget 移动选城', () => {
     // 断开前线：仅保留 caocao 内部 xuchang-ye 边，去掉 jiangling-xuchang
     const s = {
       ...createInitialState(1),
-      adjacency: { xuchang: ['ye'], ye: ['xuchang'] },
+      adjacency: { 3: [4], 4: [3] },
     }
-    const [target, next] = pickMoveTarget(s, 'caocao', 3, s.rng)
-    expect(target).toBe('xuchang') // 'xuchang' < 'ye'
+    const [target, next] = pickMoveTarget(s, 6, 3, s.rng)
+    expect(target).toBe(3) // 3 < 4
     expect(next.seed).toBe(s.rng.seed) // 无敌邻城 → 不掷 50% 骰
   })
 })
@@ -114,10 +114,10 @@ describe('pickMoveTarget 移动选城', () => {
 describe('runAiInternal 确定性 / 无副作用越界', () => {
   it('相同 seed 两次一致；不产生 campaign；不扣城金', () => {
     const s = createInitialState(9)
-    const a = runAiInternal(s, 'ye')
-    const b = runAiInternal(s, 'ye')
+    const a = runAiInternal(s, 4)
+    const b = runAiInternal(s, 4)
     expect(a).toEqual(b)
     expect(a.pendingCommands.some((c) => c.type === 'campaign')).toBe(false)
-    expect(a.cities.ye!.gold).toBe(s.cities.ye!.gold)
+    expect(a.cities[4]!.gold).toBe(s.cities[4]!.gold)
   })
 })

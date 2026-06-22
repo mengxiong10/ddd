@@ -58,7 +58,7 @@ export function isInstigateTarget(
   targetId: OfficerId
 ): boolean {
   if (!isEnemyServingNonLord(state, execLord, targetId)) return false
-  const gov = governorOf(state, state.officers[targetId]!.cityId)
+  const gov = governorOf(state, state.officers[targetId]!.cityId!)
   return gov !== null && gov.id === targetId
 }
 
@@ -74,7 +74,7 @@ function checkExecutor(
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   if (officer.stamina < staminaCost) return { ok: false, reason: 'stamina-insufficient' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
   if (city.gold < goldCost) return { ok: false, reason: 'gold-insufficient' }
   return { ok: true }
@@ -90,10 +90,10 @@ function enqueueDiplomacy(
   type: DiplomacyType
 ): GameState {
   const officer = state.officers[officerId]!
-  const city = state.cities[officer.cityId]!
+  const city = state.cities[officer.cityId!]!
   return {
     ...state,
-    cities: { ...state.cities, [officer.cityId]: spendGold(city, goldCost) },
+    cities: { ...state.cities, [officer.cityId!]: spendGold(city, goldCost) },
     officers: { ...state.officers, [officerId]: spendStamina(officer, staminaCost) },
     pendingCommands: [...state.pendingCommands, { type, officerId, targetOfficerId }],
   }
@@ -181,7 +181,7 @@ export function executeEntice(
   const [loyalty, rng2] = randInt(rng, ENTICE_OK_LOYALTY_MIN, ENTICE_OK_LOYALTY_MAX)
   const target = {
     ...state.officers[targetOfficerId]!,
-    cityId: officer.cityId,
+    cityId: officer.cityId!,
     lordId: officer.lordId,
     loyalty,
   }
@@ -327,7 +327,7 @@ export function executeInstigate(
 
   const target = state.officers[targetOfficerId]!
   const oldLord = target.lordId
-  const cityId = target.cityId
+  const cityId = target.cityId!
   const officers = { ...state.officers }
   for (const o of Object.values(state.officers)) {
     if (o.cityId === cityId && o.lordId === oldLord)
@@ -442,7 +442,10 @@ export function executeInduce(
   const officers = { ...state.officers }
   for (const o of Object.values(state.officers)) {
     if (o.lordId === targetLord)
-      officers[o.id] = { ...o, lordId: cityIdSet.has(o.cityId) ? execLord : null }
+      officers[o.id] = {
+        ...o,
+        lordId: o.cityId !== null && cityIdSet.has(o.cityId) ? execLord : null,
+      }
   }
   return withEvents({ ...state, rng: rng2, officers, cities }, [
     { kind: 'diplomacy-result', command: 'induce', officerId, targetOfficerId, success: true },

@@ -5,8 +5,8 @@ import { attackerWinPercent, quickResolveCampaign } from './quick-battle'
 
 function withOfficer(
   s: GameState,
-  id: string,
-  patch: Partial<GameState['officers'][string]>
+  id: number,
+  patch: Partial<GameState['officers'][number]>
 ): GameState {
   return { ...s, officers: { ...s.officers, [id]: { ...s.officers[id]!, ...patch } } }
 }
@@ -40,21 +40,21 @@ describe('attackerWinPercent 速算胜率表', () => {
 describe('quickResolveCampaign', () => {
   it('无守军（defenderIds 空）→ 直接占城、不掷骰（rng 不变）', () => {
     const s = createInitialState(1)
-    const out = quickResolveCampaign(s, ['guanyu'], [], 'xuchang', 50).state
-    expect(out.cities.xuchang!.lordId).toBe('liubei')
-    expect(out.cities.xuchang!.food).toBe(50 + 500) // provisions + 目标城原粮
+    const out = quickResolveCampaign(s, [4], [], 3, 50).state
+    expect(out.cities[3]!.lordId).toBe(1)
+    expect(out.cities[3]!.food).toBe(50 + 500) // provisions + 目标城原粮
     expect(out.rng).toEqual(s.rng) // 直接占城不消耗 RNG
   })
 
   it('有守军 → 掷骰定胜负、消耗 RNG、复用战后处理；同 seed 可复现', () => {
     // 攻方碾压（兵力 ≥2 倍）：guanyu 5000 攻 邺城(司马懿/张辽 各100 + 后备0)。
-    let s = withOfficer(createInitialState(3), 'guanyu', { troops: 5000 })
+    let s = withOfficer(createInitialState(3), 4, { troops: 5000 })
     s = {
       ...s,
-      officers: { ...s.officers, guanyu: { ...s.officers.guanyu!, cityId: 'jiangling' } },
+      officers: { ...s.officers, 4: { ...s.officers[4]!, cityId: 2 } },
     }
-    const a = quickResolveCampaign(s, ['guanyu'], ['simayi', 'zhangliao'], 'ye', 30).state
-    const b = quickResolveCampaign(s, ['guanyu'], ['simayi', 'zhangliao'], 'ye', 30).state
+    const a = quickResolveCampaign(s, [4], [9, 10], 4, 30).state
+    const b = quickResolveCampaign(s, [4], [9, 10], 4, 30).state
     expect(a).toEqual(b) // 确定性
     expect(a.rng).not.toEqual(s.rng) // 消耗 RNG
   })

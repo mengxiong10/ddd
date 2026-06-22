@@ -1,9 +1,10 @@
-import { useGameStore } from '../store/game-store'
+import { useCurrentGame, useGameStore } from '../store/game-store'
 import { successionCandidates, effectiveOfficer } from '../store/selectors'
+import type { CityId, OfficerId } from '../store/selectors'
 
 /** 玩家君主遭劫 → 拥立新君（最小选人弹窗）。 */
-function SuccessionDialog({ lordId }: { lordId: string }) {
-  const game = useGameStore((s) => s.game)
+function SuccessionDialog({ lordId }: { lordId: OfficerId }) {
+  const game = useCurrentGame()
   const dispatch = useGameStore((s) => s.dispatch)
   const candidates = successionCandidates(game, lordId)
   return (
@@ -29,8 +30,8 @@ function SuccessionDialog({ lordId }: { lordId: string }) {
 }
 
 /** AI 进攻我方城 → 选守军（本切片仅「弃守」；交互式防守战留后续切片）。 */
-function DefenseDialog({ targetCityId }: { targetCityId: string }) {
-  const game = useGameStore((s) => s.game)
+function DefenseDialog({ targetCityId }: { targetCityId: CityId }) {
+  const game = useCurrentGame()
   const dispatch = useGameStore((s) => s.dispatch)
   return (
     <div className="dialog-mask">
@@ -53,8 +54,9 @@ function DefenseDialog({ targetCityId }: { targetCityId: string }) {
 
 /** 暂停态弹窗总入口：按 store 暴露的暂停态择一渲染。 */
 export function PauseDialogs() {
-  const pendingSuccession = useGameStore((s) => s.game.pendingSuccession)
-  const pendingDefense = useGameStore((s) => s.game.pendingDefense)
+  const game = useCurrentGame()
+  const pendingSuccession = game.pendingSuccession
+  const pendingDefense = game.pendingDefense
   if (pendingSuccession) return <SuccessionDialog lordId={pendingSuccession.lordId} />
   if (pendingDefense) return <DefenseDialog targetCityId={pendingDefense.targetCityId} />
   return null

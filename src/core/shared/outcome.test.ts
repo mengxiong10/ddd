@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { lift, step, withEvents, type OutcomeEvent } from './outcome'
 
-const evtA: OutcomeEvent = { kind: 'city-recovered', cityId: 'a' }
-const evtB: OutcomeEvent = { kind: 'city-recovered', cityId: 'b' }
+const evtA: OutcomeEvent = { kind: 'city-recovered', cityId: 1 }
+const evtB: OutcomeEvent = { kind: 'city-recovered', cityId: 2 }
 
 describe('outcome 并列通道助手', () => {
   it('withEvents 缺省事件为空', () => {

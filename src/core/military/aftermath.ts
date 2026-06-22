@@ -65,7 +65,7 @@ export function resolveCampaignOutcome(
   next = defeated.state
 
   // 4. 遭劫君主（按 id 定序）：君主遭劫事件 + 处置（灭亡/挂起/换主）事件。
-  for (const lordId of [...defeated.strickenLords].sort()) {
+  for (const lordId of [...defeated.strickenLords].sort((a, b) => a - b)) {
     events.push({ kind: 'lord-stricken', lordId })
     const resolved = resolveStrickenLord(next, lordId)
     next = resolved.state
@@ -82,7 +82,7 @@ export function resolveCampaignOutcome(
 }
 
 /**
- * 败军处理（耗 RNG，按 officerId 字典序）：每名 loser 逐一——
+ * 败军处理（耗 RNG，按数字 officerId 升序）：每名 loser 逐一——
  * ① RandInt(0,99) > 有效智力 → 被俘；
  * ② 否则取 citiesOfLord(其 lordId)（占城后、按 id 排序）随机一座 → 逃跑成功（cityId=该城、保留兵）；
  * ③ 无城 → 逃跑失败：RandInt(0,99)===0 → 战死，否则 → 被俘。
@@ -98,7 +98,7 @@ function processDefeatedArmy(
   let next = state
   const strickenLords = new Set<OfficerId>()
 
-  for (const id of [...loserIds].sort()) {
+  for (const id of [...loserIds].sort((a, b) => a - b)) {
     const officer = next.officers[id]
     if (!officer) continue
     const isLord = officer.lordId === officer.id
@@ -117,7 +117,7 @@ function processDefeatedArmy(
           ? []
           : citiesOfLord(next, officer.lordId)
               .map((c) => c.id)
-              .sort()
+              .sort((a, b) => a - b)
       if (cityIds.length > 0) {
         const [idx, rng2] = randInt(next.rng, 0, cityIds.length - 1)
         next = { ...next, rng: rng2 }

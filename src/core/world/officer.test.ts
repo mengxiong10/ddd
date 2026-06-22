@@ -10,17 +10,17 @@ import {
 } from './officer'
 
 const base: Officer = {
-  id: 'o1',
+  id: 1,
   name: '测试',
   intelligence: 50,
-  lordId: 'o1',
-  cityId: 'c1',
+  lordId: 1,
+  cityId: 1,
   stamina: 100,
   troops: 100,
   level: 1,
   force: 50,
   loyalty: 50,
-  recruiterId: null,
+  appearanceConditions: { birth: 0, recruiterId: null, cityId: null },
   personality: 0,
   troopType: 'infantry',
   experience: 0,

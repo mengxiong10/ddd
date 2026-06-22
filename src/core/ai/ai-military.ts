@@ -56,6 +56,7 @@ export function runAiMilitary(state: GameState, cityId: CityId): GameState {
  */
 function tryCampaign(state: GameState, cityId: CityId, rng: Rng): readonly [GameState, Rng] {
   const city = state.cities[cityId]!
+  if (city.lordId === null) return [state, rng]
   const enemies = adjacentEnemyCities(state, cityId, city.lordId)
   if (enemies.length === 0) return [state, rng]
 

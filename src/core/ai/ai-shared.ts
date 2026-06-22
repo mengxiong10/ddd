@@ -6,8 +6,8 @@ import { officersInCity } from '../world/queries'
 import { areAdjacent } from '../world/adjacency'
 
 /** 按 id 升序比较（AI 全程遍历序，保确定性）。 */
-export function byId<T extends { id: string }>(a: T, b: T): number {
-  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+export function byId<T extends { id: number }>(a: T, b: T): number {
+  return a.id - b.id
 }
 
 /**

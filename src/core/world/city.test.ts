@@ -17,9 +17,9 @@ import {
 } from './city'
 
 const base: City = {
-  id: 'c1',
+  id: 1,
   name: '成都',
-  lordId: 'o1',
+  lordId: 1,
   agriculture: 300,
   commerce: 200,
   agricultureCap: 1000,

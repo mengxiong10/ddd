@@ -14,14 +14,14 @@ export function allocateMaxTroops(officer: Officer, city: City): number {
 }
 
 /**
- * 校验分配前置条件（不修改状态）。分配不占人，作用城 = 武将所在城（officer.cityId）。
+ * 校验分配前置条件（不修改状态）。分配不占人，作用城 = 武将所在城（officer.cityId!）。
  * 武将存在且未占用 → 0 ≤ amount ≤ 可分配上限。
  */
 export function canAllocate(state: GameState, officerId: OfficerId, amount: number): CommandCheck {
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
 
   if (amount < 0) return { ok: false, reason: 'invalid-amount' }
@@ -44,14 +44,14 @@ export function allocate(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city = state.cities[officer.cityId]!
+  const city = state.cities[officer.cityId!]!
 
   const nextCity = addReserveTroops(city, officer.troops - amount)
   const nextOfficer = setTroops(officer, amount)
 
   return commandOk({
     ...state,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
   })
 }

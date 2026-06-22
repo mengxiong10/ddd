@@ -30,6 +30,7 @@ export function canCampaign(
   const officers = officerIds.map((id) => state.officers[id])
   if (officers.some((o) => !o)) return { ok: false, reason: 'officer-not-found' }
   const sourceCityId = officers[0]!.cityId
+  if (sourceCityId === null) return { ok: false, reason: 'officer-not-available' }
   if (officers.some((o) => o!.cityId !== sourceCityId))
     return { ok: false, reason: 'officers-not-same-city' }
   if (officers.some((o) => isBusy(state, o!.id) || isCaptive(state, o!.id)))
@@ -64,7 +65,7 @@ export function campaign(
   const check = canCampaign(state, officerIds, targetCityId, provisions)
   if (!check.ok) return commandFail(check, state)
 
-  const sourceCityId = state.officers[officerIds[0]!]!.cityId
+  const sourceCityId = state.officers[officerIds[0]!]!.cityId!
 
   return commandOk({
     ...state,

@@ -1,5 +1,6 @@
 import type { CityId, OfficerId } from '../shared/ids'
 import type { TroopType } from './troop-type'
+import type { AppearanceConditions } from './appearance'
 
 /** 体力量纲上限（百分制，固定值；规则身份，不入 config）。 */
 export const STAMINA_MAX = 100
@@ -24,7 +25,7 @@ export interface Officer {
   /** 归属君主；君主本人 lordId 指向自身。null = 无主（覆盖未登场/在野），仅可经搜寻招募。 */
   readonly lordId: OfficerId | null
   /** 所属城（本切片不跨城移动）。 */
-  readonly cityId: CityId
+  readonly cityId: CityId | null
   /** 体力，取值 [0, STAMINA_MAX]。 */
   readonly stamina: number
   /** 当前带兵数，取值 [0, 带兵量上限]。 */
@@ -38,8 +39,7 @@ export interface Officer {
    * 对外读取应走 queries.officerLoyalty（君主派生恒 100）；此存储值对君主无意义。
    */
   readonly loyalty: number
-  /** 伯乐：能招募该（在野）武将的特定武将 id；null = 无指定（搜寻时按执行人智力判定）。 */
-  readonly recruiterId: OfficerId | null
+  readonly appearanceConditions: AppearanceConditions
   /** 性格（0..4），见 Personality。君主/普通两套表解读同一值。 */
   readonly personality: Personality
   /** 基础兵种（fixture 可信播种、不跑 >105 门槛）；有效兵种由 queries 派生、不写回。 */

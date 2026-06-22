@@ -184,3 +184,45 @@ body {
   gap: 8px;
   margin-top: 10px;
 }
+.new-game-page,
+.new-game-mask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.new-game-page {
+  min-height: calc(100vh - 24px);
+}
+.new-game-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.45);
+}
+.new-game-panel {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid #d8d2c4;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+}
+.new-game-panel h1 {
+  margin: 0 0 20px;
+  font-size: 22px;
+}
+.new-game-panel label {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+}
+.new-game-panel select {
+  width: 100%;
+  padding: 8px;
+}
+.new-game-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}

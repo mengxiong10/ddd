@@ -3,54 +3,56 @@ import { createInitialState } from './fixture'
 import { runDebuts } from './debut'
 import { endMonth } from '../turn/end-month'
 import { DEFAULT_CONFIG } from '../shared/config'
-
-// fixture 待登场：赵云(191,江陵) / 姜维(192,随机,伯乐诸葛亮) / 青釭剑(191,许昌)。START_YEAR=189。
+import { createScenarioState } from './scenario'
 
 describe('runDebuts 登场', () => {
-  it('未到登场年：全部留池、不消费 RNG', () => {
-    const s = createInitialState(1)
-    const r = runDebuts(s)
-    expect(r.pendingDebuts).toHaveLength(3)
-    expect(Object.keys(r.officers)).toHaveLength(10)
-    expect(r.rng.seed).toBe(s.rng.seed)
+  it('未到登场年：位置不变、不消费 RNG', () => {
+    const state = createInitialState(1)
+    const result = runDebuts(state)
+    expect(result).toBe(state)
+    expect(result.officers[11]?.cityId).toBeNull()
+    expect(result.items[3]?.holder).toBeNull()
   })
 
-  it('到指定登场年：落指定城、出池；武将 lordId=null/troops=0，道具未发现', () => {
-    const s = { ...createInitialState(1), year: 191 }
-    const r = runDebuts(s)
-    // 赵云登场江陵
-    expect(r.officers.zhaoyun!.lordId).toBeNull()
-    expect(r.officers.zhaoyun!.cityId).toBe('jiangling')
-    expect(r.officers.zhaoyun!.troops).toBe(0)
-    // 青釭剑登场许昌、未发现
-    expect(r.items.qinggangjian!.holder).toEqual({ kind: 'city', cityId: 'xuchang' })
-    expect(r.items.qinggangjian!.discovered).toBe(false)
-    // 姜维(192)未到 -> 留池；二者均为指定城 -> 不消费 RNG
-    expect(r.pendingDebuts).toHaveLength(1)
-    expect(r.rng.seed).toBe(s.rng.seed)
+  it('到指定登场年：武将和独立道具落指定城', () => {
+    const state = { ...createInitialState(1), year: 191 }
+    const result = runDebuts(state)
+    expect(result.officers[11]?.cityId).toBe(2)
+    expect(result.items[3]?.holder).toEqual({ kind: 'city', cityId: 3 })
+    expect(result.items[3]?.discovered).toBe(false)
+    expect(result.officers[12]?.cityId).toBeNull()
+    expect(result.rng.seed).toBe(state.rng.seed)
   })
 
-  it('随机落城：到年后全部出池、消费 RNG、落城确定可复现', () => {
-    const s = { ...createInitialState(1), year: 192 }
-    const r = runDebuts(s)
-    expect(r.pendingDebuts).toHaveLength(0)
-    expect(r.officers.jiangwei!.lordId).toBeNull()
-    expect(Object.keys(s.cities)).toContain(r.officers.jiangwei!.cityId)
-    expect(r.rng.seed).not.toBe(s.rng.seed)
-    // 相同 seed 复现到同一落城
-    const r2 = runDebuts({ ...createInitialState(1), year: 192 })
-    expect(r2.officers.jiangwei!.cityId).toBe(r.officers.jiangwei!.cityId)
+  it('随机落城：按 id 处理并可复现', () => {
+    const state = { ...createInitialState(1), year: 192 }
+    const first = runDebuts(state)
+    const second = runDebuts({ ...createInitialState(1), year: 192 })
+    expect(first.officers[12]?.cityId).not.toBeNull()
+    expect(first.officers[12]?.cityId).toBe(second.officers[12]?.cityId)
+    expect(first.rng.seed).not.toBe(state.rng.seed)
+  })
+
+  it('未登场武将装备从开局起已持有，登场只改变武将位置', () => {
+    const initial = createScenarioState({ scenarioId: 'period-4', playerLordId: 230, seed: 1 })
+    const huatuo = Object.values(initial.officers).find((officer) => officer.name === '华佗')!
+    const holderBefore = initial.items[26]?.holder
+    expect(huatuo.cityId).toBeNull()
+    expect(holderBefore).toEqual({ kind: 'officer', officerId: huatuo.id, equipSeq: 1 })
+
+    const result = runDebuts({ ...initial, year: 226 })
+    expect(result.officers[huatuo.id]?.cityId).toBe(17)
+    expect(result.items[26]?.holder).toEqual(holderBefore)
   })
 })
 
 describe('登场时机（endMonth：月份+1 之后）', () => {
   it('跨入登场年后该实体出现', () => {
     const before = { ...createInitialState(1), year: 190, month: 11 }
-    const r1 = endMonth(before, DEFAULT_CONFIG) // -> 190/12，赵云(191)尚未登场
-    expect(r1.year).toBe(190)
-    expect(r1.officers.zhaoyun).toBeUndefined()
-    const r2 = endMonth(r1, DEFAULT_CONFIG) // -> 191/1，赵云登场
-    expect(r2.year).toBe(191)
-    expect(r2.officers.zhaoyun!.cityId).toBe('jiangling')
+    const december = endMonth(before, DEFAULT_CONFIG)
+    expect(december.officers[11]?.cityId).toBeNull()
+    const january = endMonth(december, DEFAULT_CONFIG)
+    expect(january.year).toBe(191)
+    expect(january.officers[11]?.cityId).toBe(2)
   })
 })

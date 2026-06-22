@@ -1,5 +1,6 @@
 import type { CityId, ItemId, OfficerId } from '../shared/ids'
 import type { TroopTypeOverride } from './troop-type'
+import type { AppearanceConditions } from './appearance'
 
 /**
  * 道具归属（判别式值对象）：属某城 或 某武将，二选一——单一真相源。
@@ -20,13 +21,12 @@ export interface Item {
   readonly intelBonus: number
   /** 移动力加成（整数）：佩戴即计入有效移动力。 */
   readonly movementBonus: number
-  /** 改兵种字段（0..3）：见 TroopTypeOverride。装备门槛在求有效兵种时判定。 */
+  /** 改兵种字段（0..6）：见 TroopTypeOverride。玄兵/极兵门槛在求有效兵种时判定。 */
   readonly troopTypeOverride: TroopTypeOverride
-  readonly holder: ItemHolder
+  readonly holder: ItemHolder | null
   /** 是否已被发现：fixture 既有道具恒 true；登场道具落城为 false，未发现则不可被赏赐。 */
   readonly discovered: boolean
-  /** 伯乐：能发现该道具的特定武将 id；null = 无指定（任何执行人可发现）。 */
-  readonly recruiterId: OfficerId | null
+  readonly appearanceConditions: AppearanceConditions
 }
 
 /** 每名武将最多持有道具数（量纲上限，规则身份，内联常量）。 */

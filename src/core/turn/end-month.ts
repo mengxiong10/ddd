@@ -172,7 +172,7 @@ function dropFirstCampaign(state: GameState): GameState {
 function finishMonthTail(state: GameState, config: GameConfig): WithEvents<GameState> {
   const settled = settle({ ...state, pendingCommands: [] })
   const officers: Record<OfficerId, GameState['officers'][OfficerId]> = { ...settled.officers }
-  for (const id of Object.keys(officers)) {
+  for (const id of Object.keys(officers).map(Number)) {
     officers[id] = recoverStamina(officers[id]!, config.staminaRecoveryPerMonth)
   }
   const month = settled.month === 12 ? 1 : settled.month + 1

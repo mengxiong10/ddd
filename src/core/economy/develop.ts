@@ -18,7 +18,7 @@ const DEVELOP_RAND_MAX = 30
 
 /**
  * 校验开垦/招商前置条件（不修改状态），供 UI 置灰/提示与 develop 内部守卫复用。
- * 作用城 = 武将所在城（officer.cityId，单一真相源）。与君主无关，AI 后续也可复用同一校验。
+ * 作用城 = 武将所在城（officer.cityId!，单一真相源）。与君主无关，AI 后续也可复用同一校验。
  */
 export function canDevelop(
   state: GameState,
@@ -29,7 +29,7 @@ export function canDevelop(
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
 
   const attr = kind === 'agriculture' ? city.agriculture : city.commerce
@@ -57,7 +57,7 @@ export function develop(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city = state.cities[officer.cityId]!
+  const city = state.cities[officer.cityId!]!
   const before = kind === 'agriculture' ? city.agriculture : city.commerce
   // 增量 = floor(有效智力 / 除数) + RandInt(0, 随机上限)；有效智力含道具加成
   const [rand, nextRng] = randInt(state.rng, 0, DEVELOP_RAND_MAX)
@@ -71,7 +71,7 @@ export function develop(
   const next: GameState = {
     ...state,
     rng: nextRng,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'develop', officerId }],
   }
@@ -80,7 +80,7 @@ export function develop(
     {
       kind: 'develop-done',
       officerId,
-      cityId: officer.cityId,
+      cityId: officer.cityId!,
       attr: kind,
       newValue,
       delta: newValue - before,

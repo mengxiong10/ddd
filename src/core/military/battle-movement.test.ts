@@ -9,7 +9,7 @@ import { reachableTiles, attackableTiles, skillTargetTiles } from './battle-move
 const state = createInitialState(1)
 const map = BATTLE_MAPS[DEFAULT_MAP_ID]!
 
-function unit(officerId: string, side: BattleSide, pos: Position): BattleUnit {
+function unit(officerId: number, side: BattleSide, pos: Position): BattleUnit {
   return {
     officerId,
     side,
@@ -32,17 +32,17 @@ function makeBattle(units: BattleUnit[]): BattleState {
     units: Object.fromEntries(units.map((u) => [u.officerId, u])),
     playerProvisions: 100,
     opponentProvisions: 100,
-    attackerCommanderId: 'guanyu',
-    defenderCommanderId: 'caocao',
+    attackerCommanderId: 4,
+    defenderCommanderId: 6,
     outcome: null,
-    targetCityId: 'xuchang',
+    targetCityId: 3,
   }
 }
 const has = (ps: Position[], p: Position) => ps.some((q) => samePos(q, p))
 
 describe('reachableTiles 开阔平原（骑兵移动力 5）', () => {
-  const battle = makeBattle([unit('guanyu', 'player', { x: 3, y: 3 })])
-  const r = reachableTiles(state, battle, 'guanyu')
+  const battle = makeBattle([unit(4, 'player', { x: 3, y: 3 })])
+  const r = reachableTiles(state, battle, 4)
   it('含起点（原地不动）', () => {
     expect(has(r, { x: 3, y: 3 })).toBe(true)
   })
@@ -54,11 +54,8 @@ describe('reachableTiles 开阔平原（骑兵移动力 5）', () => {
 })
 
 describe('reachableTiles 友方穿越但不可落点', () => {
-  const battle = makeBattle([
-    unit('guanyu', 'player', { x: 3, y: 3 }),
-    unit('zhangfei', 'player', { x: 4, y: 3 }),
-  ])
-  const r = reachableTiles(state, battle, 'guanyu')
+  const battle = makeBattle([unit(4, 'player', { x: 3, y: 3 }), unit(5, 'player', { x: 4, y: 3 })])
+  const r = reachableTiles(state, battle, 4)
   it('友方所占格不可作为落点', () => {
     expect(has(r, { x: 4, y: 3 })).toBe(false)
   })
@@ -69,10 +66,10 @@ describe('reachableTiles 友方穿越但不可落点', () => {
 
 describe('reachableTiles 敌方占格阻挡 + 接敌停步区', () => {
   const battle = makeBattle([
-    unit('guanyu', 'player', { x: 3, y: 3 }),
-    unit('caocao', 'opponent', { x: 6, y: 3 }),
+    unit(4, 'player', { x: 3, y: 3 }),
+    unit(6, 'opponent', { x: 6, y: 3 }),
   ])
-  const r = reachableTiles(state, battle, 'guanyu')
+  const r = reachableTiles(state, battle, 4)
   it('敌方占格不可进入', () => {
     expect(has(r, { x: 6, y: 3 })).toBe(false)
   })
@@ -84,21 +81,18 @@ describe('reachableTiles 敌方占格阻挡 + 接敌停步区', () => {
 
 describe('reachableTiles 状态影响', () => {
   it('定身：移动力压到 1（距离 1 可达、距离 2 不可达）', () => {
-    const battle = makeBattle([{ ...unit('guanyu', 'player', { x: 3, y: 3 }), status: 'rooted' }])
-    const r = reachableTiles(state, battle, 'guanyu')
+    const battle = makeBattle([{ ...unit(4, 'player', { x: 3, y: 3 }), status: 'rooted' }])
+    const r = reachableTiles(state, battle, 4)
     expect(has(r, { x: 4, y: 3 })).toBe(true)
     expect(has(r, { x: 5, y: 3 })).toBe(false)
   })
   it('奇门：可穿越接敌停步区（(7,2) 仅能经 ZoC 格进入）', () => {
     // 敌在 (6,3)，ZoC 含 (6,2)/(7,3)；(7,2) 只能从 ZoC 格踏入。
-    const enemy = unit('caocao', 'opponent', { x: 6, y: 3 })
-    const normal = makeBattle([unit('guanyu', 'player', { x: 3, y: 3 }), enemy])
-    expect(has(reachableTiles(state, normal, 'guanyu'), { x: 7, y: 2 })).toBe(false)
-    const qimen = makeBattle([
-      { ...unit('guanyu', 'player', { x: 3, y: 3 }), status: 'qimen' },
-      enemy,
-    ])
-    expect(has(reachableTiles(state, qimen, 'guanyu'), { x: 7, y: 2 })).toBe(true)
+    const enemy = unit(6, 'opponent', { x: 6, y: 3 })
+    const normal = makeBattle([unit(4, 'player', { x: 3, y: 3 }), enemy])
+    expect(has(reachableTiles(state, normal, 4), { x: 7, y: 2 })).toBe(false)
+    const qimen = makeBattle([{ ...unit(4, 'player', { x: 3, y: 3 }), status: 'qimen' }, enemy])
+    expect(has(reachableTiles(state, qimen, 4), { x: 7, y: 2 })).toBe(true)
   })
 })
 

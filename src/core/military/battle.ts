@@ -103,8 +103,8 @@ export function initBattle(
     units,
     playerProvisions: mode === 'attack' ? provisions : cityFood,
     opponentProvisions: mode === 'attack' ? cityFood : provisions,
-    attackerCommanderId: attackerIds[0] ?? '',
-    defenderCommanderId: defenderIds[0] ?? '',
+    attackerCommanderId: attackerIds[0] ?? 0,
+    defenderCommanderId: defenderIds[0] ?? 0,
     outcome: null,
     targetCityId,
   }
@@ -141,7 +141,9 @@ export function startDay(state: GameState): GameState {
   rng = rngW
   // 3. 逐单位（按 officerId 定序保确定性）状态判定 + 石阵损兵 + 重置 acted
   const units: Record<OfficerId, BattleUnit> = { ...battle.units }
-  for (const id of Object.keys(units).sort()) {
+  for (const id of Object.keys(units)
+    .map(Number)
+    .sort((a, b) => a - b)) {
     let u = units[id]!
     if (u.status !== 'dead') {
       if (u.status === 'stone') {

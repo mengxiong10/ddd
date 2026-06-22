@@ -1,0 +1,129 @@
+import { describe, expect, it } from 'vitest'
+import period1 from './scenarios/period-1.json'
+import period2 from './scenarios/period-2.json'
+import period3 from './scenarios/period-3.json'
+import period4 from './scenarios/period-4.json'
+import cities from './scenarios/cities.json'
+import officers from './scenarios/officers.json'
+import items from './scenarios/items.json'
+import adjacency from './scenarios/adjacency.json'
+import { SCENARIOS, createScenarioState, lordsForScenario } from './scenario'
+
+const periods = [period1, period2, period3, period4]
+
+describe('original scenario data', () => {
+  it('generates shared catalogs and audited period counts', () => {
+    expect(cities).toHaveLength(38)
+    expect(officers).toHaveLength(295)
+    expect(items).toHaveLength(37)
+    expect(adjacency.length).toBeGreaterThan(0)
+    expect(periods.map((period) => period.officers.length)).toEqual([187, 184, 189, 176])
+    expect(
+      periods.map((period) => period.officers.filter((o) => o.cityId !== null).length)
+    ).toEqual([157, 175, 179, 166])
+    expect(periods.map((period) => period.items.length)).toEqual([37, 33, 33, 33])
+  })
+
+  it('uses positive numeric ids and unique items in every period', () => {
+    for (const period of periods) {
+      for (const group of [period.cities, period.officers, period.items]) {
+        const ids = group.map((entry) => entry.id)
+        expect(ids.every((id) => Number.isInteger(id) && id > 0)).toBe(true)
+        expect(new Set(ids).size).toBe(ids.length)
+      }
+    }
+  })
+
+  it('keeps stable officer identity and the audited duplicate-item winners', () => {
+    const huatuo = officers.find((officer) => officer.name === '华佗')!
+    const guanlu = officers.find((officer) => officer.name === '管辂')!
+    const p4Jueying = period4.items.find((item) => item.id === 26)
+    expect(p4Jueying?.holder).toEqual({ kind: 'officer', officerId: huatuo.id, equipSeq: 1 })
+    expect(p4Jueying?.holder).not.toMatchObject({ officerId: guanlu.id })
+
+    expect(period1.items.find((item) => item.id === 34)?.holder).toEqual({
+      kind: 'city',
+      cityId: 3,
+    })
+    expect(period1.items.find((item) => item.id === 37)?.holder).toEqual({
+      kind: 'city',
+      cityId: 4,
+    })
+    expect(period1.items.find((item) => item.id === 32)?.holder).toEqual({
+      kind: 'city',
+      cityId: 6,
+    })
+    expect(period1.items.find((item) => item.id === 33)?.holder).toEqual({
+      kind: 'city',
+      cityId: 7,
+    })
+    expect(period1.items.find((item) => item.id === 36)?.holder).toEqual({
+      kind: 'city',
+      cityId: 11,
+    })
+    expect(period1.items.find((item) => item.id === 35)?.holder).toEqual({
+      kind: 'city',
+      cityId: 14,
+    })
+  })
+
+  it('keeps future officers and their equipment in the initial aggregate', () => {
+    const state = createScenarioState({ scenarioId: 'period-4', playerLordId: 230, seed: 1 })
+    const huatuo = Object.values(state.officers).find((officer) => officer.name === '华佗')!
+    const guanlu = Object.values(state.officers).find((officer) => officer.name === '管辂')!
+    expect(huatuo.cityId).toBeNull()
+    expect(guanlu.cityId).toBeNull()
+    expect(state.items[24]?.holder).toEqual({ kind: 'officer', officerId: huatuo.id, equipSeq: 0 })
+    expect(state.items[26]?.holder).toEqual({ kind: 'officer', officerId: huatuo.id, equipSeq: 1 })
+    expect(state.items[24]?.discovered).toBe(true)
+  })
+})
+
+describe('scenario runtime', () => {
+  it('lists the four scenarios and every current lord', () => {
+    expect(SCENARIOS.map((scenario) => scenario.name)).toEqual([
+      '董卓弄权',
+      '曹操崛起',
+      '赤壁之战',
+      '三足鼎立',
+    ])
+    expect(SCENARIOS.map((scenario) => lordsForScenario(scenario.id).length)).toEqual([
+      19, 16, 11, 5,
+    ])
+  })
+
+  it('creates a deterministic state for the selected lord and seed', () => {
+    const request = { scenarioId: 'period-1' as const, playerLordId: 1, seed: 42 }
+    const first = createScenarioState(request)
+    const second = createScenarioState(request)
+    expect(first).toEqual(second)
+    expect(first).not.toBe(second)
+    expect(first.playerLordId).toBe(1)
+    expect(Object.keys(first.cities)).toHaveLength(38)
+    expect(first).not.toHaveProperty('pendingDebuts')
+  })
+
+  it('rejects an invalid lord and keeps static data independent of seed', () => {
+    expect(() =>
+      createScenarioState({ scenarioId: 'period-1', playerLordId: 9999, seed: 1 })
+    ).toThrow(/invalid player lord/)
+    const first = createScenarioState({ scenarioId: 'period-1', playerLordId: 1, seed: 1 })
+    const second = createScenarioState({ scenarioId: 'period-1', playerLordId: 1, seed: 2 })
+    expect({ ...first, rng: null }).toEqual({ ...second, rng: null })
+    expect(first.rng).not.toEqual(second.rng)
+  })
+
+  it('creates a valid 38-city game for every current lord', () => {
+    for (const scenario of SCENARIOS) {
+      for (const lord of lordsForScenario(scenario.id)) {
+        const state = createScenarioState({
+          scenarioId: scenario.id,
+          playerLordId: lord.id,
+          seed: 7,
+        })
+        expect(Object.keys(state.cities)).toHaveLength(38)
+        expect(state.officers[lord.id]?.lordId).toBe(lord.id)
+      }
+    }
+  })
+})

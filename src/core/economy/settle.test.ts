@@ -17,22 +17,22 @@ describe('settle 按月份结算', () => {
   it('6 月：收粮 + 收税', () => {
     const s = { ...createInitialState(1), month: 6 }
     const next = settle(s)
-    expect(next.cities.chengdu!.food).toBe(400 + 75)
-    expect(next.cities.chengdu!.gold).toBe(500 + 100)
+    expect(next.cities[1]!.food).toBe(400 + 75)
+    expect(next.cities[1]!.gold).toBe(500 + 100)
   })
 
   it('10 月：仅收粮', () => {
     const s = { ...createInitialState(1), month: 10 }
     const next = settle(s)
-    expect(next.cities.chengdu!.food).toBe(400 + 75)
-    expect(next.cities.chengdu!.gold).toBe(500)
+    expect(next.cities[1]!.food).toBe(400 + 75)
+    expect(next.cities[1]!.gold).toBe(500)
   })
 
   it('3 月：仅收税', () => {
     const s = { ...createInitialState(1), month: 3 }
     const next = settle(s)
-    expect(next.cities.chengdu!.gold).toBe(500 + 100)
-    expect(next.cities.chengdu!.food).toBe(400)
+    expect(next.cities[1]!.gold).toBe(500 + 100)
+    expect(next.cities[1]!.food).toBe(400)
   })
 
   it('非结算月（1 月）：无变化', () => {
@@ -43,7 +43,7 @@ describe('settle 按月份结算', () => {
   it('AI 城同样参与结算', () => {
     const s = { ...createInitialState(1), month: 6 }
     const next = settle(s)
-    expect(next.cities.xuchang!.food).toBe(500 + Math.floor(350 / 4))
-    expect(next.cities.xuchang!.gold).toBe(600 + Math.floor(320 / 2))
+    expect(next.cities[3]!.food).toBe(500 + Math.floor(350 / 4))
+    expect(next.cities[3]!.gold).toBe(600 + Math.floor(320 / 2))
   })
 })

@@ -35,13 +35,13 @@ export function canTransport(
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
   if (officer.stamina < config.transportStaminaCost)
     return { ok: false, reason: 'stamina-insufficient' }
   const target = state.cities[targetCityId]
   if (!target) return { ok: false, reason: 'target-city-not-found' }
-  if (targetCityId === officer.cityId) return { ok: false, reason: 'target-is-self-city' }
+  if (targetCityId === officer.cityId!) return { ok: false, reason: 'target-is-self-city' }
   if (target.lordId !== officer.lordId) return { ok: false, reason: 'target-not-friendly-city' }
   for (const v of [food, gold, troops]) {
     if (!Number.isInteger(v) || v < 0) return { ok: false, reason: 'invalid-amount' }
@@ -69,13 +69,13 @@ export function transport(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city0 = state.cities[officer.cityId]!
+  const city0 = state.cities[officer.cityId!]!
   const nextCity = addReserveTroops(spendGold(spendFood(city0, food), gold), -troops)
   const nextOfficer = spendStamina(officer, config.transportStaminaCost)
 
   return commandOk({
     ...state,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [
       ...state.pendingCommands,

@@ -17,7 +17,7 @@ export function successionCandidates(state: GameState, lordId: OfficerId): Offic
   )
 }
 
-/** 自动选新君：候选中有效智力最高（平局取 id 字典序最小）；无候选→null。 */
+/** 自动选新君：候选中有效智力最高（平局取数字 id 最小）；无候选→null。 */
 export function pickSuccessor(state: GameState, lordId: OfficerId): OfficerId | null {
   const candidates = successionCandidates(state, lordId)
   if (candidates.length === 0) return null
@@ -40,7 +40,7 @@ export function promoteLord(
 ): GameState {
   const promotedIds = successionCandidates(state, oldLordId).map((o) => o.id)
   const cities = { ...state.cities }
-  for (const id of Object.keys(cities)) {
+  for (const id of Object.keys(cities).map(Number)) {
     if (cities[id]!.lordId === oldLordId) cities[id] = { ...cities[id]!, lordId: newLordId }
   }
   const officers = { ...state.officers }

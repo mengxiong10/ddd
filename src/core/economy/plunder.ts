@@ -23,7 +23,7 @@ const PLUNDER_GOLD_PER_POWER = 2
 
 /**
  * 校验掠夺前置条件（不修改状态），供 UI 置灰/提示与 plunder 内部守卫复用。
- * 武将存在且未占用 → 体力 ≥ plunderStaminaCost。掠夺目标恒为本城（officer.cityId）。
+ * 武将存在且未占用 → 体力 ≥ plunderStaminaCost。掠夺目标恒为本城（officer.cityId!）。
  */
 export function canPlunder(
   state: GameState,
@@ -66,7 +66,7 @@ export function plunder(
  */
 export function executePlunder(state: GameState, officerId: OfficerId): WithEvents<GameState> {
   const officer = state.officers[officerId]!
-  const cityId = officer.cityId
+  const cityId = officer.cityId!
   const eff = effectiveOfficer(state, officerId)
   const power = eff.intelligence + eff.force
   const goldGained = power * PLUNDER_GOLD_PER_POWER

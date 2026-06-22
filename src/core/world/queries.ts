@@ -16,6 +16,7 @@ export function isCaptive(state: GameState, officerId: OfficerId): boolean {
   const officer = state.officers[officerId]
   if (!officer) return false
   if (officer.lordId === null) return false
+  if (officer.cityId === null) return false
   const city = state.cities[officer.cityId]
   if (!city) return false
   return officer.lordId !== city.lordId
@@ -72,7 +73,7 @@ export function captivesInCity(state: GameState, cityId: CityId): Officer[] {
 /** 本城未发现道具（holder=本城 且 discovered=false）：搜寻发现的候选。 */
 export function undiscoveredItemsInCity(state: GameState, cityId: CityId): Item[] {
   return Object.values(state.items).filter(
-    (i) => i.holder.kind === 'city' && i.holder.cityId === cityId && !i.discovered
+    (i) => i.holder?.kind === 'city' && i.holder.cityId === cityId && !i.discovered
   )
 }
 
@@ -84,17 +85,17 @@ export function citiesOfLord(state: GameState, lordId: OfficerId): City[] {
 /** 取归属某城的道具（按 holder 派生，无第二份存储）。 */
 export function itemsInCity(state: GameState, cityId: CityId): Item[] {
   return Object.values(state.items).filter(
-    (i) => i.holder.kind === 'city' && i.holder.cityId === cityId
+    (i) => i.holder?.kind === 'city' && i.holder.cityId === cityId
   )
 }
 
 /** 取归属某武将的道具（按 holder 派生），按装备先后 equipSeq 升序返回。 */
 export function itemsOfOfficer(state: GameState, officerId: OfficerId): Item[] {
   return Object.values(state.items)
-    .filter((i) => i.holder.kind === 'officer' && i.holder.officerId === officerId)
+    .filter((i) => i.holder?.kind === 'officer' && i.holder.officerId === officerId)
     .sort((a, b) => {
-      const sa = a.holder.kind === 'officer' ? a.holder.equipSeq : 0
-      const sb = b.holder.kind === 'officer' ? b.holder.equipSeq : 0
+      const sa = a.holder?.kind === 'officer' ? a.holder.equipSeq : 0
+      const sb = b.holder?.kind === 'officer' ? b.holder.equipSeq : 0
       return sa - sb
     })
 }
@@ -143,13 +144,13 @@ export function officerLoyalty(state: GameState, officerId: OfficerId): number {
 /**
  * 太守（派生，零存储字段）：某城的领头武将。
  * - 该城归属君主（id===city.lordId 的武将）正驻本城（其 cityId===本城）→ 返该君主。
- * - 否则 → 本城在任武将（lordId===city.lordId，自动排除俘虏/在野）中有效智力最高者，平局取 id 字典序最小。
+ * - 否则 → 本城在任武将（lordId===city.lordId，自动排除俘虏/在野）中有效智力最高者，平局取数字 id 最小。
  * - 空城 / 仅俘虏 → null。
  * 智力取 effectiveOfficer 有效值。仅服务策反（instigate）目标判定。
  */
 export function governorOf(state: GameState, cityId: CityId): Officer | null {
   const city = state.cities[cityId]
-  if (!city) return null
+  if (!city || city.lordId === null) return null
   const lord = state.officers[city.lordId]
   if (lord && lord.cityId === cityId) return lord
   const serving = Object.values(state.officers).filter(

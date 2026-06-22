@@ -16,8 +16,9 @@ type EnqueueDiploType = 'entice' | 'alienate' | 'instigate' | 'induce'
  * 3 离间 / 4 招揽 / 5 策反 / 6 劝降为入队命令（池非空才入队，复用月末 executeX）。
  */
 export function runAiDiplomacy(state: GameState, cityId: CityId): GameState {
-  const serving = aiServingOfficers(state, cityId)
   const lordId = state.cities[cityId]!.lordId
+  if (lordId === null) return state
+  const serving = aiServingOfficers(state, cityId)
   let next = state
   let rng = next.rng
   for (const o of serving) {

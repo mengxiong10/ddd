@@ -17,7 +17,7 @@ const PATROL_LOYALTY_RAND_MAX = 4
 const PATROL_POPULATION_GAIN = 100
 
 /**
- * 校验出巡前置条件（不修改状态）。作用城 = 武将所在城（officer.cityId）。
+ * 校验出巡前置条件（不修改状态）。作用城 = 武将所在城（officer.cityId!）。
  * 武将存在、未占用、非俘虏 → 本城金 ≥ patrolGoldCost → 体力 ≥ patrolStaminaCost。
  */
 export function canPatrol(
@@ -28,7 +28,7 @@ export function canPatrol(
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
   if (officer.lordId !== city.lordId) return { ok: false, reason: 'is-captive' }
   if (city.gold < config.patrolGoldCost) return { ok: false, reason: 'gold-insufficient' }
@@ -51,7 +51,7 @@ export function patrol(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city = state.cities[officer.cityId]!
+  const city = state.cities[officer.cityId!]!
   const [loyaltyGain, nextRng] = randInt(
     state.rng,
     PATROL_LOYALTY_RAND_MIN,
@@ -67,7 +67,7 @@ export function patrol(
   const next: GameState = {
     ...state,
     rng: nextRng,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'patrol', officerId }],
   }
@@ -75,7 +75,7 @@ export function patrol(
     {
       kind: 'patrol-done',
       officerId,
-      cityId: officer.cityId,
+      cityId: officer.cityId!,
       newLoyalty: nextCity.loyalty,
       loyaltyDelta: nextCity.loyalty - city.loyalty,
     },

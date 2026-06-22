@@ -19,7 +19,7 @@ export function canMove(
   if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
   const target = state.cities[targetCityId]
   if (!target) return { ok: false, reason: 'target-city-not-found' }
-  if (targetCityId === officer.cityId) return { ok: false, reason: 'target-is-self-city' }
+  if (targetCityId === officer.cityId!) return { ok: false, reason: 'target-is-self-city' }
   if (target.lordId !== officer.lordId) return { ok: false, reason: 'target-not-friendly-city' }
   return { ok: true }
 }

@@ -10,19 +10,19 @@ import { nextOpponentAction } from './battle-ai'
 const map = BATTLE_MAPS[DEFAULT_MAP_ID]!
 const CITY = map.cityTiles[0]!
 
-function mkOfficer(id: string, over: Partial<Officer> = {}): Officer {
+function mkOfficer(id: number, over: Partial<Officer> = {}): Officer {
   return {
     id,
-    name: id,
+    name: String(id),
     intelligence: 50,
-    lordId: 'lordA',
-    cityId: 'cityA',
+    lordId: 200,
+    cityId: 200,
     stamina: 100,
     troops: 100,
     level: 1,
     force: 50,
     loyalty: 50,
-    recruiterId: null,
+    appearanceConditions: { birth: 0, recruiterId: null, cityId: null },
     personality: 0,
     troopType: 'cavalry',
     experience: 0,
@@ -39,7 +39,7 @@ function withOfficers(s: GameState, officers: Officer[]): GameState {
 }
 
 function unit(
-  officerId: string,
+  officerId: number,
   side: BattleSide,
   pos: Position,
   extra: Partial<BattleUnit> = {}
@@ -68,10 +68,10 @@ function makeBattle(units: BattleUnit[], over: Partial<BattleState> = {}): Battl
     units: Object.fromEntries(units.map((u) => [u.officerId, u])),
     playerProvisions: 1000,
     opponentProvisions: 1000,
-    attackerCommanderId: 'pcmd',
-    defenderCommanderId: 'pcmd',
+    attackerCommanderId: 100,
+    defenderCommanderId: 100,
     outcome: null,
-    targetCityId: 'xuchang',
+    targetCityId: 3,
     ...over,
   }
 }
@@ -82,9 +82,9 @@ describe('nextOpponentAction 守卫', () => {
     expect(nextOpponentAction(createInitialState(1))).toBeNull()
   })
   it('已分胜负 → null', () => {
-    const s = withOfficers(createInitialState(1), [mkOfficer('pcmd'), mkOfficer('a1')])
+    const s = withOfficers(createInitialState(1), [mkOfficer(100), mkOfficer(101)])
     const b = makeBattle(
-      [unit('pcmd', 'player', { x: 5, y: 5 }), unit('a1', 'opponent', { x: 6, y: 5 })],
+      [unit(100, 'player', { x: 5, y: 5 }), unit(101, 'opponent', { x: 6, y: 5 })],
       {
         outcome: 'playerWin',
       }
@@ -92,15 +92,11 @@ describe('nextOpponentAction 守卫', () => {
     expect(nextOpponentAction(withBattle(s, b))).toBeNull()
   })
   it('无可动对手单位（全已行动/混乱/石阵）→ null', () => {
-    const s = withOfficers(createInitialState(1), [
-      mkOfficer('pcmd'),
-      mkOfficer('a1'),
-      mkOfficer('a2'),
-    ])
+    const s = withOfficers(createInitialState(1), [mkOfficer(100), mkOfficer(101), mkOfficer(102)])
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 5, y: 5 }),
-      unit('a1', 'opponent', { x: 6, y: 5 }, { acted: true }),
-      unit('a2', 'opponent', { x: 7, y: 5 }, { status: 'confused' }),
+      unit(100, 'player', { x: 5, y: 5 }),
+      unit(101, 'opponent', { x: 6, y: 5 }, { acted: true }),
+      unit(102, 'opponent', { x: 7, y: 5 }, { status: 'confused' }),
     ])
     expect(nextOpponentAction(withBattle(s, b))).toBeNull()
   })
@@ -108,40 +104,30 @@ describe('nextOpponentAction 守卫', () => {
 
 describe('选将（§7.2）：离目标点曼哈顿最小', () => {
   it('attack 模式取离玩家主将更近的对手单位', () => {
-    const s = withOfficers(createInitialState(1), [
-      mkOfficer('pcmd'),
-      mkOfficer('a1'),
-      mkOfficer('a2'),
-    ])
+    const s = withOfficers(createInitialState(1), [mkOfficer(100), mkOfficer(101), mkOfficer(102)])
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 5, y: 5 }),
-      unit('a2', 'opponent', { x: 5, y: 20 }), // 远
-      unit('a1', 'opponent', { x: 5, y: 8 }), // 近
+      unit(100, 'player', { x: 5, y: 5 }),
+      unit(102, 'opponent', { x: 5, y: 20 }), // 远
+      unit(101, 'opponent', { x: 5, y: 8 }), // 近
     ])
     const r = nextOpponentAction(withBattle(s, b))!
-    expect(r.action.officerId).toBe('a1')
+    expect(r.action.officerId).toBe(101)
   })
 })
 
 describe('选落点（§7.4）', () => {
   it('已站城池格 → 原地不动（无 moveTo）', () => {
-    const s = withOfficers(createInitialState(1), [mkOfficer('pcmd'), mkOfficer('a1')])
-    const b = makeBattle([
-      unit('pcmd', 'player', { x: 5, y: 5 }),
-      unit('a1', 'opponent', { ...CITY }),
-    ])
+    const s = withOfficers(createInitialState(1), [mkOfficer(100), mkOfficer(101)])
+    const b = makeBattle([unit(100, 'player', { x: 5, y: 5 }), unit(101, 'opponent', { ...CITY })])
     const r = nextOpponentAction(withBattle(s, b))!
     expect(r.action.moveTo).toBeUndefined()
   })
 
   it('defend 模式可达城池格 → 进城（moveTo=城池格）', () => {
-    const s = withOfficers(createInitialState(1), [mkOfficer('pdef'), mkOfficer('a1')])
+    const s = withOfficers(createInitialState(1), [mkOfficer(104), mkOfficer(101)])
     const b = makeBattle(
-      [
-        unit('pdef', 'player', { x: 5, y: 5 }),
-        unit('a1', 'opponent', { x: CITY.x, y: CITY.y + 2 }),
-      ],
-      { mode: 'defend', attackerCommanderId: 'a1', defenderCommanderId: 'pdef' }
+      [unit(104, 'player', { x: 5, y: 5 }), unit(101, 'opponent', { x: CITY.x, y: CITY.y + 2 })],
+      { mode: 'defend', attackerCommanderId: 101, defenderCommanderId: 104 }
     )
     const r = nextOpponentAction(withBattle(s, b))!
     expect(r.action.moveTo).toEqual(CITY)
@@ -151,15 +137,11 @@ describe('选落点（§7.4）', () => {
 describe('终结动作（§7.6/§7.7）', () => {
   it('攻击优先：兵力远超带兵量 → 跳过技能、普攻最近敌方', () => {
     // cap(cavalry, force50/intel50/lv1)=1100；troops=3000 > floor(1100*1.5) → 兵力筛恒跳过技能。
-    const s = withOfficers(createInitialState(1), [
-      mkOfficer('pcmd'),
-      mkOfficer('p1'),
-      mkOfficer('a1'),
-    ])
+    const s = withOfficers(createInitialState(1), [mkOfficer(100), mkOfficer(103), mkOfficer(101)])
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 25, y: 25 }), // 主将（远、够不到）
-      unit('p1', 'player', { x: 5, y: 5 }), // 普通敌方
-      unit('a1', 'opponent', { x: 6, y: 5 }, { troops: 3000 }),
+      unit(100, 'player', { x: 25, y: 25 }), // 主将（远、够不到）
+      unit(103, 'player', { x: 5, y: 5 }), // 普通敌方
+      unit(101, 'opponent', { x: 6, y: 5 }, { troops: 3000 }),
     ])
     const r = nextOpponentAction(withBattle(s, b))!
     expect(r.action.terminal.kind).toBe('attack')
@@ -168,10 +150,10 @@ describe('终结动作（§7.6/§7.7）', () => {
   })
 
   it('孤立无敌、技能无目标 → 休息', () => {
-    const s = withOfficers(createInitialState(1), [mkOfficer('pcmd'), mkOfficer('a1')])
+    const s = withOfficers(createInitialState(1), [mkOfficer(100), mkOfficer(101)])
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 25, y: 25 }),
-      unit('a1', 'opponent', { x: 3, y: 3 }),
+      unit(100, 'player', { x: 25, y: 25 }),
+      unit(101, 'opponent', { x: 3, y: 3 }),
     ])
     const r = nextOpponentAction(withBattle(s, b))!
     expect(r.action.terminal.kind).toBe('rest')
@@ -180,12 +162,12 @@ describe('终结动作（§7.6/§7.7）', () => {
   it('玄兵技能优先：高智力过筛 + 范围内敌方 → 施法（最佳=高序号优先）', () => {
     // 玄兵免兵力筛；intelligence=149 → 智力筛 r1≤149 必过。level1 玄兵仅解锁技能 14（咒封，敌方）。
     const s = withOfficers(createInitialState(1), [
-      mkOfficer('pcmd', { intelligence: 50 }),
-      mkOfficer('a1', { troopType: 'mystic', intelligence: 149 }),
+      mkOfficer(100, { intelligence: 50 }),
+      mkOfficer(101, { troopType: 'mystic', intelligence: 149 }),
     ])
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 8, y: 5 }), // 距 a1 曼哈顿 3，在咒封 r3 菱形内
-      unit('a1', 'opponent', { x: 5, y: 5 }, { mp: 100 }),
+      unit(100, 'player', { x: 8, y: 5 }), // 距 a1 曼哈顿 3，在咒封 r3 菱形内
+      unit(101, 'opponent', { x: 5, y: 5 }, { mp: 100 }),
     ])
     const r = nextOpponentAction(withBattle(s, b))!
     expect(r.action.terminal.kind).toBe('cast')
@@ -196,16 +178,12 @@ describe('终结动作（§7.6/§7.7）', () => {
   })
 
   it('主将在普攻范围 → 无条件优先打主将', () => {
-    const s = withOfficers(createInitialState(1), [
-      mkOfficer('pcmd'),
-      mkOfficer('p1'),
-      mkOfficer('a1'),
-    ])
+    const s = withOfficers(createInitialState(1), [mkOfficer(100), mkOfficer(103), mkOfficer(101)])
     // a1 同时邻接主将 pcmd 与普通 p1；应选打主将。
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 5, y: 5 }),
-      unit('p1', 'player', { x: 7, y: 6 }),
-      unit('a1', 'opponent', { x: 6, y: 5 }, { troops: 3000 }),
+      unit(100, 'player', { x: 5, y: 5 }),
+      unit(103, 'player', { x: 7, y: 6 }),
+      unit(101, 'opponent', { x: 6, y: 5 }, { troops: 3000 }),
     ])
     const r = nextOpponentAction(withBattle(s, b))!
     expect(r.action.terminal.kind).toBe('attack')
@@ -217,31 +195,31 @@ describe('终结动作（§7.6/§7.7）', () => {
 describe('治疗筛（§7.7）：只给损失≥1/4 兵力的友军', () => {
   // a1 玄兵带个人技能 17（援兵，友方恢复）；范围内无敌方（仅默认 14 无目标）。
   const baseOfficers = [
-    mkOfficer('pcmd', { intelligence: 50 }),
-    mkOfficer('a1', { troopType: 'mystic', intelligence: 149, personalSkills: [17] }),
-    mkOfficer('a2', { troopType: 'mystic', intelligence: 50 }),
+    mkOfficer(100, { intelligence: 50 }),
+    mkOfficer(101, { troopType: 'mystic', intelligence: 149, personalSkills: [17] }),
+    mkOfficer(102, { troopType: 'mystic', intelligence: 50 }),
   ]
   const aA1 = { x: 6, y: 5 }
   const aA2 = { x: 5, y: 5 }
   function scenario(allyTroops: number) {
     const s = withOfficers(createInitialState(1), baseOfficers)
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 25, y: 25 }), // 远，无敌在范围
+      unit(100, 'player', { x: 25, y: 25 }), // 远，无敌在范围
       // rooted=移动力 1：a1 几乎不挪窝，友军始终留在援兵范围内（隔离「选位不为治疗服务」的干扰）
-      unit('a1', 'opponent', aA1, { mp: 100, status: 'rooted' }),
-      unit('a2', 'opponent', aA2, { troops: allyTroops }),
+      unit(101, 'opponent', aA1, { mp: 100, status: 'rooted' }),
+      unit(102, 'opponent', aA2, { troops: allyTroops }),
     ])
     return nextOpponentAction(withBattle(s, b))!
   }
   it('友军满编（损失 < 1/4）→ 不施治疗 → 休息', () => {
     // a2 cap=1100，满编 → 援兵无目标；无敌方 → 14 无目标 → 休息。
     const r = scenario(1100)
-    expect(r.action.officerId).toBe('a1')
+    expect(r.action.officerId).toBe(101)
     expect(r.action.terminal.kind).toBe('rest')
   })
   it('友军损失≥1/4 → 施援兵于该友军', () => {
     const r = scenario(100) // 损失 1000 ≥ floor(1100/4)=275
-    expect(r.action.officerId).toBe('a1')
+    expect(r.action.officerId).toBe(101)
     expect(r.action.terminal.kind).toBe('cast')
     if (r.action.terminal.kind === 'cast') {
       expect(r.action.terminal.skillId).toBe(17)
@@ -253,12 +231,12 @@ describe('治疗筛（§7.7）：只给损失≥1/4 兵力的友军', () => {
 describe('确定性', () => {
   it('同 state（同 seed）多次调用结果一致', () => {
     const s = withOfficers(createInitialState(7), [
-      mkOfficer('pcmd', { intelligence: 80 }),
-      mkOfficer('a1', { troopType: 'mystic', intelligence: 80 }),
+      mkOfficer(100, { intelligence: 80 }),
+      mkOfficer(101, { troopType: 'mystic', intelligence: 80 }),
     ])
     const b = makeBattle([
-      unit('pcmd', 'player', { x: 8, y: 5 }),
-      unit('a1', 'opponent', { x: 5, y: 5 }, { mp: 100, troops: 80 }),
+      unit(100, 'player', { x: 8, y: 5 }),
+      unit(101, 'opponent', { x: 5, y: 5 }, { mp: 100, troops: 80 }),
     ])
     const r1 = nextOpponentAction(withBattle(s, b))!
     const r2 = nextOpponentAction(withBattle(s, b))!

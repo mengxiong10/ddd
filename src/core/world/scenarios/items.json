@@ -1,0 +1,298 @@
+[
+  {
+    "id": 1,
+    "name": "方天戟",
+    "forceBonus": 10,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 2,
+    "name": "七星刀",
+    "forceBonus": 8,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 3,
+    "name": "青龙刀",
+    "forceBonus": 10,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 4,
+    "name": "丈八矛",
+    "forceBonus": 9,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 5,
+    "name": "双股剑",
+    "forceBonus": 8,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 6,
+    "name": "三尖刀",
+    "forceBonus": 7,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 7,
+    "name": "双铁戟",
+    "forceBonus": 10,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 8,
+    "name": "倚天剑",
+    "forceBonus": 10,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 9,
+    "name": "青虹剑",
+    "forceBonus": 10,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 10,
+    "name": "望月枪",
+    "forceBonus": 8,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 11,
+    "name": "亮银枪",
+    "forceBonus": 10,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 12,
+    "name": "古淀刀",
+    "forceBonus": 7,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 13,
+    "name": "六韬",
+    "forceBonus": 2,
+    "intelBonus": 9,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 14,
+    "name": "司马法",
+    "forceBonus": 2,
+    "intelBonus": 3,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 15,
+    "name": "孙子兵法",
+    "forceBonus": 0,
+    "intelBonus": 11,
+    "movementBonus": 1,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 16,
+    "name": "范蠡兵法",
+    "forceBonus": 0,
+    "intelBonus": 6,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 17,
+    "name": "墨子",
+    "forceBonus": 6,
+    "intelBonus": 4,
+    "movementBonus": 2,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 18,
+    "name": "吴子兵法",
+    "forceBonus": 0,
+    "intelBonus": 6,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 19,
+    "name": "鬼谷子",
+    "forceBonus": 3,
+    "intelBonus": 7,
+    "movementBonus": 1,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 20,
+    "name": "孙膑兵法",
+    "forceBonus": 0,
+    "intelBonus": 5,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 21,
+    "name": "尉缭子",
+    "forceBonus": 2,
+    "intelBonus": 4,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 22,
+    "name": "商君书",
+    "forceBonus": 0,
+    "intelBonus": 5,
+    "movementBonus": 1,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 23,
+    "name": "三略",
+    "forceBonus": 3,
+    "intelBonus": 7,
+    "movementBonus": 0,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 24,
+    "name": "赤兔",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 3,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 25,
+    "name": "的卢",
+    "forceBonus": 0,
+    "intelBonus": 2,
+    "movementBonus": 2,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 26,
+    "name": "绝影",
+    "forceBonus": 2,
+    "intelBonus": 0,
+    "movementBonus": 2,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 27,
+    "name": "爪黄飞电",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 1,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 28,
+    "name": "王追",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 1,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 29,
+    "name": "惊帆",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 1,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 30,
+    "name": "白鸽",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 1,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 31,
+    "name": "快航",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 2,
+    "troopTypeOverride": 0
+  },
+  {
+    "id": 32,
+    "name": "铁骑兵符",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 3
+  },
+  {
+    "id": 33,
+    "name": "太玄兵符",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 2
+  },
+  {
+    "id": 34,
+    "name": "水战兵符",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 1
+  },
+  {
+    "id": 35,
+    "name": "步战兵符",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 5
+  },
+  {
+    "id": 36,
+    "name": "弓战兵符",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 6
+  },
+  {
+    "id": 37,
+    "name": "骑战兵符",
+    "forceBonus": 0,
+    "intelBonus": 0,
+    "movementBonus": 0,
+    "troopTypeOverride": 4
+  }
+]

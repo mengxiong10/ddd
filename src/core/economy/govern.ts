@@ -16,7 +16,7 @@ const GOVERN_PREVENTION_RAND_MIN = 1
 const GOVERN_PREVENTION_RAND_MAX = 4
 
 /**
- * 校验治理前置条件（不修改状态）。作用城 = 武将所在城（officer.cityId）。
+ * 校验治理前置条件（不修改状态）。作用城 = 武将所在城（officer.cityId!）。
  * 武将存在、未占用、非俘虏 → 本城金 ≥ governGoldCost → 体力 ≥ governStaminaCost
  * → 非「已正常且防灾已满」（避免浪费；异常城即使防灾满仍可治理清灾）。
  */
@@ -28,7 +28,7 @@ export function canGovern(
   const officer = state.officers[officerId]
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
   if (officer.lordId !== city.lordId) return { ok: false, reason: 'is-captive' }
   if (city.gold < config.governGoldCost) return { ok: false, reason: 'gold-insufficient' }
@@ -54,7 +54,7 @@ export function govern(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city = state.cities[officer.cityId]!
+  const city = state.cities[officer.cityId!]!
   const [preventionGain, nextRng] = randInt(
     state.rng,
     GOVERN_PREVENTION_RAND_MIN,
@@ -70,7 +70,7 @@ export function govern(
   const next: GameState = {
     ...state,
     rng: nextRng,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'govern', officerId }],
   }
@@ -78,7 +78,7 @@ export function govern(
     {
       kind: 'govern-done',
       officerId,
-      cityId: officer.cityId,
+      cityId: officer.cityId!,
       newPrevention: nextCity.disasterPrevention,
       delta: nextCity.disasterPrevention - city.disasterPrevention,
     },

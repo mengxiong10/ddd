@@ -36,7 +36,7 @@ export function canTrade(
   if (!officer) return { ok: false, reason: 'officer-not-found' }
   if (isBusy(state, officerId)) return { ok: false, reason: 'officer-busy' }
   if (isCaptive(state, officerId)) return { ok: false, reason: 'is-captive' }
-  const city = state.cities[officer.cityId]
+  const city = state.cities[officer.cityId!]
   if (!city) return { ok: false, reason: 'city-not-found' }
   if (officer.stamina < config.tradeStaminaCost)
     return { ok: false, reason: 'stamina-insufficient' }
@@ -63,7 +63,7 @@ export function trade(
   if (!check.ok) return commandFail(check, state)
 
   const officer = state.officers[officerId]!
-  const city0 = state.cities[officer.cityId]!
+  const city0 = state.cities[officer.cityId!]!
   const nextCity =
     mode === 'buy'
       ? spendGold(addFood(city0, amount), amount * TRADE_BUY_GOLD_PER_FOOD)
@@ -72,7 +72,7 @@ export function trade(
 
   return commandOk({
     ...state,
-    cities: { ...state.cities, [officer.cityId]: nextCity },
+    cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
     pendingCommands: [...state.pendingCommands, { type: 'trade', officerId }],
   })

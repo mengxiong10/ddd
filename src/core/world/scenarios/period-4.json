@@ -1,0 +1,4429 @@
+{
+  "id": "period-4",
+  "name": "三足鼎立",
+  "startYear": 225,
+  "cities": [
+    {
+      "id": 1,
+      "lordId": null,
+      "agriculture": 3426,
+      "commerce": 2637,
+      "agricultureCap": 7139,
+      "commerceCap": 5860,
+      "gold": 293,
+      "food": 856,
+      "loyalty": 50,
+      "reserveTroops": 0,
+      "population": 154702,
+      "status": "normal",
+      "disasterPrevention": 55,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 2,
+      "lordId": 230,
+      "agriculture": 2112,
+      "commerce": 2109,
+      "agricultureCap": 6212,
+      "commerceCap": 5702,
+      "gold": 234,
+      "food": 528,
+      "loyalty": 65,
+      "reserveTroops": 0,
+      "population": 164492,
+      "status": "normal",
+      "disasterPrevention": 38,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 3,
+      "lordId": 104,
+      "agriculture": 1858,
+      "commerce": 1385,
+      "agricultureCap": 4224,
+      "commerceCap": 3553,
+      "gold": 153,
+      "food": 464,
+      "loyalty": 39,
+      "reserveTroops": 0,
+      "population": 73367,
+      "status": "normal",
+      "disasterPrevention": 65,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 4,
+      "lordId": null,
+      "agriculture": 490,
+      "commerce": 523,
+      "agricultureCap": 1962,
+      "commerceCap": 1091,
+      "gold": 58,
+      "food": 122,
+      "loyalty": 63,
+      "reserveTroops": 0,
+      "population": 23101,
+      "status": "normal",
+      "disasterPrevention": 58,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 5,
+      "lordId": 230,
+      "agriculture": 1158,
+      "commerce": 1842,
+      "agricultureCap": 3131,
+      "commerceCap": 4494,
+      "gold": 204,
+      "food": 289,
+      "loyalty": 63,
+      "reserveTroops": 0,
+      "population": 93607,
+      "status": "normal",
+      "disasterPrevention": 38,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 6,
+      "lordId": 230,
+      "agriculture": 533,
+      "commerce": 657,
+      "agricultureCap": 1111,
+      "commerceCap": 1826,
+      "gold": 73,
+      "food": 133,
+      "loyalty": 35,
+      "reserveTroops": 0,
+      "population": 26635,
+      "status": "normal",
+      "disasterPrevention": 33,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 7,
+      "lordId": 230,
+      "agriculture": 1804,
+      "commerce": 3203,
+      "agricultureCap": 5822,
+      "commerceCap": 6817,
+      "gold": 355,
+      "food": 451,
+      "loyalty": 58,
+      "reserveTroops": 0,
+      "population": 247943,
+      "status": "normal",
+      "disasterPrevention": 62,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 8,
+      "lordId": 230,
+      "agriculture": 2877,
+      "commerce": 1907,
+      "agricultureCap": 5995,
+      "commerceCap": 7066,
+      "gold": 211,
+      "food": 719,
+      "loyalty": 31,
+      "reserveTroops": 0,
+      "population": 137387,
+      "status": "normal",
+      "disasterPrevention": 48,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 9,
+      "lordId": 230,
+      "agriculture": 1478,
+      "commerce": 1298,
+      "agricultureCap": 4768,
+      "commerceCap": 3247,
+      "gold": 144,
+      "food": 369,
+      "loyalty": 34,
+      "reserveTroops": 0,
+      "population": 63496,
+      "status": "normal",
+      "disasterPrevention": 44,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 10,
+      "lordId": 230,
+      "agriculture": 1548,
+      "commerce": 1000,
+      "agricultureCap": 3520,
+      "commerceCap": 3574,
+      "gold": 111,
+      "food": 387,
+      "loyalty": 44,
+      "reserveTroops": 0,
+      "population": 78494,
+      "status": "normal",
+      "disasterPrevention": 52,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 11,
+      "lordId": 230,
+      "agriculture": 6726,
+      "commerce": 6864,
+      "agricultureCap": 9748,
+      "commerceCap": 9668,
+      "gold": 762,
+      "food": 1681,
+      "loyalty": 63,
+      "reserveTroops": 0,
+      "population": 465784,
+      "status": "normal",
+      "disasterPrevention": 45,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 12,
+      "lordId": 230,
+      "agriculture": 1989,
+      "commerce": 2317,
+      "agricultureCap": 6631,
+      "commerceCap": 6437,
+      "gold": 257,
+      "food": 497,
+      "loyalty": 67,
+      "reserveTroops": 0,
+      "population": 196949,
+      "status": "normal",
+      "disasterPrevention": 34,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 13,
+      "lordId": 230,
+      "agriculture": 1501,
+      "commerce": 956,
+      "agricultureCap": 4170,
+      "commerceCap": 3678,
+      "gold": 106,
+      "food": 375,
+      "loyalty": 58,
+      "reserveTroops": 0,
+      "population": 94892,
+      "status": "normal",
+      "disasterPrevention": 47,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 14,
+      "lordId": 230,
+      "agriculture": 1378,
+      "commerce": 2746,
+      "agricultureCap": 5104,
+      "commerceCap": 5843,
+      "gold": 305,
+      "food": 344,
+      "loyalty": 69,
+      "reserveTroops": 0,
+      "population": 147686,
+      "status": "normal",
+      "disasterPrevention": 55,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 15,
+      "lordId": 265,
+      "agriculture": 2409,
+      "commerce": 2026,
+      "agricultureCap": 5475,
+      "commerceCap": 5065,
+      "gold": 225,
+      "food": 602,
+      "loyalty": 45,
+      "reserveTroops": 0,
+      "population": 184155,
+      "status": "normal",
+      "disasterPrevention": 39,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 16,
+      "lordId": 230,
+      "agriculture": 866,
+      "commerce": 321,
+      "agricultureCap": 2341,
+      "commerceCap": 1190,
+      "gold": 35,
+      "food": 216,
+      "loyalty": 51,
+      "reserveTroops": 0,
+      "population": 40512,
+      "status": "normal",
+      "disasterPrevention": 48,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 17,
+      "lordId": 230,
+      "agriculture": 2616,
+      "commerce": 3392,
+      "agricultureCap": 7695,
+      "commerceCap": 7219,
+      "gold": 376,
+      "food": 654,
+      "loyalty": 32,
+      "reserveTroops": 0,
+      "population": 248593,
+      "status": "normal",
+      "disasterPrevention": 56,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 18,
+      "lordId": null,
+      "agriculture": 827,
+      "commerce": 871,
+      "agricultureCap": 1838,
+      "commerceCap": 1937,
+      "gold": 96,
+      "food": 206,
+      "loyalty": 30,
+      "reserveTroops": 0,
+      "population": 36427,
+      "status": "normal",
+      "disasterPrevention": 42,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 19,
+      "lordId": null,
+      "agriculture": 663,
+      "commerce": 922,
+      "agricultureCap": 2553,
+      "commerceCap": 2145,
+      "gold": 102,
+      "food": 165,
+      "loyalty": 45,
+      "reserveTroops": 0,
+      "population": 36827,
+      "status": "normal",
+      "disasterPrevention": 42,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 20,
+      "lordId": 265,
+      "agriculture": 685,
+      "commerce": 548,
+      "agricultureCap": 2141,
+      "commerceCap": 1482,
+      "gold": 60,
+      "food": 171,
+      "loyalty": 39,
+      "reserveTroops": 0,
+      "population": 46697,
+      "status": "normal",
+      "disasterPrevention": 66,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 21,
+      "lordId": 230,
+      "agriculture": 1502,
+      "commerce": 1143,
+      "agricultureCap": 4553,
+      "commerceCap": 3943,
+      "gold": 127,
+      "food": 375,
+      "loyalty": 52,
+      "reserveTroops": 0,
+      "population": 77278,
+      "status": "normal",
+      "disasterPrevention": 56,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 22,
+      "lordId": 230,
+      "agriculture": 1500,
+      "commerce": 1436,
+      "agricultureCap": 4546,
+      "commerceCap": 4103,
+      "gold": 159,
+      "food": 375,
+      "loyalty": 63,
+      "reserveTroops": 0,
+      "population": 98483,
+      "status": "normal",
+      "disasterPrevention": 69,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 23,
+      "lordId": 56,
+      "agriculture": 2339,
+      "commerce": 1876,
+      "agricultureCap": 7312,
+      "commerceCap": 7219,
+      "gold": 208,
+      "food": 584,
+      "loyalty": 47,
+      "reserveTroops": 0,
+      "population": 185255,
+      "status": "normal",
+      "disasterPrevention": 39,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 24,
+      "lordId": 56,
+      "agriculture": 1108,
+      "commerce": 1876,
+      "agricultureCap": 3360,
+      "commerceCap": 4812,
+      "gold": 208,
+      "food": 277,
+      "loyalty": 55,
+      "reserveTroops": 0,
+      "population": 85274,
+      "status": "normal",
+      "disasterPrevention": 48,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 25,
+      "lordId": 265,
+      "agriculture": 2682,
+      "commerce": 1646,
+      "agricultureCap": 5960,
+      "commerceCap": 6098,
+      "gold": 182,
+      "food": 670,
+      "loyalty": 30,
+      "reserveTroops": 0,
+      "population": 180761,
+      "status": "normal",
+      "disasterPrevention": 45,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 26,
+      "lordId": 265,
+      "agriculture": 1163,
+      "commerce": 1329,
+      "agricultureCap": 3061,
+      "commerceCap": 3694,
+      "gold": 147,
+      "food": 290,
+      "loyalty": 40,
+      "reserveTroops": 0,
+      "population": 71168,
+      "status": "normal",
+      "disasterPrevention": 32,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 27,
+      "lordId": 56,
+      "agriculture": 2956,
+      "commerce": 2077,
+      "agricultureCap": 6160,
+      "commerceCap": 5936,
+      "gold": 230,
+      "food": 739,
+      "loyalty": 51,
+      "reserveTroops": 0,
+      "population": 236541,
+      "status": "normal",
+      "disasterPrevention": 39,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 28,
+      "lordId": 56,
+      "agriculture": 1655,
+      "commerce": 1419,
+      "agricultureCap": 4868,
+      "commerceCap": 3154,
+      "gold": 157,
+      "food": 413,
+      "loyalty": 59,
+      "reserveTroops": 0,
+      "population": 61035,
+      "status": "normal",
+      "disasterPrevention": 59,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 29,
+      "lordId": 56,
+      "agriculture": 1566,
+      "commerce": 1711,
+      "agricultureCap": 4746,
+      "commerceCap": 3803,
+      "gold": 190,
+      "food": 391,
+      "loyalty": 38,
+      "reserveTroops": 0,
+      "population": 68134,
+      "status": "normal",
+      "disasterPrevention": 49,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 30,
+      "lordId": 56,
+      "agriculture": 1581,
+      "commerce": 1927,
+      "agricultureCap": 3294,
+      "commerceCap": 4701,
+      "gold": 214,
+      "food": 395,
+      "loyalty": 56,
+      "reserveTroops": 0,
+      "population": 84355,
+      "status": "normal",
+      "disasterPrevention": 68,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 31,
+      "lordId": 266,
+      "agriculture": 1540,
+      "commerce": 1096,
+      "agricultureCap": 4280,
+      "commerceCap": 3656,
+      "gold": 121,
+      "food": 385,
+      "loyalty": 65,
+      "reserveTroops": 0,
+      "population": 95691,
+      "status": "normal",
+      "disasterPrevention": 57,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 32,
+      "lordId": 265,
+      "agriculture": 770,
+      "commerce": 539,
+      "agricultureCap": 2083,
+      "commerceCap": 1588,
+      "gold": 59,
+      "food": 192,
+      "loyalty": 50,
+      "reserveTroops": 0,
+      "population": 27127,
+      "status": "normal",
+      "disasterPrevention": 41,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 33,
+      "lordId": 56,
+      "agriculture": 1315,
+      "commerce": 1006,
+      "agricultureCap": 3985,
+      "commerceCap": 3355,
+      "gold": 111,
+      "food": 328,
+      "loyalty": 60,
+      "reserveTroops": 0,
+      "population": 78026,
+      "status": "normal",
+      "disasterPrevention": 35,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 34,
+      "lordId": 56,
+      "agriculture": 1653,
+      "commerce": 1448,
+      "agricultureCap": 4469,
+      "commerceCap": 3292,
+      "gold": 160,
+      "food": 413,
+      "loyalty": 65,
+      "reserveTroops": 0,
+      "population": 74034,
+      "status": "normal",
+      "disasterPrevention": 55,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 35,
+      "lordId": 56,
+      "agriculture": 1148,
+      "commerce": 1792,
+      "agricultureCap": 3704,
+      "commerceCap": 4074,
+      "gold": 199,
+      "food": 287,
+      "loyalty": 56,
+      "reserveTroops": 0,
+      "population": 97217,
+      "status": "normal",
+      "disasterPrevention": 60,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 36,
+      "lordId": 56,
+      "agriculture": 1111,
+      "commerce": 981,
+      "agricultureCap": 3269,
+      "commerceCap": 3067,
+      "gold": 109,
+      "food": 277,
+      "loyalty": 69,
+      "reserveTroops": 0,
+      "population": 55514,
+      "status": "normal",
+      "disasterPrevention": 43,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 37,
+      "lordId": 56,
+      "agriculture": 1042,
+      "commerce": 1455,
+      "agricultureCap": 3596,
+      "commerceCap": 3386,
+      "gold": 161,
+      "food": 260,
+      "loyalty": 39,
+      "reserveTroops": 0,
+      "population": 96995,
+      "status": "normal",
+      "disasterPrevention": 66,
+      "battleMapId": "plains"
+    },
+    {
+      "id": 38,
+      "lordId": null,
+      "agriculture": 1590,
+      "commerce": 1278,
+      "agricultureCap": 4819,
+      "commerceCap": 3045,
+      "gold": 142,
+      "food": 397,
+      "loyalty": 33,
+      "reserveTroops": 0,
+      "population": 80045,
+      "status": "normal",
+      "disasterPrevention": 43,
+      "battleMapId": "plains"
+    }
+  ],
+  "officers": [
+    {
+      "id": 24,
+      "intelligence": 75,
+      "lordId": 56,
+      "cityId": 33,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 34,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 27,
+      "intelligence": 35,
+      "lordId": 230,
+      "cityId": 16,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 73,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 28,
+      "intelligence": 55,
+      "lordId": 230,
+      "cityId": 22,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 70,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 32,
+      "intelligence": 93,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 41,
+      "loyalty": 89,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 35,
+      "intelligence": 83,
+      "lordId": 230,
+      "cityId": 2,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 81,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 36,
+      "intelligence": 42,
+      "lordId": 230,
+      "cityId": 22,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 82,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 37,
+      "intelligence": 63,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 80,
+      "loyalty": 92,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 38,
+      "intelligence": 74,
+      "lordId": 230,
+      "cityId": 16,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 73,
+      "loyalty": 94,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 51,
+      "intelligence": 83,
+      "lordId": 56,
+      "cityId": 35,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 88,
+      "loyalty": 90,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 52,
+      "intelligence": 40,
+      "lordId": 56,
+      "cityId": 30,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 94,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 53,
+      "intelligence": 63,
+      "lordId": 56,
+      "cityId": 29,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 76,
+      "loyalty": 93,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 56,
+      "intelligence": 73,
+      "lordId": 56,
+      "cityId": 24,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 100,
+      "appearanceConditions": { "birth": 0, "recruiterId": null, "cityId": 24 },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 58,
+      "intelligence": 53,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 98,
+      "loyalty": 100,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 59,
+      "intelligence": 20,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 96,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 210,
+        "recruiterId": null,
+        "cityId": 1
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 69,
+      "intelligence": 86,
+      "lordId": 230,
+      "cityId": 13,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 69,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 70,
+      "intelligence": 82,
+      "lordId": 265,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 30,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 71,
+      "intelligence": 82,
+      "lordId": 265,
+      "cityId": 26,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 53,
+      "loyalty": 83,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 73,
+      "intelligence": 53,
+      "lordId": 230,
+      "cityId": 14,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 58,
+      "loyalty": 82,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 79,
+      "intelligence": 73,
+      "lordId": 230,
+      "cityId": 13,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 36,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 93,
+      "intelligence": 74,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 53,
+      "loyalty": 78,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 97,
+      "intelligence": 49,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 92,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 210,
+        "recruiterId": null,
+        "cityId": 32
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 104,
+      "intelligence": 36,
+      "lordId": 104,
+      "cityId": 3,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 77,
+      "loyalty": 100,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 105,
+      "intelligence": 53,
+      "lordId": 104,
+      "cityId": 3,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 75,
+      "loyalty": 85,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 106,
+      "intelligence": 45,
+      "lordId": 230,
+      "cityId": 9,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 77,
+      "loyalty": 84,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 107,
+      "intelligence": 68,
+      "lordId": 230,
+      "cityId": 6,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 20,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 108,
+      "intelligence": 53,
+      "lordId": 230,
+      "cityId": 14,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 41,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 109,
+      "intelligence": 78,
+      "lordId": 230,
+      "cityId": 5,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 56,
+      "loyalty": 78,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 110,
+      "intelligence": 51,
+      "lordId": 56,
+      "cityId": 28,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 76,
+      "loyalty": 80,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 111,
+      "intelligence": 61,
+      "lordId": 230,
+      "cityId": 21,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 72,
+      "loyalty": 82,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 112,
+      "intelligence": 88,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 36,
+      "loyalty": 78,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 113,
+      "intelligence": 80,
+      "lordId": 230,
+      "cityId": 8,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 52,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 115,
+      "intelligence": 67,
+      "lordId": 56,
+      "cityId": 28,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 83,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 116,
+      "intelligence": 94,
+      "lordId": 56,
+      "cityId": 37,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 26,
+      "loyalty": 73,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 117,
+      "intelligence": 94,
+      "lordId": 230,
+      "cityId": 14,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 33,
+      "loyalty": 83,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 118,
+      "intelligence": 78,
+      "lordId": 56,
+      "cityId": 27,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 68,
+      "loyalty": 86,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 119,
+      "intelligence": 91,
+      "lordId": 56,
+      "cityId": 35,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 77,
+      "loyalty": 76,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 120,
+      "intelligence": 83,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 57,
+      "loyalty": 76,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 121,
+      "intelligence": 77,
+      "lordId": 265,
+      "cityId": 26,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 21,
+      "loyalty": 81,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 123,
+      "intelligence": 84,
+      "lordId": 265,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 52,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 124,
+      "intelligence": 72,
+      "lordId": 230,
+      "cityId": 9,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 58,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 129,
+      "intelligence": 84,
+      "lordId": 56,
+      "cityId": 33,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 40,
+      "loyalty": 83,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 130,
+      "intelligence": 70,
+      "lordId": 56,
+      "cityId": 35,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 47,
+      "loyalty": 86,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 131,
+      "intelligence": 89,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 36,
+      "loyalty": 81,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 132,
+      "intelligence": 56,
+      "lordId": 230,
+      "cityId": 12,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 82,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 133,
+      "intelligence": 96,
+      "lordId": 230,
+      "cityId": 11,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 37,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 134,
+      "intelligence": 56,
+      "lordId": 56,
+      "cityId": 28,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 81,
+      "loyalty": 81,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 135,
+      "intelligence": 79,
+      "lordId": 230,
+      "cityId": 17,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 54,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 136,
+      "intelligence": 1,
+      "lordId": 230,
+      "cityId": 7,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 1,
+      "loyalty": 70,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 137,
+      "intelligence": 59,
+      "lordId": null,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 75,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 138,
+      "intelligence": 24,
+      "lordId": 230,
+      "cityId": 8,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 96,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 142,
+      "intelligence": 77,
+      "lordId": 230,
+      "cityId": 6,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 143,
+      "intelligence": 76,
+      "lordId": 265,
+      "cityId": 26,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 82,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 144,
+      "intelligence": 59,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 82,
+      "loyalty": 81,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 145,
+      "intelligence": 70,
+      "lordId": null,
+      "cityId": 24,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 67,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 146,
+      "intelligence": 82,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 38,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 210,
+        "recruiterId": null,
+        "cityId": 17
+      },
+      "personality": 3,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 148,
+      "intelligence": 70,
+      "lordId": 230,
+      "cityId": 7,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 77,
+      "loyalty": 73,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 153,
+      "intelligence": 86,
+      "lordId": 56,
+      "cityId": 35,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 40,
+      "loyalty": 82,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 155,
+      "intelligence": 55,
+      "lordId": 265,
+      "cityId": 20,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 72,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 156,
+      "intelligence": 53,
+      "lordId": 56,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 91,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 157,
+      "intelligence": 84,
+      "lordId": 56,
+      "cityId": 29,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 25,
+      "loyalty": 95,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 158,
+      "intelligence": 100,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 26,
+      "loyalty": 100,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": [23]
+    },
+    {
+      "id": 160,
+      "intelligence": 44,
+      "lordId": 230,
+      "cityId": 14,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 75,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 161,
+      "intelligence": 47,
+      "lordId": 56,
+      "cityId": 37,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 78,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 162,
+      "intelligence": 45,
+      "lordId": 230,
+      "cityId": 21,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 163,
+      "intelligence": 87,
+      "lordId": 230,
+      "cityId": 2,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 21,
+      "loyalty": 85,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 164,
+      "intelligence": 83,
+      "lordId": 230,
+      "cityId": 22,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 86,
+      "loyalty": 89,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 166,
+      "intelligence": 69,
+      "lordId": 230,
+      "cityId": 5,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 92,
+      "loyalty": 84,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 167,
+      "intelligence": 87,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 98,
+      "loyalty": 98,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 168,
+      "intelligence": 46,
+      "lordId": 230,
+      "cityId": 21,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 76,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 169,
+      "intelligence": 78,
+      "lordId": 230,
+      "cityId": 17,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 72,
+      "loyalty": 71,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 170,
+      "intelligence": 59,
+      "lordId": 265,
+      "cityId": 26,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 91,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 171,
+      "intelligence": 72,
+      "lordId": 230,
+      "cityId": 21,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 46,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 172,
+      "intelligence": 86,
+      "lordId": 56,
+      "cityId": 28,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 20,
+      "loyalty": 95,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 173,
+      "intelligence": 84,
+      "lordId": 56,
+      "cityId": 27,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 75,
+      "loyalty": 80,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 174,
+      "intelligence": 53,
+      "lordId": 230,
+      "cityId": 16,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 77,
+      "loyalty": 71,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 175,
+      "intelligence": 73,
+      "lordId": 230,
+      "cityId": 14,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 51,
+      "loyalty": 85,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 177,
+      "intelligence": 71,
+      "lordId": 265,
+      "cityId": 26,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 34,
+      "loyalty": 84,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 178,
+      "intelligence": 75,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 44,
+      "loyalty": 83,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 179,
+      "intelligence": 77,
+      "lordId": 56,
+      "cityId": 30,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 22,
+      "loyalty": 84,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 181,
+      "intelligence": 54,
+      "lordId": 230,
+      "cityId": 12,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 182,
+      "intelligence": 41,
+      "lordId": 230,
+      "cityId": 16,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 59,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 184,
+      "intelligence": 74,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 22,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 210,
+        "recruiterId": null,
+        "cityId": 11
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 185,
+      "intelligence": 81,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 44,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 210,
+        "recruiterId": null,
+        "cityId": 17
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": [30]
+    },
+    {
+      "id": 186,
+      "intelligence": 150,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 20,
+      "force": 150,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 210,
+        "recruiterId": 265,
+        "cityId": 20
+      },
+      "personality": 0,
+      "troopType": "elite",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 187,
+      "intelligence": 150,
+      "lordId": null,
+      "cityId": 5,
+      "stamina": 100,
+      "troops": 100,
+      "level": 20,
+      "force": 150,
+      "loyalty": 0,
+      "appearanceConditions": { "birth": 0, "recruiterId": 266, "cityId": 5 },
+      "personality": 0,
+      "troopType": "elite",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 190,
+      "intelligence": 42,
+      "lordId": 230,
+      "cityId": 12,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 80,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 191,
+      "intelligence": 38,
+      "lordId": 230,
+      "cityId": 11,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 77,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 192,
+      "intelligence": 75,
+      "lordId": 230,
+      "cityId": 11,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 43,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 193,
+      "intelligence": 72,
+      "lordId": 265,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 39,
+      "loyalty": 86,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 194,
+      "intelligence": 56,
+      "lordId": 56,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 72,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 198,
+      "intelligence": 48,
+      "lordId": 230,
+      "cityId": 21,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 84,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 199,
+      "intelligence": 45,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 85,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 200,
+      "intelligence": 72,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 58,
+      "loyalty": 84,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 204,
+      "intelligence": 44,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 82,
+      "loyalty": 83,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 205,
+      "intelligence": 58,
+      "lordId": null,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 79,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 206,
+      "intelligence": 76,
+      "lordId": 230,
+      "cityId": 8,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 51,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 207,
+      "intelligence": 77,
+      "lordId": 230,
+      "cityId": 5,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 50,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 209,
+      "intelligence": 73,
+      "lordId": 265,
+      "cityId": 20,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 32,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 210,
+      "intelligence": 73,
+      "lordId": 265,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 37,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 211,
+      "intelligence": 48,
+      "lordId": null,
+      "cityId": 36,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 212,
+      "intelligence": 81,
+      "lordId": null,
+      "cityId": 26,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 25,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 217,
+      "intelligence": 52,
+      "lordId": null,
+      "cityId": 20,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 53,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 218,
+      "intelligence": 41,
+      "lordId": null,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 41,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 220,
+      "intelligence": 40,
+      "lordId": 230,
+      "cityId": 8,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 61,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 221,
+      "intelligence": 37,
+      "lordId": null,
+      "cityId": 27,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 50,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 222,
+      "intelligence": 51,
+      "lordId": null,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 71,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 223,
+      "intelligence": 22,
+      "lordId": null,
+      "cityId": 21,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 80,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 224,
+      "intelligence": 35,
+      "lordId": null,
+      "cityId": 33,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 68,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 225,
+      "intelligence": 77,
+      "lordId": null,
+      "cityId": 4,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 59,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 226,
+      "intelligence": 69,
+      "lordId": 230,
+      "cityId": 6,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 59,
+      "loyalty": 85,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 227,
+      "intelligence": 64,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 71,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 228,
+      "intelligence": 63,
+      "lordId": 230,
+      "cityId": 11,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 45,
+      "loyalty": 77,
+      "appearanceConditions": { "birth": 0, "recruiterId": null, "cityId": 11 },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 229,
+      "intelligence": 22,
+      "lordId": 230,
+      "cityId": 16,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 80,
+      "loyalty": 79,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 230,
+      "intelligence": 77,
+      "lordId": 230,
+      "cityId": 17,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 52,
+      "loyalty": 100,
+      "appearanceConditions": { "birth": 0, "recruiterId": null, "cityId": 17 },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 231,
+      "intelligence": 79,
+      "lordId": 230,
+      "cityId": 11,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 68,
+      "loyalty": 85,
+      "appearanceConditions": { "birth": 0, "recruiterId": null, "cityId": 11 },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 232,
+      "intelligence": 88,
+      "lordId": 230,
+      "cityId": 8,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 20,
+      "loyalty": 84,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 233,
+      "intelligence": 79,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 30,
+      "loyalty": 86,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 234,
+      "intelligence": 60,
+      "lordId": 230,
+      "cityId": 7,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 52,
+      "loyalty": 80,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 236,
+      "intelligence": 64,
+      "lordId": 56,
+      "cityId": 30,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 75,
+      "loyalty": 79,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 237,
+      "intelligence": 44,
+      "lordId": 56,
+      "cityId": 33,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 78,
+      "loyalty": 80,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 238,
+      "intelligence": 43,
+      "lordId": 56,
+      "cityId": 33,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 80,
+      "loyalty": 76,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 240,
+      "intelligence": 40,
+      "lordId": 56,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 81,
+      "loyalty": 86,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 241,
+      "intelligence": 73,
+      "lordId": 56,
+      "cityId": 27,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 31,
+      "loyalty": 81,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 242,
+      "intelligence": 75,
+      "lordId": 56,
+      "cityId": 29,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 36,
+      "loyalty": 78,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 243,
+      "intelligence": 74,
+      "lordId": 56,
+      "cityId": 36,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 28,
+      "loyalty": 89,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 244,
+      "intelligence": 77,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 41,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 245,
+      "intelligence": 55,
+      "lordId": 104,
+      "cityId": 3,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 246,
+      "intelligence": 72,
+      "lordId": 56,
+      "cityId": 35,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 39,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 2,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 248,
+      "intelligence": 93,
+      "lordId": null,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 84,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 249,
+      "intelligence": 94,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 41,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 225,
+        "recruiterId": null,
+        "cityId": 11
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 250,
+      "intelligence": 89,
+      "lordId": 230,
+      "cityId": 7,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 52,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 251,
+      "intelligence": 90,
+      "lordId": null,
+      "cityId": 1,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 93,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 252,
+      "intelligence": 52,
+      "lordId": 265,
+      "cityId": 26,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 253,
+      "intelligence": 35,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 59,
+      "loyalty": 89,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 254,
+      "intelligence": 73,
+      "lordId": 56,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 42,
+      "loyalty": 86,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 255,
+      "intelligence": 36,
+      "lordId": 56,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 61,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 256,
+      "intelligence": 43,
+      "lordId": 230,
+      "cityId": 7,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 40,
+      "loyalty": 70,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 257,
+      "intelligence": 75,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 28,
+      "loyalty": 82,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 258,
+      "intelligence": 43,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 76,
+      "loyalty": 70,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 259,
+      "intelligence": 84,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 45,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 260,
+      "intelligence": 53,
+      "lordId": null,
+      "cityId": 1,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 85,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 261,
+      "intelligence": 51,
+      "lordId": null,
+      "cityId": 16,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 73,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 262,
+      "intelligence": 52,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 75,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 263,
+      "intelligence": 49,
+      "lordId": 230,
+      "cityId": 16,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 80,
+      "loyalty": 79,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 264,
+      "intelligence": 73,
+      "lordId": null,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 48,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 265,
+      "intelligence": 5,
+      "lordId": 265,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 37,
+      "loyalty": 100,
+      "appearanceConditions": { "birth": 0, "recruiterId": null, "cityId": 25 },
+      "personality": 3,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 266,
+      "intelligence": 66,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 87,
+      "loyalty": 100,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 267,
+      "intelligence": 32,
+      "lordId": 230,
+      "cityId": 11,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 90,
+      "loyalty": 75,
+      "appearanceConditions": { "birth": 0, "recruiterId": null, "cityId": 11 },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 268,
+      "intelligence": 89,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 43,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 269,
+      "intelligence": 94,
+      "lordId": 230,
+      "cityId": 2,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 55,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 270,
+      "intelligence": 66,
+      "lordId": 230,
+      "cityId": 22,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 75,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 271,
+      "intelligence": 54,
+      "lordId": 230,
+      "cityId": 8,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 84,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 3,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 272,
+      "intelligence": 74,
+      "lordId": 230,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 79,
+      "loyalty": 75,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 273,
+      "intelligence": 52,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 86,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 274,
+      "intelligence": 51,
+      "lordId": 265,
+      "cityId": 15,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 84,
+      "loyalty": 71,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 275,
+      "intelligence": 49,
+      "lordId": 265,
+      "cityId": 32,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 74,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 276,
+      "intelligence": 58,
+      "lordId": 265,
+      "cityId": 25,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 83,
+      "loyalty": 70,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 277,
+      "intelligence": 29,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 90,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 210,
+        "recruiterId": null,
+        "cityId": 33
+      },
+      "personality": 0,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 278,
+      "intelligence": 26,
+      "lordId": 56,
+      "cityId": 24,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 71,
+      "loyalty": 80,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 279,
+      "intelligence": 80,
+      "lordId": 56,
+      "cityId": 34,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 42,
+      "loyalty": 80,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 280,
+      "intelligence": 49,
+      "lordId": 56,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 44,
+      "loyalty": 85,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 281,
+      "intelligence": 53,
+      "lordId": 56,
+      "cityId": 29,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 75,
+      "loyalty": 73,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 282,
+      "intelligence": 93,
+      "lordId": 56,
+      "cityId": 23,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 49,
+      "loyalty": 88,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 283,
+      "intelligence": 61,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 49,
+      "loyalty": 74,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 284,
+      "intelligence": 50,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 84,
+      "loyalty": 79,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 285,
+      "intelligence": 45,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 80,
+      "loyalty": 72,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 286,
+      "intelligence": 35,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 76,
+      "loyalty": 76,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 287,
+      "intelligence": 69,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 94,
+      "loyalty": 75,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 288,
+      "intelligence": 42,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 72,
+      "loyalty": 77,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 289,
+      "intelligence": 38,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 73,
+      "loyalty": 87,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 290,
+      "intelligence": 49,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 64,
+      "loyalty": 84,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "cavalry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 291,
+      "intelligence": 75,
+      "lordId": 266,
+      "cityId": 31,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 22,
+      "loyalty": 75,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 4,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 292,
+      "intelligence": 93,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 63,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 221,
+        "recruiterId": null,
+        "cityId": 10
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 293,
+      "intelligence": 79,
+      "lordId": null,
+      "cityId": 10,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 55,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 0,
+      "troopType": "infantry",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 294,
+      "intelligence": 84,
+      "lordId": null,
+      "cityId": 2,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 46,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      },
+      "personality": 1,
+      "troopType": "archer",
+      "experience": 0,
+      "personalSkills": []
+    },
+    {
+      "id": 295,
+      "intelligence": 70,
+      "lordId": null,
+      "cityId": null,
+      "stamina": 100,
+      "troops": 100,
+      "level": 1,
+      "force": 64,
+      "loyalty": 0,
+      "appearanceConditions": {
+        "birth": 212,
+        "recruiterId": null,
+        "cityId": 25
+      },
+      "personality": 0,
+      "troopType": "navy",
+      "experience": 0,
+      "personalSkills": []
+    }
+  ],
+  "items": [
+    {
+      "id": 1,
+      "holder": { "kind": "city", "cityId": 20 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 2,
+      "holder": { "kind": "city", "cityId": 10 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 3,
+      "holder": { "kind": "officer", "officerId": 273, "equipSeq": 0 },
+      "discovered": true,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 4,
+      "holder": { "kind": "officer", "officerId": 274, "equipSeq": 0 },
+      "discovered": true,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 5,
+      "holder": { "kind": "city", "cityId": 23 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 6,
+      "holder": { "kind": "city", "cityId": 22 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 7,
+      "holder": { "kind": "city", "cityId": 25 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 8,
+      "holder": { "kind": "city", "cityId": 17 },
+      "discovered": false,
+      "appearanceConditions": { "birth": 144, "recruiterId": 265, "cityId": 17 }
+    },
+    {
+      "id": 9,
+      "holder": { "kind": "officer", "officerId": 167, "equipSeq": 1 },
+      "discovered": true,
+      "appearanceConditions": { "birth": 144, "recruiterId": 265, "cityId": 17 }
+    },
+    {
+      "id": 11,
+      "holder": { "kind": "officer", "officerId": 167, "equipSeq": 0 },
+      "discovered": true,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 12,
+      "holder": { "kind": "city", "cityId": 24 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 13,
+      "holder": { "kind": "city", "cityId": 25 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 14,
+      "holder": { "kind": "city", "cityId": 1 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 15,
+      "holder": { "kind": "city", "cityId": 18 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 16,
+      "holder": { "kind": "city", "cityId": 32 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 17,
+      "holder": { "kind": "city", "cityId": 29 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 18,
+      "holder": { "kind": "city", "cityId": 35 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 19,
+      "holder": { "kind": "city", "cityId": 32 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 20,
+      "holder": { "kind": "city", "cityId": 2 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 21,
+      "holder": { "kind": "city", "cityId": 4 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 22,
+      "holder": { "kind": "city", "cityId": 38 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 23,
+      "holder": { "kind": "city", "cityId": 32 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 24,
+      "holder": { "kind": "officer", "officerId": 185, "equipSeq": 0 },
+      "discovered": true,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 25,
+      "holder": { "kind": "city", "cityId": 28 },
+      "discovered": false,
+      "appearanceConditions": { "birth": 144, "recruiterId": 211, "cityId": 28 }
+    },
+    {
+      "id": 26,
+      "holder": { "kind": "officer", "officerId": 185, "equipSeq": 1 },
+      "discovered": true,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 27,
+      "holder": { "kind": "city", "cityId": 9 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 28,
+      "holder": { "kind": "city", "cityId": 23 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 29,
+      "holder": { "kind": "city", "cityId": 24 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 30,
+      "holder": { "kind": "officer", "officerId": 37, "equipSeq": 1 },
+      "discovered": true,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 31,
+      "holder": { "kind": "officer", "officerId": 56, "equipSeq": 1 },
+      "discovered": true,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 32,
+      "holder": { "kind": "city", "cityId": 28 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 33,
+      "holder": { "kind": "city", "cityId": 25 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    },
+    {
+      "id": 34,
+      "holder": { "kind": "city", "cityId": 7 },
+      "discovered": false,
+      "appearanceConditions": {
+        "birth": 0,
+        "recruiterId": null,
+        "cityId": null
+      }
+    }
+  ]
+}

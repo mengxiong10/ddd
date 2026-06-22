@@ -14,8 +14,8 @@ export type CityStatus = 'normal' | 'famine' | 'drought' | 'flood' | 'riot'
 export interface City {
   readonly id: CityId
   readonly name: string
-  /** 归属君主。 */
-  readonly lordId: OfficerId
+  /** 归属君主；null 表示尚未归属的空城。 */
+  readonly lordId: OfficerId | null
   /** 农业，取值 [0, agricultureCap]；决定收粮量。 */
   readonly agriculture: number
   /** 商业，取值 [0, commerceCap]；决定收税量。 */

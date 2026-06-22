@@ -3,6 +3,7 @@ import { withEvents, type WithEvents, type OutcomeEvent } from '../shared/outcom
 import type { Rng } from '../shared/rng'
 import { randInt } from '../shared/rng'
 import type { City } from './city'
+import type { CityId } from '../shared/ids'
 import { applyDisasterDamage, setStatus } from './city'
 
 /**
@@ -68,12 +69,15 @@ function recover(city: City, rng: Rng): readonly [City, Rng] {
  * 含 AI 城；无归属空城跳过（当前模型城恒有归属）。纯函数、可注入 RNG。
  */
 export function runDisasters(state: GameState): WithEvents<GameState> {
-  const ids = Object.keys(state.cities).sort()
+  const ids = Object.keys(state.cities)
+    .map(Number)
+    .sort((a, b) => a - b)
   let rng = state.rng
-  const cities: Record<string, City> = { ...state.cities }
+  const cities: Record<CityId, City> = { ...state.cities }
   const events: OutcomeEvent[] = []
   for (const id of ids) {
     const city = cities[id]!
+    if (city.lordId === null) continue
     if (city.status === 'normal') {
       const [next, r] = generate(city, rng)
       rng = r

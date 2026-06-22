@@ -30,7 +30,7 @@ export function behead(state: GameState, captiveId: OfficerId): WithCheck<GameSt
   const captive = state.officers[captiveId]!
   const items = { ...state.items }
   for (const item of itemsOfOfficer(state, captiveId)) {
-    items[item.id] = discover(holdByCity(item, captive.cityId))
+    items[item.id] = discover(holdByCity(item, captive.cityId!))
   }
   const { [captiveId]: _removed, ...officers } = state.officers
   return commandOk({ ...state, items, officers })
