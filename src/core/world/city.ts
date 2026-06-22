@@ -1,4 +1,4 @@
-import type { CityId, OfficerId } from '../shared/ids'
+import type { BattleMapId, CityId, OfficerId } from '../shared/ids'
 import type { DevelopKind } from '../shared/config'
 
 /** 民忠量纲上限（百分制，固定值；规则身份，不入 config）。 */
@@ -14,6 +14,9 @@ export type CityStatus = 'normal' | 'famine' | 'drought' | 'flood' | 'riot'
 export interface City {
   readonly id: CityId
   readonly name: string
+  /** `12×9` 世界网格坐标；仅用于布局，不派生邻接。 */
+  readonly x: number
+  readonly y: number
   /** 归属君主；null 表示尚未归属的空城。 */
   readonly lordId: OfficerId | null
   /** 农业，取值 [0, agricultureCap]；决定收粮量。 */
@@ -38,8 +41,8 @@ export interface City {
   readonly status: CityStatus
   /** 防灾值 [0, DISASTER_PREVENTION_MAX]；越高越不易发灾、越快从旱/水灾恢复。 */
   readonly disasterPrevention: number
-  /** 战斗地图 id（指向 military/battle-map 的 BATTLE_MAPS 模板，fixture 播种）。用 string 避免 world→military 反向依赖。 */
-  readonly battleMapId: string
+  /** 固定战斗地图 id（1..7）。 */
+  readonly battleMapId: BattleMapId
 }
 
 /** 按开发种类取对应的城级上限。 */

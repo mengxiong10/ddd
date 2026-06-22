@@ -48,7 +48,7 @@ export interface Officer {
   readonly experience: number
   /**
    * 个人技能 id 列表（战斗技能，fixture 播种、默认 []）。不受等级解锁公式限制、恒可用。
-   * 用 number 而非 SkillId 以规避 world→military 反向依赖（同 City.battleMapId 用 string）。
+   * 用 number 而非 SkillId 以规避 world→military 反向依赖。
    */
   readonly personalSkills: readonly number[]
 }

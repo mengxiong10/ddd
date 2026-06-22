@@ -1,5 +1,6 @@
 import type { Position } from '../shared/position'
 import { samePos } from '../shared/position'
+import type { BattleMapId } from '../shared/ids'
 import type { TroopType } from '../world/troop-type'
 
 /** 8 种战斗地形。 */
@@ -13,7 +14,7 @@ export type Terrain =
   | 'camp'
   | 'river'
 
-export type MapId = string
+export type MapId = BattleMapId
 
 /** 棋盘边长（规则身份，与总纲一致）。 */
 export const GRID_SIZE = 32
@@ -35,6 +36,16 @@ export interface BattleMap {
   readonly attackerSpawns: readonly Position[]
   readonly defenderSpawns: readonly Position[]
 }
+
+/** data 层注入 core 前使用的纯地形形状。 */
+export interface BattleMapData {
+  readonly id: BattleMapId
+  readonly width: number
+  readonly height: number
+  readonly tiles: readonly Terrain[]
+}
+
+export type BattleMapCatalog = Readonly<Record<BattleMapId, BattleMap>>
 
 /**
  * 地形移动消耗 [兵种][地形]（§6.5.2，规则身份内联常量）。
@@ -92,61 +103,35 @@ export function isCityTile(map: BattleMap, p: Position): boolean {
   return map.cityTiles.some((c) => samePos(c, p))
 }
 
-/**
- * 程序化构造一张模板地图（比手写 1024 字符更易维护、可平衡期再细化）：
- * 默认 plain 铺底；中央一块山地、左右各一条河流带、若干森林点缀；
- * 城池格置于地图中线偏防守方一侧；进攻方出生点在左列、防守方在右列各 10 个。
- */
-function makeTemplateMap(id: MapId): BattleMap {
-  const width = GRID_SIZE
-  const height = GRID_SIZE
-  const tiles: Terrain[] = new Array(width * height).fill('plain')
-  const set = (x: number, y: number, t: Terrain) => {
-    tiles[y * width + x] = t
-  }
+/** 双方出生点继续使用既有固定规则，不属于原版地形数据。 */
+const attackerSpawns: readonly Position[] = Array.from({ length: 10 }, (_, i) => ({
+  x: 1,
+  y: 7 + i + (i >= 5 ? 6 : 0),
+}))
+const defenderSpawns: readonly Position[] = attackerSpawns.map(({ y }) => ({ x: 30, y }))
 
-  // 两条河流纵带（x=10、x=21），中段留缺口便于穿行
-  for (let y = 0; y < height; y++) {
-    if (y < 14 || y > 17) {
-      set(10, y, 'river')
-      set(21, y, 'river')
-    }
+function hydrateMap(raw: BattleMapData): BattleMap {
+  const tiles = raw.tiles
+  const cityTiles: Position[] = []
+  for (let index = 0; index < tiles.length; index += 1) {
+    if (tiles[index] === 'city')
+      cityTiles.push({ x: index % raw.width, y: Math.floor(index / raw.width) })
   }
-  // 中央山地块 + 环绕森林
-  for (let y = 12; y <= 19; y++) {
-    for (let x = 14; x <= 17; x++) set(x, y, 'mountain')
+  return {
+    id: raw.id,
+    width: raw.width,
+    height: raw.height,
+    tiles,
+    cityTiles,
+    attackerSpawns,
+    defenderSpawns,
   }
-  for (let y = 10; y <= 21; y++) {
-    set(13, y, 'forest')
-    set(18, y, 'forest')
-  }
-  // 防守方一侧的村庄与营寨（增加守方纵深）
-  set(26, 15, 'village')
-  set(27, 16, 'camp')
-
-  // 城池格（胜负点）：靠防守方中线
-  const cityTiles: Position[] = [{ x: 28, y: 16 }]
-  set(28, 16, 'city')
-
-  // 出生点：进攻方左列 x=1，防守方右列 x=30，各 10 个，纵向铺开
-  const attackerSpawns: Position[] = []
-  const defenderSpawns: Position[] = []
-  for (let i = 0; i < 10; i++) {
-    const y = 7 + i + (i >= 5 ? 6 : 0) // 7..11 与 18..22 两段，避开中央
-    attackerSpawns.push({ x: 1, y })
-    defenderSpawns.push({ x: 30, y })
-  }
-
-  return { id, width, height, tiles, cityTiles, attackerSpawns, defenderSpawns }
 }
 
-/**
- * 模板地图注册表（模块常量、静态规则数据，不进 GameState/存档）。
- * 城经 City.battleMapId 指向其一；本切片先一张通用模板，平衡期可加。
- */
-export const BATTLE_MAPS: Record<MapId, BattleMap> = {
-  plains: makeTemplateMap('plains'),
+/** 把 data 层注入的纯地形资料补成 core 使用的地图目录。 */
+export function createBattleMapCatalog(maps: readonly BattleMapData[]): BattleMapCatalog {
+  return Object.fromEntries(maps.map((raw) => [raw.id, hydrateMap(raw)]))
 }
 
-/** 默认地图 id（City.battleMapId 缺省时兜底）。 */
-export const DEFAULT_MAP_ID: MapId = 'plains'
+/** fixture 使用的已知地图；不是未知 id 的运行时回退。 */
+export const DEFAULT_MAP_ID: MapId = 1

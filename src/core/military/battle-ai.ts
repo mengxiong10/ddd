@@ -7,7 +7,7 @@ import { randInt, pickRandom } from '../shared/rng'
 import { effectiveOfficer, effectiveTroopType } from '../world/queries'
 import { troopCapacity } from '../world/officer'
 import type { Terrain, BattleMap } from './battle-map'
-import { BATTLE_MAPS, terrainAt, isCityTile } from './battle-map'
+import { terrainAt, isCityTile } from './battle-map'
 import { reachableTiles, attackableTiles, skillTargetTiles } from './battle-movement'
 import type { SkillDef } from './battle-skill'
 import { SKILL_DEFS, availableSkills } from './battle-skill'
@@ -65,7 +65,7 @@ function selectUnitId(battle: BattleState, map: BattleMap): OfficerId | null {
   return candidates[0]!.officerId
 }
 
-const mapOf = (battle: BattleState) => BATTLE_MAPS[battle.mapId]!
+const mapOf = (state: GameState, battle: BattleState) => state.battleMaps[battle.mapId]!
 const posKey = (p: Position, width: number): number => p.y * width + p.x
 
 /**
@@ -286,7 +286,7 @@ export function nextOpponentAction(
 ): { readonly state: GameState; readonly action: ActAction } | null {
   const battle = state.activeBattle
   if (!battle || battle.outcome) return null
-  const map = mapOf(battle)
+  const map = mapOf(state, battle)
   const officerId = selectUnitId(battle, map)
   if (!officerId) return null
   const pos = chooseTile(state, battle, map, officerId)

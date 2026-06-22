@@ -19,6 +19,8 @@ import {
 const base: City = {
   id: 1,
   name: '成都',
+  x: 0,
+  y: 0,
   lordId: 1,
   agriculture: 300,
   commerce: 200,
@@ -31,7 +33,7 @@ const base: City = {
   population: 30000,
   status: 'normal',
   disasterPrevention: 50,
-  battleMapId: 'plains',
+  battleMapId: 1,
 }
 
 describe('city 聚合', () => {

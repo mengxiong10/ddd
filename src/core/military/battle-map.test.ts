@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
+import { createInitialState } from '../world/fixture'
 import {
-  BATTLE_MAPS,
   DEFAULT_MAP_ID,
   GRID_SIZE,
   MAX_MOVEMENT,
@@ -40,7 +40,7 @@ describe('battle-map 常量', () => {
 })
 
 describe('battle-map 读取助手', () => {
-  const map = BATTLE_MAPS[DEFAULT_MAP_ID]!
+  const map = createInitialState(1).battleMaps[DEFAULT_MAP_ID]!
 
   it('inBounds 边界正确', () => {
     expect(inBounds(map, { x: 0, y: 0 })).toBe(true)

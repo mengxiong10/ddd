@@ -4,7 +4,7 @@ import { withEvents, type WithEvents } from '../shared/outcome'
 import type { Position } from '../shared/position'
 import { effectiveOfficer, governorOf, defendingOfficers } from '../world/queries'
 import type { BattleMap } from './battle-map'
-import { BATTLE_MAPS, MAX_DAYS } from './battle-map'
+import { MAX_DAYS } from './battle-map'
 import { dailyFoodCost } from './battle-combat'
 import { resolveCampaignOutcome } from './aftermath'
 import { INITIAL_WEATHER, refreshWeather } from './battle-weather'
@@ -56,7 +56,8 @@ export function initBattle(
   const mode = attackerLord === state.playerLordId ? 'attack' : 'defend'
   const attackerSide: BattleSide = mode === 'attack' ? 'player' : 'opponent'
   const defenderSide: BattleSide = mode === 'attack' ? 'opponent' : 'player'
-  const map: BattleMap = BATTLE_MAPS[target.battleMapId] ?? BATTLE_MAPS.plains!
+  const map: BattleMap | undefined = state.battleMaps[target.battleMapId]
+  if (!map) throw new Error(`unknown battle map: ${target.battleMapId}`)
 
   // 防守方：显式守军（玩家防守时 chooseDefenders 传入的已选子集，已 ⊆ defendingOfficers）或自动取
   // defendingOfficers(target)（在城·本势力·非俘虏·未被占用）。两路均「太守领衔（若在守军内）+ 其余兵力降序（平局 id 升序）」、限 10。
@@ -160,7 +161,7 @@ export function startDay(state: GameState): GameState {
   }
   const advanced: BattleState = { ...battle, weather, units }
   // 4. 胜负：石阵击溃即时检查 + 日界粮草
-  const map = BATTLE_MAPS[battle.mapId]!
+  const map = state.battleMaps[battle.mapId]!
   const outcome = checkImmediateVictory(advanced, map) ?? checkDayBoundaryVictory(advanced)
   return { ...state, rng, activeBattle: outcome ? { ...advanced, outcome } : advanced }
 }

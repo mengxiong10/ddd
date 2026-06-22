@@ -16,8 +16,7 @@
       "reserveTroops": 0,
       "population": 157101,
       "status": "normal",
-      "disasterPrevention": 58,
-      "battleMapId": "plains"
+      "disasterPrevention": 58
     },
     {
       "id": 2,
@@ -32,8 +31,7 @@
       "reserveTroops": 0,
       "population": 145003,
       "status": "normal",
-      "disasterPrevention": 56,
-      "battleMapId": "plains"
+      "disasterPrevention": 56
     },
     {
       "id": 3,
@@ -48,8 +46,7 @@
       "reserveTroops": 0,
       "population": 83690,
       "status": "normal",
-      "disasterPrevention": 55,
-      "battleMapId": "plains"
+      "disasterPrevention": 55
     },
     {
       "id": 4,
@@ -64,8 +61,7 @@
       "reserveTroops": 0,
       "population": 22969,
       "status": "normal",
-      "disasterPrevention": 69,
-      "battleMapId": "plains"
+      "disasterPrevention": 69
     },
     {
       "id": 5,
@@ -80,8 +76,7 @@
       "reserveTroops": 0,
       "population": 55834,
       "status": "normal",
-      "disasterPrevention": 69,
-      "battleMapId": "plains"
+      "disasterPrevention": 69
     },
     {
       "id": 6,
@@ -96,8 +91,7 @@
       "reserveTroops": 0,
       "population": 32225,
       "status": "normal",
-      "disasterPrevention": 62,
-      "battleMapId": "plains"
+      "disasterPrevention": 62
     },
     {
       "id": 7,
@@ -112,8 +106,7 @@
       "reserveTroops": 0,
       "population": 260514,
       "status": "normal",
-      "disasterPrevention": 43,
-      "battleMapId": "plains"
+      "disasterPrevention": 43
     },
     {
       "id": 8,
@@ -128,8 +121,7 @@
       "reserveTroops": 0,
       "population": 188118,
       "status": "normal",
-      "disasterPrevention": 60,
-      "battleMapId": "plains"
+      "disasterPrevention": 60
     },
     {
       "id": 9,
@@ -144,8 +136,7 @@
       "reserveTroops": 0,
       "population": 61263,
       "status": "normal",
-      "disasterPrevention": 51,
-      "battleMapId": "plains"
+      "disasterPrevention": 51
     },
     {
       "id": 10,
@@ -160,8 +151,7 @@
       "reserveTroops": 0,
       "population": 68580,
       "status": "normal",
-      "disasterPrevention": 49,
-      "battleMapId": "plains"
+      "disasterPrevention": 49
     },
     {
       "id": 11,
@@ -176,8 +166,7 @@
       "reserveTroops": 0,
       "population": 546813,
       "status": "normal",
-      "disasterPrevention": 39,
-      "battleMapId": "plains"
+      "disasterPrevention": 39
     },
     {
       "id": 12,
@@ -192,8 +181,7 @@
       "reserveTroops": 0,
       "population": 158134,
       "status": "normal",
-      "disasterPrevention": 37,
-      "battleMapId": "plains"
+      "disasterPrevention": 37
     },
     {
       "id": 13,
@@ -208,8 +196,7 @@
       "reserveTroops": 0,
       "population": 64139,
       "status": "normal",
-      "disasterPrevention": 30,
-      "battleMapId": "plains"
+      "disasterPrevention": 30
     },
     {
       "id": 14,
@@ -224,8 +211,7 @@
       "reserveTroops": 0,
       "population": 237246,
       "status": "normal",
-      "disasterPrevention": 57,
-      "battleMapId": "plains"
+      "disasterPrevention": 57
     },
     {
       "id": 15,
@@ -240,8 +226,7 @@
       "reserveTroops": 0,
       "population": 158978,
       "status": "normal",
-      "disasterPrevention": 50,
-      "battleMapId": "plains"
+      "disasterPrevention": 50
     },
     {
       "id": 16,
@@ -256,8 +241,7 @@
       "reserveTroops": 0,
       "population": 402696,
       "status": "normal",
-      "disasterPrevention": 48,
-      "battleMapId": "plains"
+      "disasterPrevention": 48
     },
     {
       "id": 17,
@@ -272,8 +256,7 @@
       "reserveTroops": 0,
       "population": 163481,
       "status": "normal",
-      "disasterPrevention": 60,
-      "battleMapId": "plains"
+      "disasterPrevention": 60
     },
     {
       "id": 18,
@@ -288,8 +271,7 @@
       "reserveTroops": 0,
       "population": 26183,
       "status": "normal",
-      "disasterPrevention": 40,
-      "battleMapId": "plains"
+      "disasterPrevention": 40
     },
     {
       "id": 19,
@@ -304,8 +286,7 @@
       "reserveTroops": 0,
       "population": 28791,
       "status": "normal",
-      "disasterPrevention": 62,
-      "battleMapId": "plains"
+      "disasterPrevention": 62
     },
     {
       "id": 20,
@@ -320,8 +301,7 @@
       "reserveTroops": 0,
       "population": 35537,
       "status": "normal",
-      "disasterPrevention": 36,
-      "battleMapId": "plains"
+      "disasterPrevention": 36
     },
     {
       "id": 21,
@@ -336,8 +316,7 @@
       "reserveTroops": 0,
       "population": 52329,
       "status": "normal",
-      "disasterPrevention": 39,
-      "battleMapId": "plains"
+      "disasterPrevention": 39
     },
     {
       "id": 22,
@@ -352,8 +331,7 @@
       "reserveTroops": 0,
       "population": 68674,
       "status": "normal",
-      "disasterPrevention": 44,
-      "battleMapId": "plains"
+      "disasterPrevention": 44
     },
     {
       "id": 23,
@@ -368,8 +346,7 @@
       "reserveTroops": 0,
       "population": 180381,
       "status": "normal",
-      "disasterPrevention": 33,
-      "battleMapId": "plains"
+      "disasterPrevention": 33
     },
     {
       "id": 24,
@@ -384,8 +361,7 @@
       "reserveTroops": 0,
       "population": 72962,
       "status": "normal",
-      "disasterPrevention": 66,
-      "battleMapId": "plains"
+      "disasterPrevention": 66
     },
     {
       "id": 25,
@@ -400,8 +376,7 @@
       "reserveTroops": 0,
       "population": 144730,
       "status": "normal",
-      "disasterPrevention": 53,
-      "battleMapId": "plains"
+      "disasterPrevention": 53
     },
     {
       "id": 26,
@@ -416,8 +391,7 @@
       "reserveTroops": 0,
       "population": 54159,
       "status": "normal",
-      "disasterPrevention": 63,
-      "battleMapId": "plains"
+      "disasterPrevention": 63
     },
     {
       "id": 27,
@@ -432,8 +406,7 @@
       "reserveTroops": 0,
       "population": 201414,
       "status": "normal",
-      "disasterPrevention": 68,
-      "battleMapId": "plains"
+      "disasterPrevention": 68
     },
     {
       "id": 28,
@@ -448,8 +421,7 @@
       "reserveTroops": 0,
       "population": 100037,
       "status": "normal",
-      "disasterPrevention": 35,
-      "battleMapId": "plains"
+      "disasterPrevention": 35
     },
     {
       "id": 29,
@@ -464,8 +436,7 @@
       "reserveTroops": 0,
       "population": 79259,
       "status": "normal",
-      "disasterPrevention": 47,
-      "battleMapId": "plains"
+      "disasterPrevention": 47
     },
     {
       "id": 30,
@@ -480,8 +451,7 @@
       "reserveTroops": 0,
       "population": 67546,
       "status": "normal",
-      "disasterPrevention": 63,
-      "battleMapId": "plains"
+      "disasterPrevention": 63
     },
     {
       "id": 31,
@@ -496,8 +466,7 @@
       "reserveTroops": 0,
       "population": 67795,
       "status": "normal",
-      "disasterPrevention": 54,
-      "battleMapId": "plains"
+      "disasterPrevention": 54
     },
     {
       "id": 32,
@@ -512,8 +481,7 @@
       "reserveTroops": 0,
       "population": 23362,
       "status": "normal",
-      "disasterPrevention": 68,
-      "battleMapId": "plains"
+      "disasterPrevention": 68
     },
     {
       "id": 33,
@@ -528,8 +496,7 @@
       "reserveTroops": 0,
       "population": 95077,
       "status": "normal",
-      "disasterPrevention": 60,
-      "battleMapId": "plains"
+      "disasterPrevention": 60
     },
     {
       "id": 34,
@@ -544,8 +511,7 @@
       "reserveTroops": 0,
       "population": 70129,
       "status": "normal",
-      "disasterPrevention": 69,
-      "battleMapId": "plains"
+      "disasterPrevention": 69
     },
     {
       "id": 35,
@@ -560,8 +526,7 @@
       "reserveTroops": 0,
       "population": 60162,
       "status": "normal",
-      "disasterPrevention": 49,
-      "battleMapId": "plains"
+      "disasterPrevention": 49
     },
     {
       "id": 36,
@@ -576,8 +541,7 @@
       "reserveTroops": 0,
       "population": 97024,
       "status": "normal",
-      "disasterPrevention": 40,
-      "battleMapId": "plains"
+      "disasterPrevention": 40
     },
     {
       "id": 37,
@@ -592,8 +556,7 @@
       "reserveTroops": 0,
       "population": 57225,
       "status": "normal",
-      "disasterPrevention": 62,
-      "battleMapId": "plains"
+      "disasterPrevention": 62
     },
     {
       "id": 38,
@@ -608,8 +571,7 @@
       "reserveTroops": 0,
       "population": 86137,
       "status": "normal",
-      "disasterPrevention": 40,
-      "battleMapId": "plains"
+      "disasterPrevention": 40
     }
   ],
   "officers": [

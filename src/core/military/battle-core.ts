@@ -7,7 +7,7 @@ import type { Rng } from '../shared/rng'
 import { effectiveOfficer, effectiveTroopType } from '../world/queries'
 import { troopCapacity } from '../world/officer'
 import type { MapId, BattleMap } from './battle-map'
-import { BATTLE_MAPS, REDUCTION_TIER, DEFENSE_COEF_PCT, isCityTile, terrainAt } from './battle-map'
+import { REDUCTION_TIER, DEFENSE_COEF_PCT, isCityTile, terrainAt } from './battle-map'
 import {
   COUNTER_PCT,
   baseAttack,
@@ -164,7 +164,7 @@ export function canBattle(state: GameState, action: BattleAction): CommandCheck 
   if (unit.acted) return { ok: false, reason: 'unit-already-acted' }
   if (!canActWithStatus(unit.status)) return { ok: false, reason: 'cannot-act-status' }
 
-  const map = BATTLE_MAPS[battle.mapId]!
+  const map = state.battleMaps[battle.mapId]!
   if (
     action.moveTo &&
     !reachableTiles(state, battle, action.officerId).some((p) => samePos(p, action.moveTo!))
@@ -403,7 +403,7 @@ export function applyActResolved(
   battle: BattleState,
   action: Extract<BattleAction, { type: 'act' }>
 ): GameState {
-  const map = BATTLE_MAPS[battle.mapId]!
+  const map = state.battleMaps[battle.mapId]!
   let rng = state.rng
   let weather = battle.weather
   let playerProvisions = battle.playerProvisions

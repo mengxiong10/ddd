@@ -5,6 +5,7 @@ import type { Officer } from './world/officer'
 import type { Item } from './world/item'
 import type { Adjacency } from './world/adjacency'
 import type { BattleState } from './military/battle'
+import type { BattleMapCatalog } from './military/battle-map'
 
 /**
  * 效果延到月末执行的指令项；月末由 turn 层按 type 分派（与 game.apply 同构）。
@@ -79,6 +80,8 @@ export interface GameState {
   readonly rng: Rng
   /** 城邻接拓扑（静态，fixture 播种）；出征「可达=相邻」据此校验。 */
   readonly adjacency: Adjacency
+  /** data 层注入的战斗地图目录；core 不加载具体地图数据。 */
+  readonly battleMaps: BattleMapCatalog
   /**
    * 本月待月末执行的指令，按下令顺序入队；月末由 turn 层处理后清空。
    * 非 campaign 项经 runNonCampaignPending 执行；campaign 项由 end-month 逐条结算/挂起战斗。

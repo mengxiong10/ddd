@@ -2,7 +2,7 @@
 
 ## 方案概述
 
-保留“离线静态规范化、运行时轻实例化”，但把生成结果拆成共享身份/基础目录与四份时期状态。原始时期编号只在生成器内部解释；运行时统一使用稳定数字 ID。`data/scenarios` 负责合并共享目录和时期状态，输出完整 `GameState`；core 不持有、枚举或加载具体剧本。
+保留“离线静态规范化、运行时轻实例化”，但把生成结果拆成共享身份/基础目录、共享战斗地图与四份时期状态。原始时期编号只在生成器内部解释；运行时统一使用稳定数字 ID。`data/scenarios` 负责合并所有共享目录和时期状态，把七张地图作为 `GameState.battleMaps` 注入 core；core 不 import、枚举或加载具体地图数据。
 
 删除 `DebutEntry` 与 `pendingDebuts`。本剧本全部武将/道具从开局起进入各自字典；位置为空是未登场的唯一真相源。`world/debut` 按实体 ID 扫描并填入位置。未登场武将装备从开局起直接持有，不需要同步物化协议。
 
@@ -13,6 +13,7 @@
 export type CityId = number
 export type OfficerId = number
 export type ItemId = number
+export type BattleMapId = number
 
 // core/world/appearance.ts
 export interface AppearanceConditions {
@@ -48,6 +49,7 @@ export interface GameState {
   readonly cities: Readonly<Record<CityId, City>>
   readonly officers: Readonly<Record<OfficerId, Officer>>
   readonly items: Readonly<Record<ItemId, Item>>
+  readonly battleMaps: BattleMapCatalog
   // 无 pendingDebuts
 }
 
@@ -62,6 +64,11 @@ export function runDebuts(state: GameState): GameState
 interface IdentityRecord {
   readonly id: number
   readonly name: string
+}
+interface CityDefinition extends IdentityRecord {
+  readonly x: number
+  readonly y: number
+  readonly battleMapId: BattleMapId
 }
 interface ItemDefinition {
   readonly id: ItemId
@@ -97,13 +104,20 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 - 道具扫描顺序固定为完整原始 `goods_queue`，再按原始武将编号/槽位。以 `Set<ItemId>` 记已派发，重复项跳过，但原始装备槽仍参与基础属性还原。
 - 已装备道具 holder 直接指向武将，包括未来武将；装备 `discovered=true`。城市队列道具保留高位发现标志。
 - 共享目录只含静态字段；时期数组只含成员与可变/时期字段。
+- 城目录从 `cities.city_positions` 与 `cities.city_map_ids` 合并 `x/y/battleMapId`；世界坐标不派生邻接，时期城市状态不再写 `battleMapId`。
+- 仓库保存裁剪后的 `data/sgby-reset/battle-maps.json` 输入快照，只含七张地图的源 id、尺寸与 `terrain_tiles`；不长期依赖仓库外的 `~/dev/source`。
+- 生成 `src/data/scenarios/generated/battle-maps.json`：地图 id 规范为 `1..7`，二维源地形转行主序 `Terrain[]`，`hill→mountain`，拒绝未知地形、非 `32×32`、非唯一 `city` 格。
+- `data/scenarios/index.ts` 读取生成地形并调用 core 的纯构造函数，创建 `BattleMapCatalog` 注入 `GameState`；`cityTiles` 由 `city` 地形派生，出生点复用既有固定规则且不写入源快照。
+- 删除 `plains` 占位模板与未知地图回退；fixture 使用地图 1，非法 `battleMapId` 作为数据错误显式失败。
 - 所有输出先在内存完成计数、范围、重复和引用校验，再一次性格式化写出；`--check` 比较全部八份输出。
 
 ## 模块职责
 
 - `scripts/scenarios/generate-original.mjs`：唯一原版格式解释器；分配稳定数字身份、去重道具、拆共享/时期数据、执行完整性校验。
+- `data/sgby-reset/battle-maps.json`：从原版数据裁剪的七张纯地形输入快照，不含 tile 与图片资源。
+- `src/data/scenarios/generated/battle-maps.json`：生成后的七张规范化地形矩阵，与其它剧本数据同属 data 层。
 - `src/data/scenarios/generated/*.json`：禁止手改的共享目录、拓扑与时期状态。
-- `src/data/scenarios/index.ts`：隐藏 JSON 形状，合并完整实体并创建 `GameState`；只向下依赖 core 类型和值对象。
+- `src/data/scenarios/index.ts`：隐藏 JSON 形状，合并完整实体与战斗地图并创建 `GameState`；只向下依赖 core 类型和值对象。
 - `src/core/world/appearance.ts`：共享登场条件值对象。
 - `src/core/world/debut.ts`：只推进未登场实体的位置与 RNG。
 - `src/core/world/queries.ts`：对 nullable `cityId/holder` 做统一守卫；不让未登场实体参与城市、俘虏、指令和战斗查询。
@@ -149,6 +163,10 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 - [x] 删除 `DebutEntry/pendingDebuts`，实体位置 nullable，登场与未来装备测试红绿。
 - [x] 全仓迁移数字 ID 与数字升序，逐模块修复 nullable 守卫和回归测试。
 - [x] 运行生成 `--check`、全测试、typecheck、lint、build并同步根文档。
+- [x] 先以生成器/战斗地图测试锁定 38 城坐标、地图引用、七图尺寸/地形/城池格和无静默回退（RED）。
+- [x] 迁移 terrain-only 输入快照，扩展生成器产出共享城市地图字段与七张规范化地形图（GREEN）。
+- [x] 接入数字 `BattleMapId`、七图注册表与现有战斗流程，删除 `plains` 占位和回退并更新 fixture/回归测试。
+- [x] 运行生成 `--check`、全测试、typecheck、lint、format check、build并同步 `AGENTS.md` 红线。
 
 ## TDD：是
 

@@ -8,6 +8,16 @@ const SOURCE_DIR = path.join(ROOT, 'data/sgby-reset')
 const OUTPUT_DIR = path.join(ROOT, 'src/data/scenarios/generated')
 const PERIOD_KEYS = ['period_1', 'period_2', 'period_3', 'period_4']
 const TROOP_TYPES = ['infantry', 'cavalry', 'archer', 'navy', 'mystic', 'elite']
+const TERRAIN_NAMES = new Set([
+  'grass',
+  'plain',
+  'mountain',
+  'forest',
+  'village',
+  'city',
+  'camp',
+  'river',
+])
 const OFFICER_NAME_CORRECTIONS = new Map([
   ['荀或', '荀彧'],
   ['李决', '李傕'],
@@ -178,7 +188,6 @@ function buildPeriod(period, periodIndex, generalsData, goodsData, officerIdByNa
     population: source.population,
     status: 'normal',
     disasterPrevention: source.avoid_calamity,
-    battleMapId: 'plains',
   }))
   uniqueById(cities, `${scenarioId} city`)
 
@@ -273,13 +282,46 @@ async function serialize(value) {
   return format(JSON.stringify(value), { parser: 'json' })
 }
 
+function buildBattleMaps(sourceMaps) {
+  invariant(sourceMaps.length === 7, 'battle map count mismatch')
+  return sourceMaps.map((source, index) => {
+    const id = index + 1
+    invariant(source.id === id, `battle map id mismatch: ${source.id}`)
+    invariant(source.width === 32 && source.height === 32, `battle map size mismatch: ${id}`)
+    invariant(source.terrain.length === source.height, `battle map row count mismatch: ${id}`)
+    const tiles = source.terrain.flatMap((row) => {
+      invariant(row.length === source.width, `battle map column count mismatch: ${id}`)
+      return row.map((raw) => {
+        const terrain = raw === 'hill' ? 'mountain' : raw
+        invariant(TERRAIN_NAMES.has(terrain), `unknown battle terrain ${raw}: ${id}`)
+        return terrain
+      })
+    })
+    invariant(
+      tiles.filter((terrain) => terrain === 'city').length === 1,
+      `city tile mismatch: ${id}`
+    )
+    return { id, width: source.width, height: source.height, tiles }
+  })
+}
+
 export async function generateOriginalScenarios({ check = false } = {}) {
-  const [periods, generals, goods, cities] = await Promise.all(
-    ['periods', 'generals', 'goods', 'cities'].map(readJson)
+  const [periods, generals, goods, cities, sourceBattleMaps] = await Promise.all(
+    ['periods', 'generals', 'goods', 'cities', 'battle-maps'].map(readJson)
   )
   const officerCatalog = buildOfficerCatalog(periods)
+  const positionByCity = new Map(cities.city_positions.map((position) => [position.city, position]))
   const shared = {
-    'cities.json': cities.names.map(({ index, value }) => ({ id: index, name: value })),
+    'cities.json': cities.names.map(({ index, value }) => {
+      const position = positionByCity.get(index)
+      const mapIndex = cities.city_map_ids[index - 1]
+      invariant(position, `missing city position: ${index}`)
+      invariant(
+        Number.isInteger(mapIndex) && mapIndex >= 0 && mapIndex < 7,
+        `invalid city map: ${index}`
+      )
+      return { id: index, name: value, x: position.x, y: position.y, battleMapId: mapIndex + 1 }
+    }),
     'officers.json': officerCatalog.records,
     'items.json': goods.items.map(itemDefinition),
     'adjacency.json': cities.adjacency.edges.map(({ from, to }) => [from, to]),
@@ -298,6 +340,7 @@ export async function generateOriginalScenarios({ check = false } = {}) {
   for (const [index, value] of periodsOut.entries()) {
     files.set(`period-${index + 1}.json`, await serialize(value))
   }
+  files.set('battle-maps.json', await serialize(buildBattleMaps(sourceBattleMaps)))
 
   if (check) {
     for (const [name, expected] of files) {

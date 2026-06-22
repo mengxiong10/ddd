@@ -4,3 +4,5 @@ export type CityId = number
 export type OfficerId = number
 /** 道具唯一标识。 */
 export type ItemId = number
+/** 战斗地图唯一标识。原版七图稳定使用 1..7。 */
+export type BattleMapId = number

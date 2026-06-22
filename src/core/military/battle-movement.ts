@@ -6,7 +6,7 @@ import { effectiveTroopType, officerMovement } from '../world/queries'
 import type { TroopType } from '../world/troop-type'
 import type { BattleState } from './battle-core'
 import type { BattleMap } from './battle-map'
-import { BATTLE_MAPS, MAX_MOVEMENT, MOVE_COST, inBounds, terrainAt } from './battle-map'
+import { MAX_MOVEMENT, MOVE_COST, inBounds, terrainAt } from './battle-map'
 import { ATTACK_MASK } from './battle-combat'
 import type { SkillId } from './battle-skill'
 import { RANGE_MASK } from './battle-skill'
@@ -51,7 +51,7 @@ export function reachableTiles(
 ): Position[] {
   const unit = battle.units[officerId]
   if (!unit || unit.status === 'dead') return []
-  const map: BattleMap = BATTLE_MAPS[battle.mapId]!
+  const map: BattleMap = state.battleMaps[battle.mapId]!
   const troopType: TroopType = effectiveTroopType(state, officerId)
   // 定身：移动力降为 1；其余按派生移动力封顶 8。
   const budget =

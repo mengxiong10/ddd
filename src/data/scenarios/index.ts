@@ -1,14 +1,16 @@
 import type { GameState } from '../../core/game-state'
-import type { CityId, OfficerId } from '../../core/shared/ids'
+import type { BattleMapId, CityId, OfficerId } from '../../core/shared/ids'
 import { createRng } from '../../core/shared/rng'
 import { buildAdjacency } from '../../core/world/adjacency'
 import type { City } from '../../core/world/city'
 import type { Item } from '../../core/world/item'
 import type { Officer } from '../../core/world/officer'
+import { createBattleMapCatalog, type BattleMapData } from '../../core/military/battle-map'
 import cityCatalogJson from './generated/cities.json'
 import officerCatalogJson from './generated/officers.json'
 import itemCatalogJson from './generated/items.json'
 import adjacencyJson from './generated/adjacency.json'
+import battleMapsJson from './generated/battle-maps.json'
 import period1Json from './generated/period-1.json'
 import period2Json from './generated/period-2.json'
 import period3Json from './generated/period-3.json'
@@ -39,7 +41,13 @@ interface IdentityRecord<I extends number> {
   readonly name: string
 }
 
-type CityPeriodState = Omit<City, 'name'>
+interface CityDefinition extends IdentityRecord<CityId> {
+  readonly x: number
+  readonly y: number
+  readonly battleMapId: BattleMapId
+}
+
+type CityPeriodState = Omit<City, 'name' | 'x' | 'y' | 'battleMapId'>
 type OfficerPeriodState = Omit<Officer, 'name'>
 type ItemPeriodState = Pick<Item, 'id' | 'holder' | 'discovered' | 'appearanceConditions'>
 type ItemDefinition = Omit<Item, 'holder' | 'discovered' | 'appearanceConditions'>
@@ -56,10 +64,11 @@ interface ScenarioData extends ScenarioSummary {
   readonly items: readonly Item[]
 }
 
-const CITY_CATALOG = cityCatalogJson as readonly IdentityRecord<CityId>[]
+const CITY_CATALOG = cityCatalogJson as readonly CityDefinition[]
 const OFFICER_CATALOG = officerCatalogJson as readonly IdentityRecord<OfficerId>[]
 const ITEM_CATALOG = itemCatalogJson as unknown as readonly ItemDefinition[]
 const ADJACENCY_EDGES = adjacencyJson as unknown as readonly (readonly [CityId, CityId])[]
+const BATTLE_MAP_DATA = battleMapsJson as unknown as readonly BattleMapData[]
 
 function byId<T extends { readonly id: number }>(records: readonly T[]): Map<number, T> {
   return new Map(records.map((record) => [record.id, record]))
@@ -144,6 +153,7 @@ export function createScenarioState(request: CreateScenarioRequest): GameState {
     items: indexById(data.items),
     rng: createRng(request.seed),
     adjacency: buildAdjacency(ADJACENCY_EDGES),
+    battleMaps: createBattleMapCatalog(BATTLE_MAP_DATA),
     pendingCommands: [],
     activeBattle: null,
     pendingSuccession: null,

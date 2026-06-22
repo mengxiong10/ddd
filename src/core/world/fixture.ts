@@ -7,7 +7,12 @@ import type { TroopType, TroopTypeOverride } from './troop-type'
 import type { CityId, ItemId, OfficerId } from '../shared/ids'
 import { createRng } from '../shared/rng'
 import { buildAdjacency } from './adjacency'
-import { DEFAULT_MAP_ID } from '../military/battle-map'
+import {
+  createBattleMapCatalog,
+  DEFAULT_MAP_ID,
+  GRID_SIZE,
+  type Terrain,
+} from '../military/battle-map'
 import { DEFAULT_APPEARANCE } from './appearance'
 
 const START_YEAR = 189
@@ -20,6 +25,32 @@ const MOCK_FORCE = 50
 const MOCK_TROOPS = 100
 const MOCK_LORD_LOYALTY = 100
 const MOCK_OFFICER_LOYALTY = 50
+
+function fixtureBattleMaps() {
+  const tiles: Terrain[] = new Array(GRID_SIZE * GRID_SIZE).fill('plain')
+  const set = (x: number, y: number, terrain: Terrain) => {
+    tiles[y * GRID_SIZE + x] = terrain
+  }
+  for (let y = 0; y < GRID_SIZE; y += 1) {
+    if (y < 14 || y > 17) {
+      set(10, y, 'river')
+      set(21, y, 'river')
+    }
+  }
+  for (let y = 12; y <= 19; y += 1) {
+    for (let x = 14; x <= 17; x += 1) set(x, y, 'mountain')
+  }
+  for (let y = 10; y <= 21; y += 1) {
+    set(13, y, 'forest')
+    set(18, y, 'forest')
+  }
+  set(8, 1, 'village')
+  set(27, 16, 'camp')
+  set(28, 16, 'city')
+  return createBattleMapCatalog([
+    { id: DEFAULT_MAP_ID, width: GRID_SIZE, height: GRID_SIZE, tiles },
+  ])
+}
 
 interface OfficerSeed {
   readonly id: OfficerId
@@ -158,6 +189,8 @@ export function createInitialState(seed: number): GameState {
     cities[cs.id] = {
       id: cs.id,
       name: cs.name,
+      x: cs.id - 1,
+      y: 0,
       lordId: cs.lordId,
       agriculture: cs.agriculture,
       commerce: cs.commerce,
@@ -258,6 +291,7 @@ export function createInitialState(seed: number): GameState {
     rng: createRng(seed),
     pendingCommands: [],
     adjacency: buildAdjacency(ADJACENCY_EDGES),
+    battleMaps: fixtureBattleMaps(),
     activeBattle: null,
     pendingSuccession: null,
     pendingDefense: null,

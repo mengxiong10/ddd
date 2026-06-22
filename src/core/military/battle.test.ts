@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import type { Position } from '../shared/position'
-import { BATTLE_MAPS, DEFAULT_MAP_ID } from './battle-map'
+import { DEFAULT_MAP_ID } from './battle-map'
 import type { BattleState, BattleUnit, BattleSide, BattleMode } from './battle'
 import {
   initBattle,
@@ -14,7 +14,7 @@ import {
 } from './battle'
 import { WEATHER_ORDER } from './battle-weather'
 
-const map = BATTLE_MAPS[DEFAULT_MAP_ID]!
+const map = createInitialState(1).battleMaps[DEFAULT_MAP_ID]!
 
 function unit(
   officerId: number,
@@ -93,6 +93,15 @@ describe('initBattle 玩家进攻许昌', () => {
     expect(b2.units[7]!.pos).toEqual(map.defenderSpawns[1]) // 兵力高者次位
     expect(b2.units[8]!.pos).toEqual(map.defenderSpawns[2])
   })
+})
+
+it('initBattle rejects an unknown city battle-map id instead of falling back', () => {
+  const base = createInitialState(1)
+  const state: GameState = {
+    ...base,
+    cities: { ...base.cities, 3: { ...base.cities[3]!, battleMapId: 99 } },
+  }
+  expect(() => initBattle(state, [4], 3, 100)).toThrow('unknown battle map: 99')
 })
 
 describe('reduceBattle act 普攻：扣兵 + 经验', () => {
@@ -324,13 +333,13 @@ describe('reduceBattle cast 施法（诸葛亮 intel100 → seed1 必中、seed2
   it('火箭（破粮）：扣对手战场粮草（1000→850）', () => {
     const s = withPersonal(createInitialState(1), 2, [11])
     const b = makeBattle([
-      unit(2, 'player', { x: 26, y: 12 }),
-      unit(7, 'opponent', { x: 26, y: 15 }), // 村庄格
+      unit(2, 'player', { x: 8, y: 4 }),
+      unit(7, 'opponent', { x: 8, y: 1 }), // 原版地图 1 的村庄格
     ])
     const nb = reduceBattle(withBattle(s, b), {
       type: 'act',
       officerId: 2,
-      terminal: { kind: 'cast', skillId: 11, target: { x: 26, y: 15 } },
+      terminal: { kind: 'cast', skillId: 11, target: { x: 8, y: 1 } },
     }).activeBattle!
     expect(nb.opponentProvisions).toBe(850) // effectValue(150,…)=150
   })

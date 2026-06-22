@@ -2,12 +2,12 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import type { Position } from '../shared/position'
 import { samePos } from '../shared/position'
-import { BATTLE_MAPS, DEFAULT_MAP_ID } from './battle-map'
+import { DEFAULT_MAP_ID } from './battle-map'
 import type { BattleState, BattleUnit, BattleSide } from './battle'
 import { reachableTiles, attackableTiles, skillTargetTiles } from './battle-movement'
 
 const state = createInitialState(1)
-const map = BATTLE_MAPS[DEFAULT_MAP_ID]!
+const map = state.battleMaps[DEFAULT_MAP_ID]!
 
 function unit(officerId: number, side: BattleSide, pos: Position): BattleUnit {
   return {
