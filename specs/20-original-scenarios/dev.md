@@ -2,7 +2,7 @@
 
 ## 方案概述
 
-保留“离线静态规范化、运行时轻实例化”，但把生成结果拆成共享身份/基础目录与四份时期状态。原始时期编号只在生成器内部解释；运行时统一使用稳定数字 ID。`world/scenario` 负责合并共享目录和时期状态，输出完整 `GameState`。
+保留“离线静态规范化、运行时轻实例化”，但把生成结果拆成共享身份/基础目录与四份时期状态。原始时期编号只在生成器内部解释；运行时统一使用稳定数字 ID。`data/scenarios` 负责合并共享目录和时期状态，输出完整 `GameState`；core 不持有、枚举或加载具体剧本。
 
 删除 `DebutEntry` 与 `pendingDebuts`。本剧本全部武将/道具从开局起进入各自字典；位置为空是未登场的唯一真相源。`world/debut` 按实体 ID 扫描并填入位置。未登场武将装备从开局起直接持有，不需要同步物化协议。
 
@@ -58,7 +58,7 @@ export function runDebuts(state: GameState): GameState
 `runDebuts` 先按 `OfficerId` 升序处理 `cityId=null && year>=birth+16` 的武将，再按 `ItemId` 升序处理 `holder=null && year>=birth` 的道具；指定城直接落城，空目标调用既有随机选城助手。持有未登场武将的道具不参与扫描。
 
 ```ts
-// core/world/scenario.ts（生成 JSON 内部接口）
+// data/scenarios/index.ts（生成 JSON 内部接口）
 interface IdentityRecord {
   readonly id: number
   readonly name: string
@@ -91,6 +91,7 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 
 - 城市 ID 直接使用原版 1..38；道具 ID 直接使用 `goods.json` 1..37。
 - 武将身份按时期 1→4、时期内原始编号升序首次出现分配 1-based ID；同名复用，目录输出后按 ID 升序。
+- 原始姓名先用于跨时期身份匹配，再由显式校订表输出规范姓名；姓名校订不重排或重分配数字 ID。
 - 时期武将成员 = 城市队列中的非空武将 + `birth+16>startYear` 的未来非空武将；未来武将 `cityId=null`。
 - `appearanceConditions` 必填，字段为 `{birth,recruiterId,cityId}`；0 引用转 null，引用转稳定项目 ID。
 - 道具扫描顺序固定为完整原始 `goods_queue`，再按原始武将编号/槽位。以 `Set<ItemId>` 记已派发，重复项跳过，但原始装备槽仍参与基础属性还原。
@@ -100,9 +101,9 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 
 ## 模块职责
 
-- `scripts/generate-original-scenarios.mjs`：唯一原版格式解释器；分配稳定数字身份、去重道具、拆共享/时期数据、执行完整性校验。
-- `src/core/world/scenarios/*.json`：禁止手改的共享目录、拓扑与时期状态。
-- `src/core/world/scenario.ts`：隐藏 JSON 形状，合并完整实体并创建 `GameState`。
+- `scripts/scenarios/generate-original.mjs`：唯一原版格式解释器；分配稳定数字身份、去重道具、拆共享/时期数据、执行完整性校验。
+- `src/data/scenarios/generated/*.json`：禁止手改的共享目录、拓扑与时期状态。
+- `src/data/scenarios/index.ts`：隐藏 JSON 形状，合并完整实体并创建 `GameState`；只向下依赖 core 类型和值对象。
 - `src/core/world/appearance.ts`：共享登场条件值对象。
 - `src/core/world/debut.ts`：只推进未登场实体的位置与 RNG。
 - `src/core/world/queries.ts`：对 nullable `cityId/holder` 做统一守卫；不让未登场实体参与城市、俘虏、指令和战斗查询。
@@ -112,6 +113,7 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 
 - [ ] 生成共享目录和四时期文件，ID/计数/引用符合 PRD，`--check` 能检测漂移。
 - [ ] 武将 ID 跨时期稳定；城/道具沿用原版 ID；三类编号从 1 开始且各自独立。
+- [ ] 四个已确认姓名校订进入共享目录，误写不再出现在运行时，稳定数字 ID 不变。
 - [ ] 道具按首引用唯一化，保留位置与 PRD 一致，装备基础属性还原不受去重扫描影响。
 - [ ] `createScenarioState` 合并目录与时期状态，相同请求深相等，非法君主抛错。
 - [ ] 未来武将从开局起在 `officers`、装备从开局起在 `items`；未登场查询不可见。
@@ -122,25 +124,27 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 ## 新建文件
 
 - `src/core/world/appearance.ts`：登场条件类型。
-- `src/core/world/scenarios/cities.json`：共享城市身份。
-- `src/core/world/scenarios/officers.json`：共享武将身份。
-- `src/core/world/scenarios/items.json`：共享道具基础资料。
-- `src/core/world/scenarios/adjacency.json`：共享邻接边。
+- `src/data/scenarios/generated/cities.json`：共享城市身份。
+- `src/data/scenarios/generated/officers.json`：共享武将身份。
+- `src/data/scenarios/generated/items.json`：共享道具基础资料。
+- `src/data/scenarios/generated/adjacency.json`：共享邻接边。
+- `src/data/scenarios/index.ts`：运行时剧本目录、数据合并与初始状态装配。
 
 ## 修改文件
 
-- `scripts/generate-original-scenarios.mjs`：数字身份、共享输出、时期状态、首引用去重和新校验。
-- `src/core/world/scenarios/period-*.json`：仅保留时期状态。
+- `scripts/scenarios/generate-original.mjs`：数字身份、共享输出、时期状态、首引用去重和新校验。
+- `src/data/scenarios/generated/period-*.json`：仅保留时期状态。
 - `src/core/shared/ids.ts`：三类 ID 改为数字。
 - `src/core/game-state.ts`：删除 `DebutEntry/PendingEquipment/pendingDebuts`。
 - `src/core/world/officer.ts`、`item.ts`：nullable 位置与必填登场条件。
-- `src/core/world/scenario.ts`、`debut.ts`、`fixture.ts`：装配与登场模型迁移。
+- `src/core/world/debut.ts`、`fixture.ts`：登场模型迁移；具体剧本装配位于 `src/data/scenarios/index.ts`。
 - `src/core/world/queries.ts` 及 core/store/UI 测试和调用点：nullable 守卫、数字 fixture 与数字排序。
 - `AGENTS.md`、`CONTEXT.md`：替换旧拼音 ID、独立待登场池和待登场装备红线。
 
 ## 任务清单
 
 - [x] 生成器产出共享目录/拓扑与四时期状态；首引用道具去重、数字身份和计数测试红绿。
+- [x] 生成器显式校订四个已确认武将姓名，并以回归测试锁定规范输出。
 - [x] `scenario` 合并共享/时期数据，四剧本状态与可选君主测试红绿。
 - [x] 删除 `DebutEntry/pendingDebuts`，实体位置 nullable，登场与未来装备测试红绿。
 - [x] 全仓迁移数字 ID 与数字升序，逐模块修复 nullable 守卫和回归测试。
@@ -164,4 +168,4 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 - 低改动放大：新增时期只新增状态文件，城市/武将/道具基础资料集中维护。
 - 无提前抽象：固定静态 JSON、无仓储/schema/migration 框架。
 - 测试行为导向：锁身份、成员、去重、登场、引用和确定性，不锁脚本内部函数。
-- 依赖健康：生成器离线；运行时保持 `ui → store → core`。
+- 依赖健康：生成器离线；对局推进保持 `ui → store → core`，开局数据保持 `store → data/scenarios → core`，core 不反向依赖具体剧本。

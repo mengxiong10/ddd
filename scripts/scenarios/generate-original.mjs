@@ -3,11 +3,17 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { format } from 'prettier'
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const SOURCE_DIR = path.join(ROOT, 'data/sgby-reset')
-const OUTPUT_DIR = path.join(ROOT, 'src/core/world/scenarios')
+const OUTPUT_DIR = path.join(ROOT, 'src/data/scenarios/generated')
 const PERIOD_KEYS = ['period_1', 'period_2', 'period_3', 'period_4']
 const TROOP_TYPES = ['infantry', 'cavalry', 'archer', 'navy', 'mystic', 'elite']
+const OFFICER_NAME_CORRECTIONS = new Map([
+  ['荀或', '荀彧'],
+  ['李决', '李傕'],
+  ['博士仁', '傅士仁'],
+  ['张合', '张郃'],
+])
 const EXPECTED = [
   { lords: 19, emptyCities: 12, officers: 187, appeared: 157, items: 37 },
   { lords: 16, emptyCities: 8, officers: 184, appeared: 175, items: 33 },
@@ -34,13 +40,19 @@ function uniqueById(records, label) {
 
 function buildOfficerCatalog(periods) {
   const idByName = new Map()
+  const idByCanonicalName = new Map()
   const records = []
   for (const period of periods) {
     for (const general of period.generals) {
       if (!general.name || idByName.has(general.name)) continue
-      const id = records.length + 1
+      const canonicalName = OFFICER_NAME_CORRECTIONS.get(general.name) ?? general.name
+      let id = idByCanonicalName.get(canonicalName)
+      if (id === undefined) {
+        id = records.length + 1
+        idByCanonicalName.set(canonicalName, id)
+        records.push({ id, name: canonicalName })
+      }
       idByName.set(general.name, id)
-      records.push({ id, name: general.name })
     }
   }
   uniqueById(records, 'officer catalog')

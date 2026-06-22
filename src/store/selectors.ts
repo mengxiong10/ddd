@@ -25,7 +25,7 @@ export {
 } from '../core/world/queries'
 export { successionCandidates } from '../core/world/succession'
 export { troopCapacity } from '../core/world/officer'
-export { SCENARIOS, lordsForScenario } from '../core/world/scenario'
+export { SCENARIOS, lordsForScenario } from '../data/scenarios'
 
 export type { GameState, PendingCommand } from '../core/game-state'
 export type { Action, CommandResult } from '../core/game'
@@ -41,7 +41,7 @@ export type {
   ScenarioSummary,
   ScenarioLordSummary,
   CreateScenarioRequest,
-} from '../core/world/scenario'
+} from '../data/scenarios'
 
 /** 玩家全部城池（= citiesOfLord(game, game.playerLordId)）。 */
 export const playerCities = (game: GameState): City[] => citiesOfLord(game, game.playerLordId)

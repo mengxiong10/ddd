@@ -3,7 +3,6 @@ import { createInitialState } from './fixture'
 import { runDebuts } from './debut'
 import { endMonth } from '../turn/end-month'
 import { DEFAULT_CONFIG } from '../shared/config'
-import { createScenarioState } from './scenario'
 
 describe('runDebuts 登场', () => {
   it('未到登场年：位置不变、不消费 RNG', () => {
@@ -34,15 +33,30 @@ describe('runDebuts 登场', () => {
   })
 
   it('未登场武将装备从开局起已持有，登场只改变武将位置', () => {
-    const initial = createScenarioState({ scenarioId: 'period-4', playerLordId: 230, seed: 1 })
-    const huatuo = Object.values(initial.officers).find((officer) => officer.name === '华佗')!
-    const holderBefore = initial.items[26]?.holder
-    expect(huatuo.cityId).toBeNull()
-    expect(holderBefore).toEqual({ kind: 'officer', officerId: huatuo.id, equipSeq: 1 })
+    const base = createInitialState(1)
+    const initial = {
+      ...base,
+      items: {
+        ...base.items,
+        4: {
+          id: 4,
+          name: '未登场装备',
+          forceBonus: 1,
+          intelBonus: 0,
+          movementBonus: 0,
+          troopTypeOverride: 0 as const,
+          holder: { kind: 'officer' as const, officerId: 11, equipSeq: 0 },
+          discovered: true,
+          appearanceConditions: { birth: 0, recruiterId: null, cityId: null },
+        },
+      },
+    }
+    const holderBefore = initial.items[4]?.holder
+    expect(initial.officers[11]?.cityId).toBeNull()
 
-    const result = runDebuts({ ...initial, year: 226 })
-    expect(result.officers[huatuo.id]?.cityId).toBe(17)
-    expect(result.items[26]?.holder).toEqual(holderBefore)
+    const result = runDebuts({ ...initial, year: 191 })
+    expect(result.officers[11]?.cityId).toBe(2)
+    expect(result.items[4]?.holder).toEqual(holderBefore)
   })
 })
 

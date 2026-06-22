@@ -7,7 +7,7 @@ import type { Action, CommandResult } from '../core/game'
 import { applyWithEvents, canApply } from '../core/game'
 import type { CommandCheck, ReasonCode } from '../core/shared/command'
 import type { OutcomeEvent } from '../core/shared/outcome'
-import { createScenarioState, type CreateScenarioRequest } from '../core/world/scenario'
+import { createScenarioState, type CreateScenarioRequest } from '../data/scenarios'
 
 /**
  * 瞬态反馈项（`19-store-ui`）：core 结构化反馈 + 自增 id（UI keying + 定时出队）。

@@ -22,13 +22,14 @@
 明确不使用 Phaser / PixiJS 等游戏引擎。回合制 UI/面板/地图驱动的特性下，分层架构更易维护、可测：
 
 - **游戏核心 `src/core/`**：纯 TypeScript，**禁止 import React / Zustand / 任何 UI**。
+  - core 只推进已初始化的 `GameState`；不持有、枚举或加载具体剧本数据。
   - 不可变状态推进：`apply(state, action) -> newState`，纯函数、确定性、可单测。
   - 所有规则归此层：经营产出、兵力增长、战斗结算、AI 决策、胜负判定。
   - 随机性通过可注入的 seed/RNG，保证可复现、可测。
 - **状态层 `src/store/`**：Zustand store 持有 core 状态、派发 action、对接 localStorage 存档。**不写游戏规则**。Zustand store 即"应用服务层"，不再额外引入应用层。
 - **渲染层 `src/ui/`**：React + shadcn/ui，只读状态、画界面、发 action。**不写游戏规则**。
 
-依赖方向严格单向：`ui → store → core`，core 不反向依赖任何上层。
+依赖方向严格单向：对局推进为 `ui → store → core`；开局数据为 `store → data/scenarios → core`。core 不反向依赖任何上层或具体剧本。
 
 ## core 内部组织：DDD-lite（函数式）
 
@@ -60,6 +61,9 @@ src/
     game-state.ts        # 根状态 GameState（聚合各上下文状态）
     game.ts              # apply(state, action) 总入口，编排各上下文
     *.test.ts            # 与被测文件同级
+  data/
+    scenarios/           # 运行时剧本目录与初始 GameState 装配（向下依赖 core）
+      generated/         # 生成产物，禁止手改
   store/                 # Zustand store + 存档
   ui/
     components/ui/        # shadcn 生成的基础组件

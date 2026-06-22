@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import period1 from './scenarios/period-1.json'
-import period2 from './scenarios/period-2.json'
-import period3 from './scenarios/period-3.json'
-import period4 from './scenarios/period-4.json'
-import cities from './scenarios/cities.json'
-import officers from './scenarios/officers.json'
-import items from './scenarios/items.json'
-import adjacency from './scenarios/adjacency.json'
-import { SCENARIOS, createScenarioState, lordsForScenario } from './scenario'
+import period1 from './generated/period-1.json'
+import period2 from './generated/period-2.json'
+import period3 from './generated/period-3.json'
+import period4 from './generated/period-4.json'
+import cities from './generated/cities.json'
+import officers from './generated/officers.json'
+import items from './generated/items.json'
+import adjacency from './generated/adjacency.json'
+import { SCENARIOS, createScenarioState, lordsForScenario } from '.'
 
 const periods = [period1, period2, period3, period4]
 
@@ -65,6 +65,20 @@ describe('original scenario data', () => {
       kind: 'city',
       cityId: 14,
     })
+  })
+
+  it('normalizes known historical officer names', () => {
+    const names = officers.map((officer) => officer.name)
+    expect(names).toEqual(expect.arrayContaining(['荀彧', '李傕', '傅士仁', '张郃']))
+    expect(names).not.toEqual(expect.arrayContaining(['荀或', '李决', '博士仁', '张合']))
+    expect(
+      officers.filter((officer) => ['荀彧', '李傕', '傅士仁', '张郃'].includes(officer.name))
+    ).toEqual([
+      { id: 33, name: '李傕' },
+      { id: 139, name: '荀彧' },
+      { id: 166, name: '张郃' },
+      { id: 256, name: '傅士仁' },
+    ])
   })
 
   it('keeps future officers and their equipment in the initial aggregate', () => {
