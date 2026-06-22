@@ -89,13 +89,13 @@ export function nextOpponentAction(
 内部 helper（不导出）：
 
 ```ts
-// 目标点（§7.3，纯由模式定）：attack→玩家主将(attackerCommanderId)格；defend→城池格中心(map.cityTiles 的代表点)。
+// 目标点（§7.3，纯由模式定）：attack→玩家主将(attackerCommanderId)格；defend→tiles 中唯一的 city 格。
 function targetPoint(state: GameState, battle: BattleState, map: BattleMap): Position
 // 玩家主将 id（AI 的「敌方主将」）：attack→attackerCommanderId；defend→defenderCommanderId。
 function playerCommanderId(battle: BattleState): OfficerId
 // 选将（§7.2）：对手方、非 dead/confused/stone（canActWithStatus）、未 acted；取离目标点曼哈顿最小（平局 officerId 升序）。
 function selectUnitId(state: GameState, battle: BattleState, map: BattleMap): OfficerId | null
-// 选落点（§7.4，确定性）：①已站城池格→原地 ②defend 模式且某可达点∈cityTiles→该点(进城即胜) ③否则按
+// 选落点（§7.4，确定性）：①已站城池格→原地 ②defend 模式且某可达点为 city 地形→该点(进城即胜) ③否则按
 //   (预估伤害降序; 若全 0 则离目标点更近; 防御地形(山/林/村/城/寨)优先; 离起点更远; 坐标序) 取最优。
 function chooseTile(
   state: GameState,
@@ -207,7 +207,7 @@ import type { BattleState } from './battle-core' // 原来自 './battle'
 
 - **`最佳模式`实现偏差**：原文「序号越高被抽中概率越大」实现为**确定性「序号从高到低取第一个可施放」**（不耗 rng、最易测）；偏好高序号（≈高威力）的意图保留，随机性舍弃。
 - **self 技能（天变/谍报）AI 不施放**：天变改天气本可有益，但 AI「不评估技能收益」、谍报对 core 无效，故一律跳过；如需 AI 天变留后续。
-- **城池格「中心」**：`map.cityTiles` 可能多格，取代表点（如第一格/几何中心）作目标点；具体取法实现期定，须确定性。
+- **城池目标点**：战斗地图生成约束保证唯一 `city` 地形，直接从 `tiles` 定位该格。
 - **defend 模式实际触发依赖 `16-ai-campaign`**：本切片同时实现两模式行为；`attack` 模式（AI 守城）今日即可达（玩家进攻），`defend`（AI 推城）须 `16` 实装后才发生。
 - **AI 防守仅「扑主将 + 站城上不动」**：除此无额外守城池格倾向（PRD 待定），观察后再议。
 - **拆分回归面**：`battle.ts` 拆 3 文件是纯重构步，必须在加 AI 前先让全量测试绿，隔离「重构」与「新行为」两类改动。

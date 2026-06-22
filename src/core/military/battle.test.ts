@@ -2,7 +2,13 @@ import { describe, it, expect } from 'vitest'
 import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import type { Position } from '../shared/position'
-import { DEFAULT_MAP_ID } from './battle-map'
+import {
+  DEFAULT_MAP_ID,
+  attackDirection,
+  attackerSpawns,
+  defenderSpawns,
+  cityTile,
+} from './battle-map'
 import type { BattleState, BattleUnit, BattleSide, BattleMode } from './battle'
 import {
   initBattle,
@@ -74,8 +80,10 @@ describe('initBattle 玩家进攻许昌', () => {
     expect(b.opponentProvisions).toBe(s.cities[3]!.food)
   })
   it('单位摆在对应出生点、兵力/经验/等级取自 Officer', () => {
-    expect(b.units[4]!.pos).toEqual(map.attackerSpawns[0])
-    expect(b.units[6]!.pos).toEqual(map.defenderSpawns[0])
+    const direction = attackDirection(s.cities[2]!, s.cities[3]!)
+    expect(direction).toBe('west')
+    expect(b.units[4]!.pos).toEqual(attackerSpawns(map, direction)[0])
+    expect(b.units[6]!.pos).toEqual(defenderSpawns(map)[0])
     expect(b.units[4]!.troops).toBe(100)
   })
   it('守方排序：太守领衔，其余按兵力降序入位', () => {
@@ -89,9 +97,10 @@ describe('initBattle 玩家进攻许昌', () => {
       },
     }
     const b2 = initBattle(s2, [4], 3, 100)
-    expect(b2.units[6]!.pos).toEqual(map.defenderSpawns[0]) // 太守领衔
-    expect(b2.units[7]!.pos).toEqual(map.defenderSpawns[1]) // 兵力高者次位
-    expect(b2.units[8]!.pos).toEqual(map.defenderSpawns[2])
+    const spawns = defenderSpawns(map)
+    expect(b2.units[6]!.pos).toEqual(spawns[0]) // 太守领衔
+    expect(b2.units[7]!.pos).toEqual(spawns[1]) // 兵力高者次位
+    expect(b2.units[8]!.pos).toEqual(spawns[2])
   })
 })
 
@@ -156,7 +165,7 @@ describe('reduceBattle act 移动+休息：只占行动不伤害', () => {
 })
 
 describe('checkImmediateVictory 城池格 / 全灭', () => {
-  const city = map.cityTiles[0]!
+  const city = cityTile(map)
   it('玩家进攻单位进入城池格 → 玩家胜', () => {
     const b = makeBattle([unit(4, 'player', city), unit(6, 'opponent', { x: 1, y: 1 })])
     expect(checkImmediateVictory(b, map)).toBe('playerWin')

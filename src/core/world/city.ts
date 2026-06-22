@@ -14,7 +14,7 @@ export type CityStatus = 'normal' | 'famine' | 'drought' | 'flood' | 'riot'
 export interface City {
   readonly id: CityId
   readonly name: string
-  /** `12×9` 世界网格坐标；仅用于布局，不派生邻接。 */
+  /** `12×9` 世界网格坐标；用于布局与开战时派生攻击方向，不派生邻接。 */
   readonly x: number
   readonly y: number
   /** 归属君主；null 表示尚未归属的空城。 */

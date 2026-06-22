@@ -3,12 +3,12 @@ import { createInitialState } from '../world/fixture'
 import type { GameState } from '../game-state'
 import type { Officer } from '../world/officer'
 import type { Position } from '../shared/position'
-import { DEFAULT_MAP_ID } from './battle-map'
+import { DEFAULT_MAP_ID, cityTile } from './battle-map'
 import type { BattleState, BattleUnit, BattleSide } from './battle-core'
 import { nextOpponentAction } from './battle-ai'
 
 const map = createInitialState(1).battleMaps[DEFAULT_MAP_ID]!
-const CITY = map.cityTiles[0]!
+const CITY = cityTile(map)
 
 function mkOfficer(id: number, over: Partial<Officer> = {}): Officer {
   return {

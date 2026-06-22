@@ -7,7 +7,7 @@ import { randInt, pickRandom } from '../shared/rng'
 import { effectiveOfficer, effectiveTroopType } from '../world/queries'
 import { troopCapacity } from '../world/officer'
 import type { Terrain, BattleMap } from './battle-map'
-import { terrainAt, isCityTile } from './battle-map'
+import { terrainAt, isCityTile, cityTile } from './battle-map'
 import { reachableTiles, attackableTiles, skillTargetTiles } from './battle-movement'
 import type { SkillDef } from './battle-skill'
 import { SKILL_DEFS, availableSkills } from './battle-skill'
@@ -49,7 +49,7 @@ function targetPoint(battle: BattleState, map: BattleMap): Position {
     const anyPlayer = aliveUnits(battle).find((u) => u.side === 'player')
     if (anyPlayer) return anyPlayer.pos
   }
-  return map.cityTiles[0] ?? { x: 0, y: 0 }
+  return cityTile(map)
 }
 
 /** 选将（§7.2）：对手方、可行动（非 dead/confused/stone）、未行动；离目标点曼哈顿最小（平局 officerId 升序）。 */
@@ -94,7 +94,7 @@ function estimateBestDamage(
 }
 
 /**
- * 选落点（§7.4，确定性）：①已站城池格→原地 ②defend 模式且某可达点∈cityTiles→进城
+ * 选落点（§7.4，确定性）：①已站城池格→原地 ②defend 模式且某可达点为 city 地形→进城
  * ③否则按（预估伤害降序；若全 0 则离目标点更近；防御地形优先；离起点更远；坐标序）取最优。
  */
 function chooseTile(

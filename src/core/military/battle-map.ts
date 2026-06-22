@@ -1,5 +1,4 @@
 import type { Position } from '../shared/position'
-import { samePos } from '../shared/position'
 import type { BattleMapId } from '../shared/ids'
 import type { TroopType } from '../world/troop-type'
 
@@ -24,7 +23,8 @@ export const MAX_MOVEMENT = 8
 export const MAX_DAYS = 30
 
 /**
- * 战斗地图（领域数据，静态模板）：行主序地形数组 + 城池格（胜负点）+ 双方出生点。
+ * 战斗地图（领域数据，静态模板）：只保存行主序地形数组。
+ * 城池格直接由 city 地形判断，双方出生点在开战时按方向动态计算。
  * tiles.length === width*height；以 (y*width + x) 索引。
  */
 export interface BattleMap {
@@ -32,18 +32,20 @@ export interface BattleMap {
   readonly width: number
   readonly height: number
   readonly tiles: readonly Terrain[]
-  readonly cityTiles: readonly Position[]
-  readonly attackerSpawns: readonly Position[]
-  readonly defenderSpawns: readonly Position[]
 }
 
+/** 攻方从目标城的哪个方向进入战场。 */
+export type AttackDirection =
+  | 'north'
+  | 'northEast'
+  | 'east'
+  | 'southEast'
+  | 'south'
+  | 'southWest'
+  | 'west'
+  | 'northWest'
+
 /** data 层注入 core 前使用的纯地形形状。 */
-export interface BattleMapData {
-  readonly id: BattleMapId
-  readonly width: number
-  readonly height: number
-  readonly tiles: readonly Terrain[]
-}
 
 export type BattleMapCatalog = Readonly<Record<BattleMapId, BattleMap>>
 
@@ -100,37 +102,176 @@ export function terrainAt(map: BattleMap, p: Position): Terrain {
 
 /** 该格是否城池格（胜负点）。 */
 export function isCityTile(map: BattleMap, p: Position): boolean {
-  return map.cityTiles.some((c) => samePos(c, p))
+  return inBounds(map, p) && terrainAt(map, p) === 'city'
 }
 
-/** 双方出生点继续使用既有固定规则，不属于原版地形数据。 */
-const attackerSpawns: readonly Position[] = Array.from({ length: 10 }, (_, i) => ({
-  x: 1,
-  y: 7 + i + (i >= 5 ? 6 : 0),
-}))
-const defenderSpawns: readonly Position[] = attackerSpawns.map(({ y }) => ({ x: 30, y }))
+/** 地图唯一的城池格；生成器与 fixture 保证存在且唯一。 */
+export function cityTile(map: BattleMap): Position {
+  const index = map.tiles.indexOf('city')
+  if (index < 0) throw new Error(`battle map ${map.id} has no city tile`)
+  return { x: index % map.width, y: Math.floor(index / map.width) }
+}
 
-function hydrateMap(raw: BattleMapData): BattleMap {
-  const tiles = raw.tiles
-  const cityTiles: Position[] = []
-  for (let index = 0; index < tiles.length; index += 1) {
-    if (tiles[index] === 'city')
-      cityTiles.push({ x: index % raw.width, y: Math.floor(index / raw.width) })
+/**
+ * 由世界地图坐标计算攻方进入目标战场的方向。
+ * 返回的是出发城相对目标城的方位，与原版 GetDirect(target, source) 一致。
+ */
+export function attackDirection(source: Position, target: Position): AttackDirection {
+  const rawDx = source.x - target.x
+  const rawDy = source.y - target.y
+  const dx = Math.sign(rawDx)
+  const dy = Math.sign(rawDy)
+  if (dx === 0 && dy === 0) throw new Error('source and target city positions must differ')
+  // 原版 CITY_LINKR 的方向分槽：同列或纵向跨度大于横向跨度时归正北/正南；
+  // 同行归正东/正西，其余归四个对角。该规则覆盖原版全部有向邻接。
+  if (dx === 0 || Math.abs(rawDy) > Math.abs(rawDx)) return dy < 0 ? 'north' : 'south'
+  if (dy === 0) return dx < 0 ? 'west' : 'east'
+  if (dy < 0) return dx < 0 ? 'northWest' : dx > 0 ? 'northEast' : 'north'
+  return dx < 0 ? 'southWest' : 'southEast'
+}
+
+/** 原版 dFgtIntPos 的八组攻方相对坐标（方向顺序 N/NE/E/SE/S/SW/W/NW）。 */
+const ATTACKER_OFFSETS: Record<AttackDirection, readonly Position[]> = {
+  north: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 0, y: 4 },
+    { x: 4, y: 4 },
+    { x: 1, y: 1 },
+    { x: 3, y: 1 },
+    { x: 2, y: 0 },
+  ],
+  northEast: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 1, y: 3 },
+    { x: 0, y: 1 },
+    { x: 3, y: 4 },
+    { x: 3, y: 1 },
+    { x: 4, y: 0 },
+  ],
+  east: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 0, y: 0 },
+    { x: 0, y: 4 },
+    { x: 3, y: 1 },
+    { x: 3, y: 3 },
+    { x: 4, y: 2 },
+  ],
+  southEast: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 1, y: 1 },
+    { x: 0, y: 3 },
+    { x: 3, y: 0 },
+    { x: 3, y: 3 },
+    { x: 4, y: 4 },
+  ],
+  south: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 0, y: 0 },
+    { x: 4, y: 0 },
+    { x: 1, y: 3 },
+    { x: 3, y: 3 },
+    { x: 2, y: 4 },
+  ],
+  southWest: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 1, y: 0 },
+    { x: 4, y: 3 },
+    { x: 1, y: 3 },
+    { x: 0, y: 4 },
+  ],
+  west: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 4, y: 0 },
+    { x: 4, y: 4 },
+    { x: 1, y: 1 },
+    { x: 1, y: 3 },
+    { x: 0, y: 2 },
+  ],
+  northWest: [
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    { x: 2, y: 1 },
+    { x: 3, y: 3 },
+    { x: 1, y: 4 },
+    { x: 4, y: 1 },
+    { x: 1, y: 1 },
+    { x: 0, y: 0 },
+  ],
+}
+
+/** 原版 dFgtIntPos 第九组：守方相对城池左上两格基准的坐标。 */
+const DEFENDER_OFFSETS: readonly Position[] = [
+  { x: 2, y: 2 },
+  { x: 2, y: 3 },
+  { x: 1, y: 2 },
+  { x: 3, y: 2 },
+  { x: 2, y: 1 },
+  { x: 1, y: 1 },
+  { x: 3, y: 3 },
+  { x: 1, y: 3 },
+  { x: 3, y: 1 },
+  { x: 2, y: 0 },
+]
+
+function translate(base: Position, offsets: readonly Position[]): Position[] {
+  return offsets.map((offset) => ({ x: base.x + offset.x, y: base.y + offset.y }))
+}
+
+/** 按原版边缘基准与方向阵形动态生成 10 个攻方出生点。 */
+export function attackerSpawns(map: BattleMap, direction: AttackDirection): readonly Position[] {
+  const bases: Record<AttackDirection, Position> = {
+    north: { x: Math.floor(map.width / 2) - 2, y: 0 },
+    northEast: { x: map.width - 5, y: 2 },
+    east: { x: map.width - 5, y: Math.floor(map.height / 2) - 2 },
+    southEast: { x: map.width - 5, y: map.height - 5 },
+    south: { x: Math.floor(map.width / 2) - 2, y: map.height - 5 },
+    southWest: { x: 2, y: map.height - 5 },
+    west: { x: 2, y: Math.floor(map.height / 2) - 2 },
+    northWest: { x: 0, y: 0 },
   }
-  return {
-    id: raw.id,
-    width: raw.width,
-    height: raw.height,
-    tiles,
-    cityTiles,
-    attackerSpawns,
-    defenderSpawns,
-  }
+  return translate(bases[direction], ATTACKER_OFFSETS[direction])
+}
+
+/** 以唯一城池格为中心，按原版守方阵形动态生成 10 个出生点。 */
+export function defenderSpawns(map: BattleMap): readonly Position[] {
+  const city = cityTile(map)
+  return translate({ x: city.x - 2, y: city.y - 2 }, DEFENDER_OFFSETS)
 }
 
 /** 把 data 层注入的纯地形资料补成 core 使用的地图目录。 */
-export function createBattleMapCatalog(maps: readonly BattleMapData[]): BattleMapCatalog {
-  return Object.fromEntries(maps.map((raw) => [raw.id, hydrateMap(raw)]))
+export function createBattleMapCatalog(maps: readonly BattleMap[]): BattleMapCatalog {
+  return Object.fromEntries(maps.map((raw) => [raw.id, raw]))
 }
 
 /** fixture 使用的已知地图；不是未知 id 的运行时回退。 */

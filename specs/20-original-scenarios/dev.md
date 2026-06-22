@@ -107,7 +107,7 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 - 城目录从 `cities.city_positions` 与 `cities.city_map_ids` 合并 `x/y/battleMapId`；世界坐标不派生邻接，时期城市状态不再写 `battleMapId`。
 - 仓库保存裁剪后的 `data/sgby-reset/battle-maps.json` 输入快照，只含七张地图的源 id、尺寸与 `terrain_tiles`；不长期依赖仓库外的 `~/dev/source`。
 - 生成 `src/data/scenarios/generated/battle-maps.json`：地图 id 规范为 `1..7`，二维源地形转行主序 `Terrain[]`，`hill→mountain`，拒绝未知地形、非 `32×32`、非唯一 `city` 格。
-- `data/scenarios/index.ts` 读取生成地形并调用 core 的纯构造函数，创建 `BattleMapCatalog` 注入 `GameState`；`cityTiles` 由 `city` 地形派生，出生点复用既有固定规则且不写入源快照。
+- `data/scenarios/index.ts` 读取生成地形并调用 core 的纯构造函数，创建 `BattleMapCatalog` 注入 `GameState`；城池格直接由 `tiles` 中唯一的 `city` 判断，出生点在开战时按攻击方向和原版阵形表动态计算，均不写入源快照或 `BattleMap`。
 - 删除 `plains` 占位模板与未知地图回退；fixture 使用地图 1，非法 `battleMapId` 作为数据错误显式失败。
 - 所有输出先在内存完成计数、范围、重复和引用校验，再一次性格式化写出；`--check` 比较全部八份输出。
 
@@ -166,6 +166,7 @@ export function createScenarioState(request: CreateScenarioRequest): GameState
 - [x] 先以生成器/战斗地图测试锁定 38 城坐标、地图引用、七图尺寸/地形/城池格和无静默回退（RED）。
 - [x] 迁移 terrain-only 输入快照，扩展生成器产出共享城市地图字段与七张规范化地形图（GREEN）。
 - [x] 接入数字 `BattleMapId`、七图注册表与现有战斗流程，删除 `plains` 占位和回退并更新 fixture/回归测试。
+- [x] 删除 `BattleMap.cityTiles/attackerSpawns/defenderSpawns` 冗余派生字段，接入原版八方向动态出生阵形并更新回归测试。
 - [x] 运行生成 `--check`、全测试、typecheck、lint、format check、build并同步 `AGENTS.md` 红线。
 
 ## TDD：是

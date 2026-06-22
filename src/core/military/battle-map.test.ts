@@ -11,6 +11,10 @@ import {
   inBounds,
   terrainAt,
   isCityTile,
+  cityTile,
+  attackDirection,
+  attackerSpawns,
+  defenderSpawns,
 } from './battle-map'
 
 describe('battle-map 常量', () => {
@@ -50,17 +54,40 @@ describe('battle-map 读取助手', () => {
   })
 
   it('城池格 = 胜负点、isCityTile 命中', () => {
-    expect(map.cityTiles.length).toBeGreaterThanOrEqual(1)
-    const c = map.cityTiles[0]!
+    const c = cityTile(map)
     expect(isCityTile(map, c)).toBe(true)
     expect(terrainAt(map, c)).toBe('city')
     expect(isCityTile(map, { x: 0, y: 0 })).toBe(false)
   })
 
-  it('双方出生点各 ≥10、互不越界', () => {
-    expect(map.attackerSpawns.length).toBeGreaterThanOrEqual(10)
-    expect(map.defenderSpawns.length).toBeGreaterThanOrEqual(10)
-    for (const p of [...map.attackerSpawns, ...map.defenderSpawns]) {
+  it('由出发城相对目标城的位置派生八方向', () => {
+    const target = { x: 5, y: 5 }
+    expect(attackDirection({ x: 5, y: 4 }, target)).toBe('north')
+    expect(attackDirection({ x: 6, y: 4 }, target)).toBe('northEast')
+    expect(attackDirection({ x: 6, y: 5 }, target)).toBe('east')
+    expect(attackDirection({ x: 6, y: 6 }, target)).toBe('southEast')
+    expect(attackDirection({ x: 5, y: 6 }, target)).toBe('south')
+    expect(attackDirection({ x: 4, y: 6 }, target)).toBe('southWest')
+    expect(attackDirection({ x: 4, y: 5 }, target)).toBe('west')
+    expect(attackDirection({ x: 4, y: 4 }, target)).toBe('northWest')
+    // 原版长安(5,2)→宛城(6,4)在 CITY_LINKR 中归正南，不归东南。
+    expect(attackDirection({ x: 6, y: 4 }, { x: 5, y: 2 })).toBe('south')
+  })
+
+  it('按原版方向阵形动态生成双方各 10 个出生点', () => {
+    const attackers = attackerSpawns(map, 'north')
+    const defenders = defenderSpawns(map)
+    expect(attackers).toHaveLength(10)
+    expect(defenders).toHaveLength(10)
+    expect(attackers.slice(0, 5)).toEqual([
+      { x: 16, y: 2 },
+      { x: 16, y: 3 },
+      { x: 15, y: 2 },
+      { x: 17, y: 2 },
+      { x: 16, y: 1 },
+    ])
+    expect(defenders[0]).toEqual(cityTile(map))
+    for (const p of [...attackers, ...defenders]) {
       expect(inBounds(map, p)).toBe(true)
     }
   })

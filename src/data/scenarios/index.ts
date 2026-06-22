@@ -5,7 +5,7 @@ import { buildAdjacency } from '../../core/world/adjacency'
 import type { City } from '../../core/world/city'
 import type { Item } from '../../core/world/item'
 import type { Officer } from '../../core/world/officer'
-import { createBattleMapCatalog, type BattleMapData } from '../../core/military/battle-map'
+import { createBattleMapCatalog, type BattleMap } from '../../core/military/battle-map'
 import cityCatalogJson from './generated/cities.json'
 import officerCatalogJson from './generated/officers.json'
 import itemCatalogJson from './generated/items.json'
@@ -68,7 +68,7 @@ const CITY_CATALOG = cityCatalogJson as readonly CityDefinition[]
 const OFFICER_CATALOG = officerCatalogJson as readonly IdentityRecord<OfficerId>[]
 const ITEM_CATALOG = itemCatalogJson as unknown as readonly ItemDefinition[]
 const ADJACENCY_EDGES = adjacencyJson as unknown as readonly (readonly [CityId, CityId])[]
-const BATTLE_MAP_DATA = battleMapsJson as unknown as readonly BattleMapData[]
+const BATTLE_MAP_DATA = battleMapsJson as unknown as readonly BattleMap[]
 
 function byId<T extends { readonly id: number }>(records: readonly T[]): Map<number, T> {
   return new Map(records.map((record) => [record.id, record]))

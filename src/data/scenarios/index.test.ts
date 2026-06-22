@@ -9,7 +9,7 @@ import items from './generated/items.json'
 import adjacency from './generated/adjacency.json'
 import battleMaps from './generated/battle-maps.json'
 import { SCENARIOS, createScenarioState, lordsForScenario } from '.'
-import { terrainAt } from '../../core/military/battle-map'
+import { cityTile, terrainAt } from '../../core/military/battle-map'
 
 const periods = [period1, period2, period3, period4]
 
@@ -43,12 +43,12 @@ describe('original scenario data', () => {
     expect(Object.keys(state.battleMaps).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7])
     const first = state.battleMaps[1]!
     expect(first.tiles).toHaveLength(32 * 32)
-    expect(first.cityTiles).toEqual([{ x: 15, y: 15 }])
+    expect(cityTile(first)).toEqual({ x: 15, y: 15 })
     expect(terrainAt(first, { x: 1, y: 0 })).toBe('river')
     expect(terrainAt(first, { x: 5, y: 2 })).toBe('mountain')
     for (const map of Object.values(state.battleMaps)) {
-      expect(map.cityTiles).toHaveLength(1)
-      expect(terrainAt(map, map.cityTiles[0]!)).toBe('city')
+      expect(map.tiles.filter((terrain) => terrain === 'city')).toHaveLength(1)
+      expect(terrainAt(map, cityTile(map))).toBe('city')
     }
   })
 

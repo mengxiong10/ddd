@@ -4,7 +4,7 @@ import { withEvents, type WithEvents } from '../shared/outcome'
 import type { Position } from '../shared/position'
 import { effectiveOfficer, governorOf, defendingOfficers } from '../world/queries'
 import type { BattleMap } from './battle-map'
-import { MAX_DAYS } from './battle-map'
+import { MAX_DAYS, attackDirection, attackerSpawns, defenderSpawns } from './battle-map'
 import { dailyFoodCost } from './battle-combat'
 import { resolveCampaignOutcome } from './aftermath'
 import { INITIAL_WEATHER, refreshWeather } from './battle-weather'
@@ -71,6 +71,11 @@ export function initBattle(
     .sort((a, b) => b.troops - a.troops || (a.id < b.id ? -1 : 1))
   const defenderIds = [...governorLeads, ...rest.map((o) => o.id)].slice(0, MAX_BATTLE_UNITS)
   const attackerIds = officerIds.slice(0, MAX_BATTLE_UNITS)
+  const sourceCityId = state.officers[attackerIds[0]!]!.cityId!
+  const source = state.cities[sourceCityId]!
+  const direction = attackDirection(source, target)
+  const attackPositions = attackerSpawns(map, direction)
+  const defensePositions = defenderSpawns(map)
 
   const units: Record<OfficerId, BattleUnit> = {}
   const place = (ids: readonly OfficerId[], side: BattleSide, spawns: readonly Position[]) => {
@@ -92,8 +97,8 @@ export function initBattle(
       }
     })
   }
-  place(attackerIds, attackerSide, map.attackerSpawns)
-  place(defenderIds, defenderSide, map.defenderSpawns)
+  place(attackerIds, attackerSide, attackPositions)
+  place(defenderIds, defenderSide, defensePositions)
 
   const cityFood = target.food
   return {

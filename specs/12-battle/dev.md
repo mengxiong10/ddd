@@ -40,16 +40,23 @@ export type Terrain =
 
 export type MapId = string
 
-// 行主序地形数组（length === width*height），城池格集合，双方出生点
+// 行主序地形数组（length === width*height）；城池格与双方出生点均运行时派生
 export interface BattleMap {
   readonly id: MapId
   readonly width: number // 32
   readonly height: number // 32
   readonly tiles: readonly Terrain[]
-  readonly cityTiles: readonly Position[] // 胜负点
-  readonly attackerSpawns: readonly Position[] // 进攻方出生点（≥10）
-  readonly defenderSpawns: readonly Position[] // 防守方出生点（≥10）
 }
+
+export type AttackDirection =
+  | 'north'
+  | 'northEast'
+  | 'east'
+  | 'southEast'
+  | 'south'
+  | 'southWest'
+  | 'west'
+  | 'northWest'
 
 // 移动消耗 [兵种][地形]（规则身份，内联常量；§6.5.2）
 export const MOVE_COST: Record<TroopType, Record<Terrain, number>>
@@ -65,6 +72,12 @@ export const MAX_DAYS = 30 // 日循环上限
 export function inBounds(map: BattleMap, p: Position): boolean
 export function terrainAt(map: BattleMap, p: Position): Terrain
 export function isCityTile(map: BattleMap, p: Position): boolean
+export function cityTile(map: BattleMap): Position
+// 返回出发城相对目标城的方向，即攻方进入战场的方向
+export function attackDirection(source: Position, target: Position): AttackDirection
+// 复刻原版 dFgtIntPos：攻方按八方向取边缘基准，守方按 city 地形取基准
+export function attackerSpawns(map: BattleMap, direction: AttackDirection): readonly Position[]
+export function defenderSpawns(map: BattleMap): readonly Position[]
 ```
 
 ### military/battle-combat.ts（新建·纯战斗数学）
@@ -268,7 +281,7 @@ export type Action =
 ## 模块职责
 
 - `shared/position.ts`：格坐标值对象 + 纯助手；零依赖。
-- `military/battle-map.ts`：地形枚举、`BattleMap`、三张地形表（移动/折减/防御）、棋盘/移动/天数上限常量、地图读取助手；纯数据，不读 state。
+- `military/battle-map.ts`：地形枚举、`BattleMap`、三张地形表（移动/折减/防御）、棋盘/移动/天数上限常量、地图读取助手，以及原版八方向攻方/城池基准守方出生阵形的运行时计算；纯数据，不读 state。
 - `military/battle-combat.ts`：兵种系数/相克表/普攻范围掩码 + 攻防/伤害/经验/升级/耗粮**纯公式**；不读 state、不依赖地图结构（入参传值）。
 - `military/battle-movement.ts`：可达格（地形消耗 + 阻挡 + 接敌停步）与可击格；读 `BattleState`/`BattleMap` + `officerMovement`。
 - `military/battle.ts`：`BattleState`/`BattleUnit`/`BattleAction` 类型、`initBattle`/`canBattle`/`reduceBattle`/`checkVictory`/`concludeBattle`；编排上面三个纯模块 + world（queries/effectiveOfficer/effectiveTroopType/succession）。不 import turn/game/economy。
@@ -284,7 +297,8 @@ export type Action =
 - [ ] `dailyFoodCost` = floor(sqrt(总兵力)/3)。
 - [ ] `reachableTiles`：按兵种地形消耗算预算；存活单位挡格；友方不挡路径只挡落点；敌方四邻接敌停步区进入后压到1、不可穿越；上限 8。
 - [ ] `attackableTiles`：三类兵种掩码（十字/周身/散点）正确、越界剔除。
-- [ ] `initBattle`：≤10/方按出生点摆位；守方=太守领衔+其余兵力降序；攻方主将=出征首位、守方主将=太守；战场粮草攻=provisions/守=目标城快照城粮、day=1。
+- [ ] `battle-map`：`isCityTile` 直接读 `tiles`；攻击方向由出发城相对目标城的八方向派生；攻方按方向、守方按唯一 `city` 地形复刻原版 `dFgtIntPos` 生成各 10 个合法出生点。
+- [ ] `initBattle`：≤10/方按运行时方向计算的出生点摆位；守方=太守领衔+其余兵力降序；攻方主将=出征首位、守方主将=太守；战场粮草攻=provisions/守=目标城快照城粮、day=1。
 - [ ] `reduceBattle` act：移动+攻击结算扣兵/给经验/升级/置 acted；只移动+休息也置 acted；非法（越界/超范围/已行动/非己方）no-op。
 - [ ] `reduceBattle` endDay：对手 no-op、双方扣当日粮草(≤当前)、day+1、刷新 acted。
 - [ ] `checkVictory` 全表：任一方主将击溃（攻方主将=出征首位、守方主将=太守，按 mode 映射 player/opponent）/全灭/城池格（攻入=玩家进攻胜、守方城池被入=玩家防守败）/粮草=0（同日双归零按玩家败）/30天（进攻超时败、防守超时胜）/撤退败。
