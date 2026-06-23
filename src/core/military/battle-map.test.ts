@@ -45,6 +45,24 @@ describe('battle-map 常量', () => {
 
 describe('battle-map 读取助手', () => {
   const map = createInitialState(1).battleMaps[DEFAULT_MAP_ID]!
+  const rotateIn5x5 = (p: { x: number; y: number }, quarterTurnsClockwise: number) => {
+    const turns = ((quarterTurnsClockwise % 4) + 4) % 4
+    let x = p.x
+    let y = p.y
+    for (let i = 0; i < turns; i++) {
+      const nextX = 4 - y
+      const nextY = x
+      x = nextX
+      y = nextY
+    }
+    return { x, y }
+  }
+  const sortByXY = (points: readonly { x: number; y: number }[]) =>
+    [...points].sort((a, b) => a.x - b.x || a.y - b.y)
+  const toOffsets = (spawns: readonly { x: number; y: number }[]) => {
+    const anchor = { x: spawns[0]!.x - 2, y: spawns[0]!.y - 2 }
+    return spawns.map((p) => ({ x: p.x - anchor.x, y: p.y - anchor.y }))
+  }
 
   it('inBounds 边界正确', () => {
     expect(inBounds(map, { x: 0, y: 0 })).toBe(true)
@@ -74,7 +92,7 @@ describe('battle-map 读取助手', () => {
     expect(attackDirection({ x: 6, y: 4 }, { x: 5, y: 2 })).toBe('south')
   })
 
-  it('按原版方向阵形动态生成双方各 10 个出生点', () => {
+  it('按统一阵形动态生成双方各 10 个出生点', () => {
     const attackers = attackerSpawns(map, 'north')
     const defenders = defenderSpawns(map)
     expect(attackers).toHaveLength(10)
@@ -90,5 +108,25 @@ describe('battle-map 读取助手', () => {
     for (const p of [...attackers, ...defenders]) {
       expect(inBounds(map, p)).toBe(true)
     }
+  })
+
+  it('正交四方向由同一模板旋转得到', () => {
+    const north = toOffsets(attackerSpawns(map, 'north'))
+    const east = toOffsets(attackerSpawns(map, 'east'))
+    const south = toOffsets(attackerSpawns(map, 'south'))
+    const west = toOffsets(attackerSpawns(map, 'west'))
+    expect(sortByXY(east)).toEqual(sortByXY(north.map((p) => rotateIn5x5(p, 1))))
+    expect(sortByXY(south)).toEqual(sortByXY(north.map((p) => rotateIn5x5(p, 2))))
+    expect(sortByXY(west)).toEqual(sortByXY(north.map((p) => rotateIn5x5(p, 3))))
+  })
+
+  it('对角四方向由同一模板旋转得到', () => {
+    const northEast = toOffsets(attackerSpawns(map, 'northEast'))
+    const southEast = toOffsets(attackerSpawns(map, 'southEast'))
+    const southWest = toOffsets(attackerSpawns(map, 'southWest'))
+    const northWest = toOffsets(attackerSpawns(map, 'northWest'))
+    expect(sortByXY(southEast)).toEqual(sortByXY(northEast.map((p) => rotateIn5x5(p, 1))))
+    expect(sortByXY(southWest)).toEqual(sortByXY(northEast.map((p) => rotateIn5x5(p, 2))))
+    expect(sortByXY(northWest)).toEqual(sortByXY(northEast.map((p) => rotateIn5x5(p, 3))))
   })
 })

@@ -130,105 +130,35 @@ export function attackDirection(source: Position, target: Position): AttackDirec
   return dx < 0 ? 'southWest' : 'southEast'
 }
 
-/** 原版 dFgtIntPos 的八组攻方相对坐标（方向顺序 N/NE/E/SE/S/SW/W/NW）。 */
-const ATTACKER_OFFSETS: Record<AttackDirection, readonly Position[]> = {
-  north: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 0, y: 4 },
-    { x: 4, y: 4 },
-    { x: 1, y: 1 },
-    { x: 3, y: 1 },
-    { x: 2, y: 0 },
-  ],
-  northEast: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 1, y: 3 },
-    { x: 0, y: 1 },
-    { x: 3, y: 4 },
-    { x: 3, y: 1 },
-    { x: 4, y: 0 },
-  ],
-  east: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 0, y: 0 },
-    { x: 0, y: 4 },
-    { x: 3, y: 1 },
-    { x: 3, y: 3 },
-    { x: 4, y: 2 },
-  ],
-  southEast: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 1, y: 1 },
-    { x: 0, y: 3 },
-    { x: 3, y: 0 },
-    { x: 3, y: 3 },
-    { x: 4, y: 4 },
-  ],
-  south: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 0, y: 0 },
-    { x: 4, y: 0 },
-    { x: 1, y: 3 },
-    { x: 3, y: 3 },
-    { x: 2, y: 4 },
-  ],
-  southWest: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 3, y: 1 },
-    { x: 1, y: 0 },
-    { x: 4, y: 3 },
-    { x: 1, y: 3 },
-    { x: 0, y: 4 },
-  ],
-  west: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 4, y: 0 },
-    { x: 4, y: 4 },
-    { x: 1, y: 1 },
-    { x: 1, y: 3 },
-    { x: 0, y: 2 },
-  ],
-  northWest: [
-    { x: 2, y: 2 },
-    { x: 2, y: 3 },
-    { x: 1, y: 2 },
-    { x: 3, y: 2 },
-    { x: 2, y: 1 },
-    { x: 3, y: 3 },
-    { x: 1, y: 4 },
-    { x: 4, y: 1 },
-    { x: 1, y: 1 },
-    { x: 0, y: 0 },
-  ],
-}
+const ATTACKER_FRAME_SIZE = 5
+
+/** 正交方向（北向）基础阵形；其余东/南/西由旋转得到。 */
+const CARDINAL_ATTACKER_TEMPLATE: readonly Position[] = [
+  { x: 2, y: 2 },
+  { x: 2, y: 3 },
+  { x: 1, y: 2 },
+  { x: 3, y: 2 },
+  { x: 2, y: 1 },
+  { x: 2, y: 0 },
+  { x: 1, y: 1 },
+  { x: 3, y: 1 },
+  { x: 0, y: 2 },
+  { x: 4, y: 2 },
+]
+
+/** 对角方向（东北向）基础阵形；其余东南/西南/西北由旋转得到。 */
+const DIAGONAL_ATTACKER_TEMPLATE: readonly Position[] = [
+  { x: 2, y: 2 },
+  { x: 2, y: 3 },
+  { x: 1, y: 2 },
+  { x: 3, y: 2 },
+  { x: 2, y: 1 },
+  { x: 4, y: 0 },
+  { x: 3, y: 0 },
+  { x: 4, y: 1 },
+  { x: 3, y: 1 },
+  { x: 4, y: 2 },
+]
 
 /** 原版 dFgtIntPos 第九组：守方相对城池左上两格基准的坐标。 */
 const DEFENDER_OFFSETS: readonly Position[] = [
@@ -248,19 +178,73 @@ function translate(base: Position, offsets: readonly Position[]): Position[] {
   return offsets.map((offset) => ({ x: base.x + offset.x, y: base.y + offset.y }))
 }
 
-/** 按原版边缘基准与方向阵形动态生成 10 个攻方出生点。 */
-export function attackerSpawns(map: BattleMap, direction: AttackDirection): readonly Position[] {
-  const bases: Record<AttackDirection, Position> = {
-    north: { x: Math.floor(map.width / 2) - 2, y: 0 },
-    northEast: { x: map.width - 5, y: 2 },
-    east: { x: map.width - 5, y: Math.floor(map.height / 2) - 2 },
-    southEast: { x: map.width - 5, y: map.height - 5 },
-    south: { x: Math.floor(map.width / 2) - 2, y: map.height - 5 },
-    southWest: { x: 2, y: map.height - 5 },
-    west: { x: 2, y: Math.floor(map.height / 2) - 2 },
-    northWest: { x: 0, y: 0 },
+function rotateOffsetInFrame(offset: Position, quarterTurnsClockwise: number): Position {
+  const turns = ((quarterTurnsClockwise % 4) + 4) % 4
+  let x = offset.x
+  let y = offset.y
+  for (let i = 0; i < turns; i++) {
+    const nextX = ATTACKER_FRAME_SIZE - 1 - y
+    const nextY = x
+    x = nextX
+    y = nextY
   }
-  return translate(bases[direction], ATTACKER_OFFSETS[direction])
+  return { x, y }
+}
+
+function normalizeDirection(direction: AttackDirection): {
+  readonly family: 'cardinal' | 'diagonal'
+  readonly turns: number
+} {
+  switch (direction) {
+    case 'north':
+      return { family: 'cardinal', turns: 0 }
+    case 'east':
+      return { family: 'cardinal', turns: 1 }
+    case 'south':
+      return { family: 'cardinal', turns: 2 }
+    case 'west':
+      return { family: 'cardinal', turns: 3 }
+    case 'northEast':
+      return { family: 'diagonal', turns: 0 }
+    case 'southEast':
+      return { family: 'diagonal', turns: 1 }
+    case 'southWest':
+      return { family: 'diagonal', turns: 2 }
+    case 'northWest':
+      return { family: 'diagonal', turns: 3 }
+  }
+}
+
+function anchorForDirection(map: BattleMap, direction: AttackDirection): Position {
+  const midX = Math.floor(map.width / 2) - 2
+  const midY = Math.floor(map.height / 2) - 2
+  switch (direction) {
+    case 'north':
+      return { x: midX, y: 0 }
+    case 'east':
+      return { x: map.width - ATTACKER_FRAME_SIZE, y: midY }
+    case 'south':
+      return { x: midX, y: map.height - ATTACKER_FRAME_SIZE }
+    case 'west':
+      return { x: 0, y: midY }
+    case 'northEast':
+      return { x: map.width - ATTACKER_FRAME_SIZE, y: 0 }
+    case 'southEast':
+      return { x: map.width - ATTACKER_FRAME_SIZE, y: map.height - ATTACKER_FRAME_SIZE }
+    case 'southWest':
+      return { x: 0, y: map.height - ATTACKER_FRAME_SIZE }
+    case 'northWest':
+      return { x: 0, y: 0 }
+  }
+}
+
+/** 按“模板 + 旋转 + 锚点平移”动态生成 10 个攻方出生点。 */
+export function attackerSpawns(map: BattleMap, direction: AttackDirection): readonly Position[] {
+  const norm = normalizeDirection(direction)
+  const template =
+    norm.family === 'cardinal' ? CARDINAL_ATTACKER_TEMPLATE : DIAGONAL_ATTACKER_TEMPLATE
+  const offsets = template.map((offset) => rotateOffsetInFrame(offset, norm.turns))
+  return translate(anchorForDirection(map, direction), offsets)
 }
 
 /** 以唯一城池格为中心，按原版守方阵形动态生成 10 个出生点。 */
