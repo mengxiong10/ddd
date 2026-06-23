@@ -77,7 +77,13 @@ function developBusy(
   kind: 'agriculture' | 'commerce'
 ): GameState {
   const city = raiseAttribute(state.cities[cityId]!, kind, AI_DEVELOP_DELTA)
-  return setCityBusy(state, cityId, city, officerId, 'develop')
+  return setCityBusy(
+    state,
+    cityId,
+    city,
+    officerId,
+    kind === 'agriculture' ? 'reclaim' : 'commerce'
+  )
 }
 
 /** 出巡：民忠 +4 封顶、人口 +100 + 占人。 */
@@ -101,7 +107,7 @@ function setCityBusy(
   cityId: CityId,
   city: GameState['cities'][CityId],
   officerId: OfficerId,
-  type: 'develop' | 'patrol' | 'govern'
+  type: 'reclaim' | 'commerce' | 'patrol' | 'govern'
 ): GameState {
   return busyEnqueue({ ...state, cities: { ...state.cities, [cityId]: city } }, officerId, {
     type,

@@ -8,8 +8,9 @@ import type { BattleState } from './military/battle'
 import type { BattleMapCatalog } from './military/battle-map'
 
 /**
- * 效果延到月末执行的指令项；月末由 turn 层按 type 分派（与 game.apply 同构）。
- * 后续新增「月末执行类」指令在此并集追加一个分支。
+ * 效果延到月末执行的指令项；月末由 turn 层经 economy/registry 的 economyMonthRun 表按 type 分派
+ * （与 game.apply 经同表的 can/call 分派同构——命令三阶段 can/call/run 同处注册）。
+ * 后续新增「月末执行类」指令在 registry 追加一条（含 run），并在此并集追加对应分支。
  * - plunder：目标 = 执行人本城（officer.cityId，掠夺不跨城），故只存 officerId。
  * - campaign：出征——出发城 = 武将共同所在城（执行时仍在本城），故存武将集合 + 目标城 + 随军粮草
  *   （粮已于下令时扣，胜利并入被占城时需要）。
@@ -52,7 +53,9 @@ export type PendingCommand =
   | { readonly type: 'induce'; readonly officerId: OfficerId; readonly targetOfficerId: OfficerId }
   // 即时生效的占人指令（效果已于下令时结算）。月末无效果、仅作占用标记
   // （占用中 = 被某条 pending command 引用，见 queries.isBusy）；按各自 type 区分以如实反映占人在做什么。
-  | { readonly type: 'develop'; readonly officerId: OfficerId }
+  // 开垦/招商拆为 reclaim/commerce 两个 type，与各自 action type 一一对应。
+  | { readonly type: 'reclaim'; readonly officerId: OfficerId }
+  | { readonly type: 'commerce'; readonly officerId: OfficerId }
   | { readonly type: 'patrol'; readonly officerId: OfficerId }
   | { readonly type: 'govern'; readonly officerId: OfficerId }
   | { readonly type: 'trade'; readonly officerId: OfficerId }
@@ -84,7 +87,8 @@ export interface GameState {
   readonly battleMaps: BattleMapCatalog
   /**
    * 本月待月末执行的指令，按下令顺序入队；月末由 turn 层处理后清空。
-   * 非 campaign 项经 runNonCampaignPending 执行；campaign 项由 end-month 逐条结算/挂起战斗。
+   * 非 campaign 项经 runNonCampaignPending（查 economy/registry 的 economyMonthRun 表）执行；
+   * campaign 项由 end-month 逐条结算/挂起战斗。
    * 所有占人指令均入队；占用中 = 被某条 pending command 引用（queries.isBusy 派生），不存 Officer.busy。
    * 即时生效指令的月末分支为空操作（仅作占用标记，出队即释放）。
    */

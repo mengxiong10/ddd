@@ -73,7 +73,10 @@ export function develop(
     rng: nextRng,
     cities: { ...state.cities, [officer.cityId!]: nextCity },
     officers: { ...state.officers, [officerId]: nextOfficer },
-    pendingCommands: [...state.pendingCommands, { type: 'develop', officerId }],
+    pendingCommands: [
+      ...state.pendingCommands,
+      { type: kind === 'agriculture' ? 'reclaim' : 'commerce', officerId },
+    ],
   }
   // 事件 delta 取实际应用值（封顶后 newValue-before），如实反映"变为 X (+Y)"。
   return commandOk(next, [

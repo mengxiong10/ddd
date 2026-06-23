@@ -9,7 +9,7 @@ const cfg = DEFAULT_CONFIG
 
 /** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
 function occupy(s: GameState, id: number): GameState {
-  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'reclaim', officerId: id }] }
 }
 
 function withCity(

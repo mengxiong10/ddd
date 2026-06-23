@@ -40,7 +40,7 @@ describe('game apply 分派', () => {
   it('applyWithEvents 经营动作失败：冒泡 reason、state 不变、无事件（校验只跑一次）', () => {
     const s = createInitialState(1)
     // 庞统占用诸葛亮后再令其开垦 → officer-busy
-    const busy = { ...s, pendingCommands: [{ type: 'develop', officerId: 2 } as const] }
+    const busy = { ...s, pendingCommands: [{ type: 'reclaim', officerId: 2 } as const] }
     const res = applyWithEvents(busy, { type: 'reclaim', officerId: 2 })
     expect(res.ok).toBe(false)
     expect(res.reason).toBe('officer-busy')

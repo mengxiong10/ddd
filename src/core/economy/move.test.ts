@@ -6,7 +6,7 @@ import { isBusy } from '../world/queries'
 
 /** 占用某武将（占用为派生：入队一条引用该武将的命令）。 */
 function occupy(s: GameState, id: number): GameState {
-  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'develop', officerId: id }] }
+  return { ...s, pendingCommands: [...s.pendingCommands, { type: 'reclaim', officerId: id }] }
 }
 
 // 刘备方：成都(chengdu) / 江陵(jiangling)；曹操方：许昌(xuchang)
