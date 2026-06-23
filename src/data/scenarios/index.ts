@@ -117,6 +117,28 @@ function scenarioData(id: ScenarioId): ScenarioData {
   return data
 }
 
+export interface ScenarioPreviewCity {
+  readonly id: CityId
+  readonly name: string
+  readonly x: number
+  readonly y: number
+  readonly lordId: OfficerId | null
+}
+
+/** 建局前的只读城池布局摘要（选君主预览地图用）：城 id/name/x/y/lordId + 共享邻接；零规则、不构造 GameState。 */
+export interface ScenarioPreview {
+  readonly cities: readonly ScenarioPreviewCity[]
+  readonly adjacency: readonly (readonly [CityId, CityId])[]
+}
+
+export function scenarioPreview(scenarioId: ScenarioId): ScenarioPreview {
+  const data = scenarioData(scenarioId)
+  return {
+    cities: data.cities.map((c) => ({ id: c.id, name: c.name, x: c.x, y: c.y, lordId: c.lordId })),
+    adjacency: ADJACENCY_EDGES,
+  }
+}
+
 export function lordsForScenario(scenarioId: ScenarioId): readonly ScenarioLordSummary[] {
   const data = scenarioData(scenarioId)
   const cityCounts = new Map<OfficerId, number>()

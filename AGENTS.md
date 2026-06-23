@@ -76,5 +76,6 @@ spec-init → spec-prd（PRD）→ spec-dev（开发文档+质量自检）→ sp
 | 命令反馈 command-feedback          | specs/18-command-feedback/prd.md    | specs/18-command-feedback/dev.md    | done |
 | store/UI 接入 store-ui             | specs/19-store-ui/prd.md            | specs/19-store-ui/dev.md            | done |
 | 原版四剧本 original-scenarios      | specs/20-original-scenarios/prd.md  | specs/20-original-scenarios/dev.md  | done |
+| 主流程 UI main-flow-ui             | specs/21-main-flow-ui/prd.md        | specs/21-main-flow-ui/dev.md        | done |
 
 状态：draft（写 PRD 中）→ ready（开发文档已批准）→ done（已实现）

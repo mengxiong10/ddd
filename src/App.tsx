@@ -1,28 +1,46 @@
 import { useState } from 'react'
 import { useGameStore } from './store/game-store'
-import { GameScreen } from './ui/app-shell'
-import { ToastHost } from './ui/feedback/toast'
-import { NewGameScreen } from './ui/new-game'
-import { PauseDialogs } from './ui/pause-dialogs'
+import { ForceLandscape } from './ui/layout/force-landscape'
+import { Toaster } from './ui/feedback/toaster'
+import { NewGameScreen } from './ui/screens/new-game-screen'
+import { WorldScreen } from './ui/screens/world-screen'
+import { BattleScreen } from './ui/battle/battle-screen'
 
+/**
+ * 组合根（`21-main-flow-ui`）：按 store 状态派生当前屏——无 game→开局向导、activeBattle→战斗屏、
+ * 否则→大地图屏。ForceLandscape 包裹当前屏 + 全局 Toaster；暂停态/战果 dialog 由对应屏自带。
+ */
 export function App() {
-  const game = useGameStore((state) => state.game)
-  const [choosing, setChoosing] = useState(false)
+  const game = useGameStore((s) => s.game)
+  const [choosingNew, setChoosingNew] = useState(false)
 
-  if (!game) {
-    return (
-      <main className="app">
-        <NewGameScreen canCancel={false} onCancel={() => undefined} />
-      </main>
-    )
+  const screen = () => {
+    if (!game)
+      return (
+        <NewGameScreen
+          onStarted={() => setChoosingNew(false)}
+          canCancel={false}
+          onCancel={() => undefined}
+        />
+      )
+    if (choosingNew)
+      return (
+        <NewGameScreen
+          onStarted={() => setChoosingNew(false)}
+          canCancel
+          onCancel={() => setChoosingNew(false)}
+        />
+      )
+    if (game.activeBattle) return <BattleScreen />
+    return <WorldScreen onNewGame={() => setChoosingNew(true)} />
   }
 
   return (
-    <main className="app">
-      <GameScreen onNewGame={() => setChoosing(true)} />
-      <PauseDialogs />
-      <ToastHost />
-      {choosing && <NewGameScreen canCancel onCancel={() => setChoosing(false)} />}
-    </main>
+    <ForceLandscape>
+      <div className="h-full w-full">
+        {screen()}
+        <Toaster />
+      </div>
+    </ForceLandscape>
   )
 }

@@ -141,3 +141,8 @@
 - **store 层（Store）**：`src/store/` 的 Zustand store 持有当前 `GameState`，`dispatch(action)` 走 `applyWithEvents`，`canDispatch(action)` 走 `canApply`，`newGame({scenarioId,playerLordId,seed})` 从剧本创建对局；store 不写游戏规则或中文运行时文案。
 - **通知队列 / 反馈队列（Feedback Queue）**：store 自身持有、非 `GameState` 且不持久化的瞬态结构化反馈集合；成功时加入下令确认与全部 `OutcomeEvent`，失败时加入 `ReasonCode`，并提供消费/出队接口。
 - **UI 文案映射（Message Mapping）**：`src/ui/` 的本地化模块把下令确认、`OutcomeEvent` 与 `ReasonCode` 映射为中文 toast，并负责多变体选择与玩家可见性过滤；core/store 保持零中文。
+- **主流程 UI（Main Flow UI）**：`21-main-flow-ui` 起的完整界面，移动端横屏优先，串起「选剧本 → 选君主 → 大地图经营 → 战斗地图」四段；用 Tailwind + shadcn/ui 重建，所有美术处先用语义色块/网格占位（图片后补），只做 UI 层、不改 store/core 规则。
+- **大地图视图（World Map View）**：按 `City.x/y` 的 `12×9` 世界网格渲染的经营主视图——城池为色块节点（势力色），相邻城之间画邻接连线，点选城进入该城经营。
+- **势力色（Faction Color）**：UI 给每位君主按其 id 自动分配的 HSL 色相，用于地图与战斗中区分归属；玩家势力统一高亮、空城为灰。纯展示概念，不入 core。
+- **战斗地图视图（Battle Map View）**：玩家参战时进入的全屏交互式战棋界面——`32×32` 地形色块网格（缩放铺满屏高、可平移），双方单位为带标签色块，提供选将/移动/攻击/施法/休息/结束当日，接通 `activeBattle` 全流程。
+- **旋转提示遮罩（Rotate Hint）**：移动端竖屏时覆盖屏幕的「请旋转至横屏」提示；本作横屏优先、不做竖屏适配。
