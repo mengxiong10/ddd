@@ -25,6 +25,10 @@ export {
 } from '../core/world/queries'
 export { successionCandidates } from '../core/world/succession'
 export { troopCapacity } from '../core/world/officer'
+// 数值命令的可用上限（与 canX 校验同源；UI 据此设输入 max / 默认值）。
+export { recruitMaxTroops } from '../core/economy/recruit'
+export { allocateMaxTroops } from '../core/economy/allocate'
+export { buyMaxFood } from '../core/economy/trade'
 export { SCENARIOS, lordsForScenario } from '../data/scenarios'
 // 开局预览（建局前拿城池布局；data 层只读摘要，零规则、不构造 GameState）。
 export { scenarioPreview } from '../data/scenarios'

@@ -28,6 +28,10 @@ export interface ScenarioLordSummary {
   readonly id: OfficerId
   readonly name: string
   readonly cityCount: number
+  /** 君主静态武力（只读摘要，零规则，选君主卡片展示用）。 */
+  readonly force: number
+  /** 君主静态智力（只读摘要）。 */
+  readonly intelligence: number
 }
 
 export interface CreateScenarioRequest {
@@ -151,7 +155,13 @@ export function lordsForScenario(scenarioId: ScenarioId): readonly ScenarioLordS
         (candidate) => candidate.id === id && candidate.lordId === id
       )
       if (!officer) throw new Error(`scenario ${scenarioId} has invalid lord: ${id}`)
-      return { id, name: officer.name, cityCount }
+      return {
+        id,
+        name: officer.name,
+        cityCount,
+        force: officer.force,
+        intelligence: officer.intelligence,
+      }
     })
     .sort((a, b) => a.id - b.id)
 }

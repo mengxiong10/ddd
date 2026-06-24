@@ -1,18 +1,9 @@
 import { useRef, useState } from 'react'
-import type { GameState, OfficerId, Position, Terrain } from '../../store/selectors'
+import type { GameState, OfficerId, Position } from '../../store/selectors'
 import { GRID_SIZE, terrainAt, aliveUnits } from '../../store/selectors'
 import type { BattleState } from '../../store/selectors'
-
-const TERRAIN_FILL: Record<Terrain, string> = {
-  grass: 'hsl(95 38% 66%)',
-  plain: 'hsl(80 32% 76%)',
-  mountain: 'hsl(28 26% 56%)',
-  forest: 'hsl(140 34% 42%)',
-  village: 'hsl(40 52% 72%)',
-  city: 'hsl(45 85% 58%)',
-  camp: 'hsl(18 42% 56%)',
-  river: 'hsl(205 60% 66%)',
-}
+import { troopCapacity } from '../../store/selectors'
+import { TERRAIN_FILL, TERRAIN_STROKE, HIGHLIGHT, UNIT_COLOR } from './terrain-color'
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n))
 
@@ -109,38 +100,58 @@ export function BattleMap({
               width={1}
               height={1}
               fill={TERRAIN_FILL[terrainAt(map, { x, y })]}
-              stroke="hsl(0 0% 0% / 0.06)"
+              stroke={TERRAIN_STROKE}
               strokeWidth={0.03}
             />
           )
         })}
-        {overlay(reach, 'hsl(210 90% 55% / 0.4)', 'r')}
-        {overlay(attack, 'hsl(0 80% 55% / 0.4)', 'a')}
-        {overlay(skill, 'hsl(280 70% 60% / 0.4)', 's')}
+        {overlay(reach, HIGHLIGHT.reach, 'r')}
+        {overlay(attack, HIGHLIGHT.attack, 'a')}
+        {overlay(skill, HIGHLIGHT.skill, 's')}
         {aliveUnits(battle).map((u) => {
           const mine = u.side === 'player'
           const selected = u.officerId === selectedOfficerId
+          const officer = game.officers[u.officerId]
+          const cap = officer ? troopCapacity(officer) : 0
+          const ratio = cap > 0 ? Math.max(0, Math.min(1, u.troops / cap)) : 0
           return (
             <g key={u.officerId} className="pointer-events-none">
               <circle
                 cx={u.pos.x + 0.5}
                 cy={u.pos.y + 0.5}
                 r={0.42}
-                fill={mine ? 'hsl(210 90% 50%)' : 'hsl(0 75% 50%)'}
-                stroke={selected ? 'hsl(43 96% 50%)' : 'hsl(0 0% 100%)'}
+                fill={mine ? UNIT_COLOR.player : UNIT_COLOR.opponent}
+                stroke={selected ? HIGHLIGHT.selected : UNIT_COLOR.stroke}
                 strokeWidth={selected ? 0.18 : 0.08}
-                opacity={u.acted ? 0.55 : 1}
+                opacity={u.acted ? 0.5 : 1}
               />
               <text
                 x={u.pos.x + 0.5}
-                y={u.pos.y + 0.5}
-                fontSize={0.3}
+                y={u.pos.y + 0.46}
+                fontSize={0.32}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="white"
               >
-                {game.officers[u.officerId]?.name?.[0] ?? ''}
+                {officer?.name?.[0] ?? ''}
               </text>
+              {/* 兵力条：单位下沿一道细条，按 troops/带兵量 派生宽度。 */}
+              <rect
+                x={u.pos.x + 0.12}
+                y={u.pos.y + 0.82}
+                width={0.76}
+                height={0.1}
+                rx={0.05}
+                fill="hsl(28 28% 16% / 0.35)"
+              />
+              <rect
+                x={u.pos.x + 0.12}
+                y={u.pos.y + 0.82}
+                width={0.76 * ratio}
+                height={0.1}
+                rx={0.05}
+                fill={mine ? 'hsl(140 50% 55%)' : 'hsl(38 80% 55%)'}
+              />
             </g>
           )
         })}

@@ -94,7 +94,6 @@ export const COMMAND_LABEL: Record<CommandKind, string> = {
 
 export const COMMAND_GROUP_LABEL: Record<CommandGroup, string> = {
   develop: '内政',
-  personnel: '人事',
-  military: '军事',
   diplomacy: '外交',
+  military: '军备',
 }

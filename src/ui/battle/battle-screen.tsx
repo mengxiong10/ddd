@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CloudSun, Wheat, Flag, ChevronRight } from 'lucide-react'
 import { useCurrentGame, useGameStore } from '../../store/game-store'
 import type { BattleAction, OfficerId, Position } from '../../store/selectors'
 import {
@@ -10,6 +11,7 @@ import {
 } from '../../store/selectors'
 import { WEATHER_LABEL } from '../labels'
 import { Button } from '../components/ui/button'
+import { Screen, TopBar } from '../components/primitives'
 import { BattleMap } from './battle-map'
 import { UnitActionMenu } from './unit-action-menu'
 import { DetailDialog } from './detail-dialog'
@@ -94,42 +96,58 @@ export function BattleScreen() {
   }
 
   return (
-    <div className="relative flex h-full flex-col">
-      <header className="flex items-center gap-2 border-b bg-card px-3 py-1.5 text-sm">
-        <span>
-          第 {battle.day} 天 · {WEATHER_LABEL[battle.weather]} · 我粮 {battle.playerProvisions} 敌粮{' '}
+    <Screen className="relative">
+      <TopBar
+        className="py-1.5"
+        actions={
+          <>
+            <Button size="sm" variant="outline" onClick={() => setOverviewOpen(true)}>
+              概览
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                dispatch({ type: 'battle', action: { type: 'endDay' } })
+                setDraft({ kind: 'idle' })
+              }}
+            >
+              结束当日
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => dispatch({ type: 'battle', action: { type: 'retreat' } })}
+            >
+              撤退
+            </Button>
+          </>
+        }
+      >
+        <span className="flex items-center gap-1.5 text-sm font-semibold">
+          <span className="font-display">第 {battle.day} 天</span>
+        </span>
+        <span className="flex items-center gap-1 text-sm" title="天气">
+          <CloudSun className="size-4 text-gold" />
+          {WEATHER_LABEL[battle.weather]}
+        </span>
+        <span className="flex items-center gap-1 text-sm tabular-nums" title="我军粮草">
+          <Wheat className="size-4 text-bamboo" />
+          {battle.playerProvisions}
+        </span>
+        <span className="flex items-center gap-1 text-sm tabular-nums" title="敌军粮草">
+          <Flag className="size-4 text-destructive" />
           {battle.intelRevealDay === battle.day ? battle.opponentProvisions : '???'}
         </span>
         {selectedOfficerId !== null && (
           <button
-            className="rounded bg-secondary px-2 py-0.5"
+            className="ml-1 flex items-center gap-0.5 rounded-md bg-secondary px-2 py-1 text-xs"
             onClick={() => setInspect({ kind: 'unit', officerId: selectedOfficerId })}
           >
-            选中：{game.officers[selectedOfficerId]?.name} ▸详情
+            {game.officers[selectedOfficerId]?.name}
+            <ChevronRight className="size-3" />
           </button>
         )}
-        <div className="ml-auto flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => setOverviewOpen(true)}>
-            概览
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => {
-              dispatch({ type: 'battle', action: { type: 'endDay' } })
-              setDraft({ kind: 'idle' })
-            }}
-          >
-            结束当日
-          </Button>
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => dispatch({ type: 'battle', action: { type: 'retreat' } })}
-          >
-            撤退
-          </Button>
-        </div>
-      </header>
+      </TopBar>
 
       <div className="min-h-0 flex-1">
         <BattleMap
@@ -157,6 +175,6 @@ export function BattleScreen() {
       {inspect && <DetailDialog inspect={inspect} onClose={() => setInspect(null)} />}
       {overviewOpen && <BattleOverviewDialog onClose={() => setOverviewOpen(false)} />}
       {battle.outcome && <BattleResultDialog outcome={battle.outcome} />}
-    </div>
+    </Screen>
   )
 }

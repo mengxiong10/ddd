@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useGameStore } from './store/game-store'
 import { ForceLandscape } from './ui/layout/force-landscape'
 import { Toaster } from './ui/feedback/toaster'
@@ -14,31 +14,41 @@ export function App() {
   const game = useGameStore((s) => s.game)
   const [choosingNew, setChoosingNew] = useState(false)
 
-  const screen = () => {
+  const screen = (): { key: string; node: ReactNode } => {
     if (!game)
-      return (
-        <NewGameScreen
-          onStarted={() => setChoosingNew(false)}
-          canCancel={false}
-          onCancel={() => undefined}
-        />
-      )
+      return {
+        key: 'new-game',
+        node: (
+          <NewGameScreen
+            onStarted={() => setChoosingNew(false)}
+            canCancel={false}
+            onCancel={() => undefined}
+          />
+        ),
+      }
     if (choosingNew)
-      return (
-        <NewGameScreen
-          onStarted={() => setChoosingNew(false)}
-          canCancel
-          onCancel={() => setChoosingNew(false)}
-        />
-      )
-    if (game.activeBattle) return <BattleScreen />
-    return <WorldScreen onNewGame={() => setChoosingNew(true)} />
+      return {
+        key: 'new-game',
+        node: (
+          <NewGameScreen
+            onStarted={() => setChoosingNew(false)}
+            canCancel
+            onCancel={() => setChoosingNew(false)}
+          />
+        ),
+      }
+    if (game.activeBattle) return { key: 'battle', node: <BattleScreen /> }
+    return { key: 'world', node: <WorldScreen onNewGame={() => setChoosingNew(true)} /> }
   }
+
+  const { key, node } = screen()
 
   return (
     <ForceLandscape>
       <div className="h-full w-full">
-        {screen()}
+        <div key={key} className="animate-screen h-full w-full">
+          {node}
+        </div>
         <Toaster />
       </div>
     </ForceLandscape>

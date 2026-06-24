@@ -1,26 +1,53 @@
 @import 'tailwindcss';
 
-/* 设计令牌（Tailwind v4 @theme：生成 background/foreground/primary 等工具类）。 */
+/*
+ * 设计令牌（Tailwind v4 @theme：生成 background/foreground/primary 等工具类）。
+ * 美术方向「国风/水墨」：宣纸暖底 + 墨色字 + 朱砂主色 + 赭金点缀 + 竹青辅色。
+ * 一致性红线：所有页面只从这里取色/圆角/字体/阴影，组件与地图/战斗调色板均派生于此。
+ */
 @theme {
-  --color-border: hsl(220 13% 88%);
-  --color-input: hsl(220 13% 88%);
-  --color-ring: hsl(221 83% 53%);
-  --color-background: hsl(40 33% 96%);
-  --color-foreground: hsl(222 47% 11%);
-  --color-primary: hsl(221 83% 53%);
-  --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(220 14% 94%);
-  --color-secondary-foreground: hsl(222 47% 11%);
-  --color-muted: hsl(220 14% 94%);
-  --color-muted-foreground: hsl(220 9% 42%);
-  --color-accent: hsl(43 96% 56%);
-  --color-accent-foreground: hsl(222 47% 11%);
-  --color-destructive: hsl(0 72% 51%);
-  --color-destructive-foreground: hsl(0 0% 100%);
-  --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(222 47% 11%);
-  --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(222 47% 11%);
+  /* 语义色（shadcn 约定，全部偏暖以贴合宣纸题材） */
+  --color-border: hsl(34 22% 80%);
+  --color-input: hsl(34 22% 80%);
+  --color-ring: hsl(8 62% 48%);
+  --color-background: hsl(40 30% 93%);
+  --color-foreground: hsl(28 28% 16%);
+  --color-primary: hsl(8 62% 48%);
+  --color-primary-foreground: hsl(40 33% 97%);
+  --color-secondary: hsl(38 26% 87%);
+  --color-secondary-foreground: hsl(28 28% 16%);
+  --color-muted: hsl(38 22% 89%);
+  --color-muted-foreground: hsl(30 12% 40%);
+  --color-accent: hsl(38 68% 50%);
+  --color-accent-foreground: hsl(28 32% 14%);
+  --color-destructive: hsl(0 64% 46%);
+  --color-destructive-foreground: hsl(40 33% 97%);
+  --color-card: hsl(42 40% 97%);
+  --color-card-foreground: hsl(28 28% 16%);
+  --color-popover: hsl(42 40% 97%);
+  --color-popover-foreground: hsl(28 28% 16%);
+
+  /* 题材命名色（生成 bg-ink / text-vermilion / border-bamboo 等；地图/战斗/势力色共用） */
+  --color-ink: hsl(28 28% 16%);
+  --color-ink-soft: hsl(28 16% 34%);
+  --color-vermilion: hsl(8 62% 48%);
+  --color-gold: hsl(38 68% 50%);
+  --color-bamboo: hsl(140 24% 36%);
+  --color-parchment: hsl(40 30% 93%);
+  --color-parchment-dark: hsl(36 24% 84%);
+
+  /* 圆角 */
+  --radius-lg: 0.625rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.375rem;
+
+  /* 题材阴影（柔和、暖调，避免冷灰投影破坏宣纸感） */
+  --shadow-card: 0 1px 2px hsl(28 28% 16% / 0.06), 0 2px 8px hsl(28 28% 16% / 0.05);
+  --shadow-float: 0 6px 24px hsl(28 28% 16% / 0.16);
+
+  /* 字体：标题用衬线（书法/宋体气质），正文用系统无衬线；不加载外部字体、纯系统回退。 */
+  --font-display: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'Source Han Serif SC', serif;
+  --font-sans: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 @layer base {
@@ -34,15 +61,50 @@
   }
   body {
     margin: 0;
-    background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family:
-      system-ui,
-      -apple-system,
-      'PingFang SC',
-      'Microsoft YaHei',
-      sans-serif;
+    font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
+    /* 宣纸质感：极淡的双向斜光渐变，零外部资源。 */
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(at 18% 12%, hsl(40 38% 97% / 0.7) 0px, transparent 55%),
+      radial-gradient(at 82% 88%, hsl(36 28% 86% / 0.6) 0px, transparent 55%);
+    background-attachment: fixed;
   }
+  /* 标题字工具类（仅大标题/数字使用，正文保持无衬线扫读性）。 */
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+  }
+}
+
+/* 屏切换入场：淡入 + 轻微上浮（开局↔大地图↔战斗）。 */
+@keyframes screen-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-screen {
+  animation: screen-rise 180ms ease-out;
+}
+
+/* 右侧抽屉入场：从右滑入（命令收集向导用，非模态、不遮挡地图）。 */
+@keyframes sheet-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-sheet-right {
+  animation: sheet-in-right 200ms ease-out;
 }

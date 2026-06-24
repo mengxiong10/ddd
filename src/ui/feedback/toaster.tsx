@@ -34,18 +34,21 @@ export function Toaster() {
       return
     }
     showingId.current = head.id
-    const failed = head.payload.kind === 'failure'
+    const kind = head.payload.kind
     const close = () => dismiss(head.id)
+    // 三类色调：失败=朱砂红；下令确认=竹青左缘；结算/战报=赭金左缘。
+    const tone =
+      kind === 'failure'
+        ? 'border-destructive/40 bg-destructive text-destructive-foreground'
+        : kind === 'issued'
+          ? 'border-l-4 border-l-bamboo border-border bg-card text-card-foreground'
+          : 'border-l-4 border-l-gold border-border bg-card text-card-foreground'
     toast.custom(
       () => (
         <div
           role="status"
           onClick={() => toast.dismiss(head.id)}
-          className={`pointer-events-auto min-w-[16rem] max-w-[80vw] cursor-pointer rounded-md border px-4 py-2.5 text-sm shadow-lg ${
-            failed
-              ? 'border-destructive/40 bg-destructive text-destructive-foreground'
-              : 'border-border bg-card text-card-foreground'
-          }`}
+          className={`pointer-events-auto min-w-[16rem] max-w-[80vw] cursor-pointer rounded-md border px-4 py-2.5 text-sm shadow-[var(--shadow-float)] ${tone}`}
         >
           {text}
         </div>

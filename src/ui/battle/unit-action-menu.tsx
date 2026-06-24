@@ -35,15 +35,22 @@ export function UnitActionMenu({
 }) {
   if (draft.kind !== 'unit' && draft.kind !== 'cast-pick-skill') return null
 
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 9999
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 9999
+  const MENU_W = 144
+  const MENU_H = 220
   const style: React.CSSProperties = {
     position: 'fixed',
-    left: Math.min(anchor.x + 8, (typeof window !== 'undefined' ? window.innerWidth : 9999) - 160),
-    top: anchor.y + 8,
+    left: Math.max(8, Math.min(anchor.x + 8, vw - MENU_W - 8)),
+    top: Math.max(8, Math.min(anchor.y + 8, vh - MENU_H - 8)),
     zIndex: 40,
   }
 
   return (
-    <div style={style} className="flex w-36 flex-col gap-1 rounded-md border bg-card p-1 shadow-lg">
+    <div
+      style={style}
+      className="flex w-36 flex-col gap-0.5 rounded-md border bg-card p-1 shadow-[var(--shadow-float)]"
+    >
       {draft.kind === 'unit' && (
         <>
           <Button size="sm" variant="ghost" onClick={() => onChoose(toAttack(draft))}>

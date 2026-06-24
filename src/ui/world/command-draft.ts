@@ -31,24 +31,28 @@ export type CommandKind =
   | 'transport' // 执行人 + 目标城
   | 'campaign' // 名单 + 目标城 + 粮草
 
-/** 命令分组（仅 UI 面板归类展示）。 */
-export type CommandGroup = 'develop' | 'personnel' | 'military' | 'diplomacy'
+/** 命令分组（仅 UI 面板归类展示）：内政 / 外交 / 军备 三类。 */
+export type CommandGroup = 'develop' | 'diplomacy' | 'military'
 
 export const COMMAND_GROUPS: Record<CommandGroup, readonly CommandKind[]> = {
-  develop: ['reclaim', 'commerce', 'patrol', 'govern', 'trade'],
-  personnel: [
-    'recruit',
-    'allocate',
+  develop: [
+    'reclaim',
+    'commerce',
+    'patrol',
+    'govern',
+    'trade',
     'search',
+    'banquet',
     'reward',
     'confiscate',
-    'banquet',
     'suborn',
     'behead',
     'banish',
+    'move',
+    'transport',
   ],
-  military: ['plunder', 'scout', 'move', 'transport', 'campaign'],
-  diplomacy: ['entice', 'alienate', 'instigate', 'induce'],
+  diplomacy: ['alienate', 'entice', 'instigate', 'induce'],
+  military: ['scout', 'recruit', 'allocate', 'plunder', 'campaign'],
 }
 
 /** 待收集的下一个参数槽。 */
@@ -214,6 +218,43 @@ export function draftToAction(draft: CommandDraft): Action | null {
     case 'transport':
       return null // 三数（粮/金/兵）由面板直接组装派发。
   }
+}
+
+/** 可被「上一步」清空的草稿数据字段（不含 kind/command/awaiting）。 */
+type ClearKey =
+  | 'officerId'
+  | 'targetCityId'
+  | 'officerIds'
+  | 'itemId'
+  | 'captiveId'
+  | 'targetOfficerId'
+  | 'amount'
+  | 'tradeMode'
+  | 'provisions'
+
+/** 每个收集槽回退时应清空的字段。 */
+const SLOT_CLEARS: Record<DraftSlot, readonly ClearKey[]> = {
+  executor: ['officerId'],
+  'target-city': ['targetCityId'],
+  'campaign-members': ['officerIds'],
+  item: ['itemId'],
+  captive: ['captiveId'],
+  'target-officer': ['targetOfficerId'],
+  amount: ['amount'],
+  'trade-args': ['tradeMode', 'amount'],
+  provisions: ['provisions'],
+}
+
+/** 上一步：退回上一收集槽并清空该槽已填值；已在首槽则回命令面板。 */
+export function stepBack(draft: CommandDraft): CommandDraft {
+  if (draft.kind !== 'collect') return draft
+  const seq = SLOTS[draft.command]
+  const idx = seq.indexOf(draft.awaiting)
+  if (idx <= 0) return { kind: 'pick-command' }
+  const prev = seq[idx - 1]!
+  const next = { ...draft, awaiting: prev }
+  for (const k of SLOT_CLEARS[prev]) delete next[k]
+  return next
 }
 
 /** 当前草稿是否处于「等地图点目标城」态（驱动地图高亮可选城）。 */

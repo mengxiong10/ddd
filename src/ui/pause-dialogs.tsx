@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Crown, Swords, Sparkles, ShieldAlert } from 'lucide-react'
 import { useCurrentGame, useGameStore } from '../store/game-store'
 import {
   successionCandidates,
@@ -17,6 +18,7 @@ import {
 } from './components/ui/dialog'
 import { Button } from './components/ui/button'
 import { Checkbox } from './components/ui/checkbox'
+import { Badge } from './components/ui/badge'
 
 const MAX_DEFENDERS = 10
 
@@ -29,26 +31,42 @@ function SuccessionDialog({ lordId }: { readonly lordId: OfficerId }) {
     <Dialog open>
       <DialogContent showClose={false}>
         <DialogHeader>
-          <DialogTitle>请拥立新君</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 font-display">
+            <Crown className="size-5 text-gold" />
+            请拥立新君
+          </DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
           君主 {game.officers[lordId]?.name ?? lordId} 遭劫，择一继位：
         </p>
-        <div className="flex flex-col gap-1.5">
-          {candidates.map((o) => (
-            <Button
-              key={o.id}
-              variant="outline"
-              className="justify-between"
-              onClick={() => dispatch({ type: 'chooseSuccessor', officerId: o.id })}
-            >
-              <span>{o.name}</span>
-              <span className="text-xs text-muted-foreground">
-                智 {effectiveOfficer(game, o.id).intelligence}
-                {governorOf(game, o.cityId ?? -1)?.id === o.id ? ' · 太守' : ''}
-              </span>
-            </Button>
-          ))}
+        <div className="flex max-h-72 flex-col gap-1.5 overflow-y-auto">
+          {candidates.map((o) => {
+            const eff = effectiveOfficer(game, o.id)
+            const isGov = governorOf(game, o.cityId ?? -1)?.id === o.id
+            return (
+              <Button
+                key={o.id}
+                variant="outline"
+                className="h-auto justify-between py-2"
+                onClick={() => dispatch({ type: 'chooseSuccessor', officerId: o.id })}
+              >
+                <span className="flex items-center gap-2 font-medium">
+                  {o.name}
+                  {isGov && <Badge variant="secondary">太守</Badge>}
+                </span>
+                <span className="flex items-center gap-2.5 text-xs text-muted-foreground tabular-nums">
+                  <span className="flex items-center gap-0.5">
+                    <Swords className="size-3" />
+                    {eff.force}
+                  </span>
+                  <span className="flex items-center gap-0.5">
+                    <Sparkles className="size-3" />
+                    {eff.intelligence}
+                  </span>
+                </span>
+              </Button>
+            )
+          })}
           {candidates.length === 0 && <p className="text-sm">已无可立之人，势力将灭亡。</p>}
         </div>
       </DialogContent>
@@ -87,25 +105,32 @@ function DefenseDialog({ targetCityId }: { readonly targetCityId: CityId }) {
     <Dialog open>
       <DialogContent showClose={false}>
         <DialogHeader>
-          <DialogTitle>敌军来犯 · {game.cities[targetCityId]?.name ?? targetCityId}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 font-display">
+            <ShieldAlert className="size-5 text-destructive" />
+            敌军来犯 · {game.cities[targetCityId]?.name ?? targetCityId}
+          </DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
-          选择出战守军（最多 {MAX_DEFENDERS}）已选 {picked.length}/{MAX_DEFENDERS}
+          选择出战守军（最多 {MAX_DEFENDERS}），已选 {picked.length}/{MAX_DEFENDERS}
         </p>
         <div className="flex max-h-60 flex-col gap-1 overflow-y-auto">
           {candidates.map((o) => (
             <label
               key={o.id}
-              className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 hover:bg-secondary"
+              className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 hover:bg-secondary"
             >
               <Checkbox
                 checked={picked.includes(o.id)}
                 disabled={!picked.includes(o.id) && picked.length >= MAX_DEFENDERS}
                 onCheckedChange={() => toggle(o.id)}
               />
-              <span className="text-sm">
-                {o.name} 兵{o.troops}
-                {gov?.id === o.id ? ' · 太守' : ''}
+              <span className="flex flex-1 items-center gap-2 text-sm">
+                <span className="font-medium">{o.name}</span>
+                {gov?.id === o.id && <Badge variant="secondary">太守</Badge>}
+                <span className="ml-auto flex items-center gap-0.5 text-xs text-muted-foreground tabular-nums">
+                  <Swords className="size-3" />
+                  {o.troops}
+                </span>
               </span>
             </label>
           ))}

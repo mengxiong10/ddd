@@ -1,13 +1,15 @@
 import type { CityId, GameState } from '../../store/selectors'
-import { factionColor, isPlayerFaction } from '../faction-color'
+import { factionColor, factionColorDark, isPlayerFaction } from '../faction-color'
+import { cn } from '@/lib/utils'
 
-const S = 10
-const PAD = 8
+const COLS = 12
+const ROWS = 9
 
 /**
- * 经营大地图（`21-main-flow-ui`）：从 live 局面渲染邻接连线 + 城池节点（势力色、我方高亮、空城灰、
- * 选中描边、highlightCityIds 脉冲）+ 选城事件。本切片占位渲染、接口按完整地图设计（后期美化）。
- * 与选君主预览 ScenarioPreviewMap 解耦、各自演进。
+ * 经营大地图（`21-main-flow-ui` 打磨）：SVG 只画邻接连线（弱化为底层、选中城的邻接高亮），
+ * 城池节点改为绝对定位的 HTML 芯片（势力色点 + 城名），文字按真实字号渲染、小屏清晰可点。
+ * 我方城金边、空城灰、选中城朱砂环；highlightCityIds（待选目标城）金色脉冲。
+ * 容器保持 12:9 比例居中铺满，避免连线被拉伸变形。
  */
 export function WorldMap({
   game,
@@ -21,85 +23,82 @@ export function WorldMap({
   readonly onSelectCity: (id: CityId) => void
 }) {
   const cities = Object.values(game.cities)
-  const cx = (x: number) => x * S + S / 2
-  const cy = (y: number) => y * S + S / 2
-  const width = 12 * S
-  const height = 9 * S
   const highlight = new Set(highlightCityIds ?? [])
+  const selectedNeighbors = new Set(
+    selectedCityId !== null ? (game.adjacency[selectedCityId] ?? []) : []
+  )
+  const left = (x: number) => `${((x + 0.5) / COLS) * 100}%`
+  const top = (y: number) => `${((y + 0.5) / ROWS) * 100}%`
 
   return (
-    <svg
-      viewBox={`${-PAD} ${-PAD} ${width + 2 * PAD} ${height + 2 * PAD}`}
-      className="h-full w-full touch-none select-none"
-      role="img"
-      aria-label="经营大地图"
-    >
-      <g stroke="hsl(220 13% 65%)" strokeWidth={0.4}>
-        {Object.entries(game.adjacency).flatMap(([a, neighbors]) =>
-          neighbors.map((b) => {
-            const ai = Number(a)
-            if (ai >= b) return null
-            const ca = game.cities[ai]
-            const cb = game.cities[b]
-            if (!ca || !cb) return null
-            return (
-              <line key={`${ai}-${b}`} x1={cx(ca.x)} y1={cy(ca.y)} x2={cx(cb.x)} y2={cy(cb.y)} />
-            )
-          })
-        )}
-      </g>
-      {cities.map((c) => {
-        const selected = c.id === selectedCityId
-        const mine = isPlayerFaction(c.lordId, game.playerLordId)
-        const size = 7
-        const x = cx(c.x) - size / 2
-        const y = cy(c.y) - size / 2
-        return (
-          <g
-            key={c.id}
-            className="cursor-pointer"
-            onClick={() => onSelectCity(c.id)}
-            role="button"
-            aria-label={c.name}
-          >
-            {highlight.has(c.id) && (
-              <rect
-                x={x - 2}
-                y={y - 2}
-                width={size + 4}
-                height={size + 4}
-                rx={1.5}
-                fill="none"
-                stroke="hsl(43 96% 50%)"
-                strokeWidth={1.2}
-                className="animate-pulse"
-              />
-            )}
-            <rect
-              x={x}
-              y={y}
-              width={size}
-              height={size}
-              rx={1.5}
-              fill={factionColor(c.lordId, game.playerLordId)}
-              stroke={
-                selected ? 'hsl(43 96% 45%)' : mine ? 'hsl(222 47% 11%)' : 'hsl(222 47% 11% / 0.4)'
-              }
-              strokeWidth={selected ? 1.4 : mine ? 0.8 : 0.3}
-            />
-            <text
-              x={cx(c.x)}
-              y={cy(c.y) + size + 0.5}
-              fontSize={2.8}
-              textAnchor="middle"
-              fill="hsl(222 47% 18%)"
-              className="pointer-events-none"
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="relative aspect-[12/9] h-full max-w-full">
+        <svg
+          viewBox={`0 0 ${COLS} ${ROWS}`}
+          preserveAspectRatio="none"
+          className="absolute inset-0 h-full w-full"
+          aria-hidden
+        >
+          {Object.entries(game.adjacency).flatMap(([a, neighbors]) =>
+            neighbors.map((b) => {
+              const ai = Number(a)
+              if (ai >= b) return null
+              const ca = game.cities[ai]
+              const cb = game.cities[b]
+              if (!ca || !cb) return null
+              const active =
+                selectedCityId !== null &&
+                (ai === selectedCityId ||
+                  b === selectedCityId ||
+                  (selectedNeighbors.has(ai) && selectedNeighbors.has(b)))
+              const onSel = ai === selectedCityId || b === selectedCityId
+              return (
+                <line
+                  key={`${ai}-${b}`}
+                  x1={ca.x + 0.5}
+                  y1={ca.y + 0.5}
+                  x2={cb.x + 0.5}
+                  y2={cb.y + 0.5}
+                  stroke={onSel ? 'hsl(38 68% 46%)' : 'hsl(30 16% 56%)'}
+                  strokeOpacity={active ? 0.9 : 0.28}
+                  strokeWidth={onSel ? 0.07 : 0.04}
+                  vectorEffect="non-scaling-stroke"
+                />
+              )
+            })
+          )}
+        </svg>
+
+        {cities.map((c) => {
+          const selected = c.id === selectedCityId
+          const mine = isPlayerFaction(c.lordId, game.playerLordId)
+          const pulse = highlight.has(c.id)
+          return (
+            <button
+              key={c.id}
+              onClick={() => onSelectCity(c.id)}
+              aria-label={c.name}
+              className={cn(
+                'absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-md border bg-card/95 px-1.5 py-0.5 text-[11px] font-medium leading-none shadow-[var(--shadow-card)] transition-transform active:scale-95',
+                selected && 'z-20 ring-2 ring-vermilion',
+                mine && !selected && 'border-gold',
+                pulse && 'z-20 animate-pulse ring-2 ring-gold'
+              )}
+              style={{ left: left(c.x), top: top(c.y) }}
             >
-              {c.name}
-            </text>
-          </g>
-        )
-      })}
-    </svg>
+              <span
+                className="size-2.5 shrink-0 rounded-full"
+                style={{
+                  backgroundColor: factionColor(c.lordId, game.playerLordId),
+                  boxShadow: `0 0 0 1px ${factionColorDark(c.lordId)}`,
+                }}
+                aria-hidden
+              />
+              <span className="whitespace-nowrap">{c.name}</span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
