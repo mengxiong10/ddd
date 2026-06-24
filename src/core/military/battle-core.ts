@@ -3,6 +3,8 @@ import type { CityId, OfficerId } from '../shared/ids'
 import type { Position } from '../shared/position'
 import { samePos } from '../shared/position'
 import type { CommandCheck } from '../shared/command'
+import type { OutcomeEvent, WithEvents } from '../shared/outcome'
+import { withEvents } from '../shared/outcome'
 import type { Rng } from '../shared/rng'
 import { effectiveOfficer, effectiveTroopType } from '../world/queries'
 import { troopCapacity } from '../world/officer'
@@ -280,6 +282,18 @@ const ORTHO: readonly Position[] = [
   { x: 1, y: 0 },
 ]
 
+/** 一次普攻的可观测结果（供 applyActResolved 产出逐次反馈事件）。 */
+export interface AttackInfo {
+  /** 目标实际损失兵力。 */
+  readonly troopLoss: number
+  /** 攻击方本次获得经验。 */
+  readonly expGain: number
+  /** 升级后等级；未升级为 null。 */
+  readonly leveledTo: number | null
+  /** 目标是否被击溃。 */
+  readonly routed: boolean
+}
+
 /** 一次普攻（mutate units）：扣目标兵力/置死亡，行动者获经验/升级。普攻与围攻共用。 */
 function basicAttack(
   state: GameState,
@@ -287,7 +301,7 @@ function basicAttack(
   units: Record<OfficerId, BattleUnit>,
   attacker: BattleUnit,
   defender: BattleUnit
-): void {
+): AttackInfo {
   const dmg = computeDamage(state, map, attacker, defender)
   const newTroops = Math.max(0, defender.troops - dmg)
   const routed = newTroops === 0
@@ -296,11 +310,15 @@ function basicAttack(
     troops: newTroops,
     status: routed ? 'dead' : defender.status,
   }
-  const leveled = applyLevelUp(
-    attacker.level,
-    attacker.experience + experienceGain(dmg, attacker.level, defender.level, routed)
-  )
+  const expGain = experienceGain(dmg, attacker.level, defender.level, routed)
+  const leveled = applyLevelUp(attacker.level, attacker.experience + expGain)
   units[attacker.officerId] = { ...attacker, level: leveled.level, experience: leveled.experience }
+  return {
+    troopLoss: defender.troops - newTroops,
+    expGain,
+    leveledTo: leveled.level > attacker.level ? leveled.level : null,
+    routed,
+  }
 }
 
 /** 施法成功后的效果结算（mutate units），返回天气/rng/双方战场粮草补丁。 */
@@ -417,13 +435,14 @@ export function applyActResolved(
   state: GameState,
   battle: BattleState,
   action: Extract<BattleAction, { type: 'act' }>
-): GameState {
+): WithEvents<GameState> {
   const map = state.battleMaps[battle.mapId]!
   let rng = state.rng
   let weather = battle.weather
   let playerProvisions = battle.playerProvisions
   let opponentProvisions = battle.opponentProvisions
   let intelRevealDay = battle.intelRevealDay
+  const events: OutcomeEvent[] = []
   const units = { ...battle.units }
   const actor = units[action.officerId]!
   const pos = action.moveTo ?? actor.pos
@@ -432,7 +451,17 @@ export function applyActResolved(
 
   const term = action.terminal
   if (term.kind === 'attack') {
-    basicAttack(state, map, units, acting, unitAt(battle, term.target)!)
+    const defender = unitAt(battle, term.target)!
+    const info = basicAttack(state, map, units, acting, defender)
+    events.push({
+      kind: 'battle-attack',
+      attackerId: action.officerId,
+      defenderId: defender.officerId,
+      troopLoss: info.troopLoss,
+      expGain: info.expGain,
+      leveledTo: info.leveledTo,
+      routed: info.routed,
+    })
   } else if (term.kind === 'rest') {
     units[action.officerId] = { ...acting, mp: Math.min(acting.maxMp, acting.mp + 1) }
   } else {
@@ -466,5 +495,5 @@ export function applyActResolved(
     intelRevealDay,
   }
   const outcome = checkImmediateVictory(next, map)
-  return { ...state, rng, activeBattle: outcome ? { ...next, outcome } : next }
+  return withEvents({ ...state, rng, activeBattle: outcome ? { ...next, outcome } : next }, events)
 }

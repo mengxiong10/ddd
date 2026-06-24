@@ -1,6 +1,7 @@
 import type { GameState } from '../core/game-state'
 import type { City } from '../core/world/city'
-import { citiesOfLord } from '../core/world/queries'
+import { citiesOfLord, officersInCity } from '../core/world/queries'
+import type { Officer } from '../core/world/officer'
 
 /**
  * UI ↔ core 的唯一通道（`19-store-ui`）：再导出 UI 所需的 core 查询与类型。
@@ -73,3 +74,9 @@ export type { BattleStatus } from '../core/military/battle-status'
 
 /** 玩家全部城池（= citiesOfLord(game, game.playerLordId)）。 */
 export const playerCities = (game: GameState): City[] => citiesOfLord(game, game.playerLordId)
+
+/** 玩家全部在任武将（己方各城中属本势力者，含俘虏外的占用者）。 */
+export const playerOfficers = (game: GameState): Officer[] =>
+  playerCities(game)
+    .flatMap((c) => officersInCity(game, c.id))
+    .filter((o) => o.lordId === game.playerLordId)

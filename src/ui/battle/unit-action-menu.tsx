@@ -33,7 +33,9 @@ export function UnitActionMenu({
   readonly onChoose: (next: ActDraft) => void
   readonly onAct: (action: ActAction) => void
 }) {
-  if (draft.kind !== 'unit' && draft.kind !== 'cast-pick-skill') return null
+  // 仅在「选定落点后」弹出：unit 态需已选 moveTo（点可达格才出菜单）；cast-pick-skill 是其子菜单。
+  if (!((draft.kind === 'unit' && draft.moveTo !== undefined) || draft.kind === 'cast-pick-skill'))
+    return null
 
   const vw = typeof window !== 'undefined' ? window.innerWidth : 9999
   const vh = typeof window !== 'undefined' ? window.innerHeight : 9999

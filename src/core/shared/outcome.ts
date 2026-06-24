@@ -93,6 +93,20 @@ export type OutcomeEvent =
       readonly targetOfficerId: OfficerId
       readonly success: boolean
     }
+  // —— 战斗逐次反馈（每次普攻产出；UI 按攻击方归属过滤）——
+  | {
+      readonly kind: 'battle-attack'
+      readonly attackerId: OfficerId
+      readonly defenderId: OfficerId
+      /** 目标实际损失兵力。 */
+      readonly troopLoss: number
+      /** 攻击方本次获得经验。 */
+      readonly expGain: number
+      /** 升级后等级；未升级为 null。 */
+      readonly leveledTo: number | null
+      /** 目标是否被击溃。 */
+      readonly routed: boolean
+    }
   // —— 系统事件（月末/战后/外交领土变更）——
   | {
       readonly kind: 'lord-surrendered'

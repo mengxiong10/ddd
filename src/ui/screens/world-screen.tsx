@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Coins, Wheat, Crown, CalendarDays, RotateCw } from 'lucide-react'
+import { Crown, CalendarDays, Castle, Users, ChevronDown } from 'lucide-react'
 import { useCurrentGame, useGameStore } from '../../store/game-store'
-import { playerCities, type CityId } from '../../store/selectors'
+import { playerCities, playerOfficers, type CityId } from '../../store/selectors'
 import { isPlayerFaction } from '../faction-color'
 import { WorldMap } from '../world/world-map'
 import { CityPanel } from '../world/city-panel'
@@ -14,11 +14,17 @@ import {
 } from '../world/command-draft'
 import { PauseDialogs } from '../pause-dialogs'
 import { Button } from '../components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu'
 import { Screen, TopBar } from '../components/primitives'
 import { reasonText } from '../feedback/messages'
 
 /**
- * 经营大地图屏（`21-main-flow-ui`）：顶栏（纪年/君主/月末/新游戏）+ 大地图 + 右侧选中城面板 +
+ * 经营大地图屏（`21-main-flow-ui`）：顶栏（纪年/君主/城池数/武将数 + 结束策略含结束游戏下拉）+ 大地图 + 右侧选中城面板 +
  * 暂停态对话框。本地状态仅「选中城」「命令草稿」；命令优先收集，目标城由地图点选回填。
  */
 export function WorldScreen({ onNewGame }: { readonly onNewGame: () => void }) {
@@ -52,8 +58,7 @@ export function WorldScreen({ onNewGame }: { readonly onNewGame: () => void }) {
   }
 
   const lord = game.officers[game.playerLordId]
-  const totalGold = cities.reduce((s, c) => s + c.gold, 0)
-  const totalFood = cities.reduce((s, c) => s + c.food, 0)
+  const officerCount = playerOfficers(game).length
   const endMonthCheck = canDispatch({ type: 'endMonth' })
   const highlight =
     draft.kind === 'collect' && isAwaitingTargetCity(draft) && selectedCityId !== null
@@ -64,9 +69,10 @@ export function WorldScreen({ onNewGame }: { readonly onNewGame: () => void }) {
     <Screen>
       <TopBar
         actions={
-          <>
+          <div className="flex items-center">
             <Button
               size="sm"
+              className="rounded-r-none"
               disabled={!endMonthCheck.ok}
               title={
                 !endMonthCheck.ok && endMonthCheck.reason ? reasonText(endMonthCheck.reason) : ''
@@ -75,10 +81,21 @@ export function WorldScreen({ onNewGame }: { readonly onNewGame: () => void }) {
             >
               结束策略
             </Button>
-            <Button size="sm" variant="ghost" className="px-2" title="新游戏" onClick={onNewGame}>
-              <RotateCw className="size-4" />
-            </Button>
-          </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className="rounded-l-none border-l border-primary-foreground/20 px-1.5"
+                  title="更多"
+                >
+                  <ChevronDown className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={onNewGame}>结束游戏</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       >
         <span className="flex items-center gap-1.5 text-sm font-semibold">
@@ -91,13 +108,13 @@ export function WorldScreen({ onNewGame }: { readonly onNewGame: () => void }) {
           <Crown className="size-4 text-gold" />
           {lord?.name}
         </span>
-        <span className="ml-auto flex items-center gap-1 text-sm tabular-nums" title="全境金钱">
-          <Coins className="size-4 text-gold" />
-          {totalGold.toLocaleString()}
+        <span className="flex items-center gap-1 text-sm tabular-nums" title="城池数">
+          <Castle className="size-4 text-muted-foreground" />
+          {cities.length}
         </span>
-        <span className="flex items-center gap-1 text-sm tabular-nums" title="全境粮食">
-          <Wheat className="size-4 text-bamboo" />
-          {totalFood.toLocaleString()}
+        <span className="flex items-center gap-1 text-sm tabular-nums" title="武将数">
+          <Users className="size-4 text-muted-foreground" />
+          {officerCount}
         </span>
       </TopBar>
 

@@ -8,8 +8,9 @@ import {
   skillTargetTiles,
   effectiveTroopType,
   unitAt,
+  terrainAt,
 } from '../../store/selectors'
-import { WEATHER_LABEL } from '../labels'
+import { WEATHER_LABEL, TERRAIN_LABEL } from '../labels'
 import { Button } from '../components/ui/button'
 import { Screen, TopBar } from '../components/primitives'
 import { BattleMap } from './battle-map'
@@ -37,6 +38,7 @@ export function BattleScreen() {
   const dispatch = useGameStore((s) => s.dispatch)
   const battle = game.activeBattle
   const [draft, setDraft] = useState<ActDraft>({ kind: 'idle' })
+  const [selected, setSelected] = useState<BattleInspect | null>(null)
   const [inspect, setInspect] = useState<BattleInspect | null>(null)
   const [anchor, setAnchor] = useState({ x: 120, y: 120 })
   const [overviewOpen, setOverviewOpen] = useState(false)
@@ -63,34 +65,37 @@ export function BattleScreen() {
   const onPickTile = (p: Position, screen: { x: number; y: number }) => {
     setAnchor(screen)
     const u = unitAt(battle, p)
-    const inspectAt = () =>
-      u
-        ? setInspect({ kind: 'unit', officerId: u.officerId })
-        : setInspect({ kind: 'tile', pos: p })
+    // 点格永不弹详情：只把目标设为「当前选中」（顶栏显示名字/地形），详情仅由顶栏名字触发。
+    const select = () =>
+      setSelected(u ? { kind: 'unit', officerId: u.officerId } : { kind: 'tile', pos: p })
+    const selectOwn = (officerId: OfficerId) => {
+      setDraft(selectUnit(officerId))
+      setSelected({ kind: 'unit', officerId })
+    }
     switch (draft.kind) {
       case 'idle':
-        if (u && u.side === 'player' && !u.acted) setDraft(selectUnit(u.officerId))
-        else inspectAt()
+        if (u && u.side === 'player' && !u.acted) selectOwn(u.officerId)
+        else select()
         break
       case 'unit':
         if (reach.some((r) => samePos(r, p))) setDraft(setMove(draft, p))
-        else if (u && u.side === 'player' && !u.acted) setDraft(selectUnit(u.officerId))
-        else inspectAt()
+        else if (u && u.side === 'player' && !u.acted) selectOwn(u.officerId)
+        else select()
         break
       case 'attack':
         if (attack.some((a) => samePos(a, p))) {
           const action = actToBattleAction(draft, p)
           if (action) battleAct(action)
-        } else inspectAt()
+        } else select()
         break
       case 'cast':
         if (skill.some((s) => samePos(s, p))) {
           const action = actToBattleAction(draft, p)
           if (action) battleAct(action)
-        } else inspectAt()
+        } else select()
         break
       case 'cast-pick-skill':
-        inspectAt()
+        select()
         break
     }
   }
@@ -138,12 +143,14 @@ export function BattleScreen() {
           <Flag className="size-4 text-destructive" />
           {battle.intelRevealDay === battle.day ? battle.opponentProvisions : '???'}
         </span>
-        {selectedOfficerId !== null && (
+        {selected && (
           <button
             className="ml-1 flex items-center gap-0.5 rounded-md bg-secondary px-2 py-1 text-xs"
-            onClick={() => setInspect({ kind: 'unit', officerId: selectedOfficerId })}
+            onClick={() => setInspect(selected)}
           >
-            {game.officers[selectedOfficerId]?.name}
+            {selected.kind === 'unit'
+              ? game.officers[selected.officerId]?.name
+              : TERRAIN_LABEL[terrainAt(map, selected.pos)]}
             <ChevronRight className="size-3" />
           </button>
         )}
@@ -154,6 +161,7 @@ export function BattleScreen() {
           game={game}
           battle={battle}
           selectedOfficerId={selectedOfficerId}
+          moveTo={draft.kind === 'idle' ? null : (draft.moveTo ?? null)}
           reach={reach}
           attack={attack}
           skill={skill}

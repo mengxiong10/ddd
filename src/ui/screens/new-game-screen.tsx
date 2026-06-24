@@ -18,6 +18,17 @@ import { ScenarioPreviewMap } from './scenario-preview-map'
 
 type Step = 'cover' | 'scenario' | 'lord'
 
+/** 开局向导共用底图：极淡水墨远山（public/bg.webp），fixed 铺满、置于内容之下、不拦截点击。 */
+function FlowBackground() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 -z-10 bg-cover bg-center"
+      style={{ backgroundImage: "url('/bg.webp')" }}
+    />
+  )
+}
+
 /** 剧本卡片缩略地图：仅势力色点（无连线/无城名），快速看清割据格局。 */
 function MiniMap({ preview }: { readonly preview: ScenarioPreview }) {
   return (
@@ -84,6 +95,7 @@ export function NewGameScreen({
   if (step === 'cover') {
     return (
       <Screen className="items-center justify-center p-6 text-center">
+        <FlowBackground />
         <div className="flex flex-col items-center gap-5">
           <div className="flex size-24 items-center justify-center rounded-2xl bg-vermilion text-primary-foreground shadow-[var(--shadow-float)]">
             <span className="font-display text-3xl font-bold leading-tight">
@@ -105,6 +117,7 @@ export function NewGameScreen({
 
   return (
     <Screen className="gap-3 p-4">
+      <FlowBackground />
       <header className="flex items-center justify-between">
         <h1 className="font-display text-xl font-bold">
           {step === 'scenario' ? '择一乱世' : '择一明主'}

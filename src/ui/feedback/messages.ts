@@ -212,6 +212,8 @@ function isPlayerRelevant(event: OutcomeEvent, game: GameState): boolean {
       return ownedBy(event.officerId)
     case 'diplomacy-result':
       return ownedBy(event.officerId) || ownedBy(event.targetOfficerId)
+    case 'battle-attack':
+      return ownedBy(event.attackerId)
     case 'city-disaster':
       return game.cities[event.cityId]?.lordId === player
     case 'city-recovered':
@@ -261,6 +263,14 @@ function eventText(event: OutcomeEvent, game: GameState): string {
         : pick(SUBORN_FAIL_LINES)
     case 'diplomacy-result':
       return diplomacyText(event, game)
+    case 'battle-attack': {
+      const atk = officerName(game, event.attackerId)
+      const def = officerName(game, event.defenderId)
+      const parts = [`敌军损失 ${event.troopLoss} 兵`, `获得经验 ${event.expGain}`]
+      if (event.routed) parts.push('将其击溃')
+      const head = `${atk} 攻击 ${def}：${parts.join('，')}。`
+      return event.leveledTo !== null ? `${head} ${atk} 升至 ${event.leveledTo} 级！` : head
+    }
     case 'lord-surrendered':
       return `${officerName(game, event.fromLordId)} 势力归降 ${officerName(game, event.toLordId)}。`
     case 'lord-instigated':

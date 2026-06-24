@@ -17,6 +17,16 @@ export function Toaster() {
   const dismiss = useGameStore((s) => s.dismiss)
   const showingId = useRef<number | null>(null)
 
+  // 把 toast 当暂停态：当前队首正在展示时，点击文档任意处即消费它、推下一条。
+  // 监听在 effect（渲染提交后）才挂载，触发展示的那次点击已派发完毕，不会被自身误消费。
+  const head = feedback[0]
+  useEffect(() => {
+    if (!head || !game || feedbackText(head, game) === null) return
+    const onDocClick = () => dismiss(head.id)
+    document.addEventListener('click', onDocClick)
+    return () => document.removeEventListener('click', onDocClick)
+  }, [head, game, dismiss])
+
   useEffect(() => {
     const head = feedback[0]
     if (!head) {

@@ -13,7 +13,7 @@ import {
   canChooseDefenders,
 } from './turn/end-month'
 import { canChooseSuccessor } from './world/succession'
-import { canBattle, reduceBattle, type BattleAction } from './military/battle'
+import { canBattle, reduceBattleWithEvents, type BattleAction } from './military/battle'
 
 /**
  * 阶段推进动作（非经营命令）：无 canX 自报告改造，由 game.ts 直接分派。
@@ -77,8 +77,7 @@ export function applyWithEvents(
     case 'battle':
       return {
         ...canApply(state, action, config),
-        state: reduceBattle(state, action.action),
-        events: [],
+        ...reduceBattleWithEvents(state, action.action),
       }
     case 'resumeMonth':
       return { ...canApply(state, action, config), ...resumeMonth(state, config) }

@@ -1,6 +1,6 @@
 import type { GameState } from '../game-state'
 import type { CityId, OfficerId } from '../shared/ids'
-import { withEvents, type WithEvents } from '../shared/outcome'
+import { withEvents, type OutcomeEvent, type WithEvents } from '../shared/outcome'
 import type { Position } from '../shared/position'
 import { effectiveOfficer, governorOf, defendingOfficers } from '../world/queries'
 import type { BattleMap } from './battle-map'
@@ -174,10 +174,12 @@ export function startDay(state: GameState): GameState {
 
 /**
  * 对手方（AI）回合：循环「选将→决策（battle-ai）→应用（battle-core）」直到无可动 AI 单位
- * 或已分胜负。每步即时胜负在 applyActResolved 内检查。返回推进后的 state。
+ * 或已分胜负。每步即时胜负在 applyActResolved 内检查。返回推进后的 state 与逐次攻击事件
+ * （AI 攻击事件由 UI 按攻击方归属过滤、不弹给玩家）。
  */
-function runOpponentTurn(state: GameState): GameState {
+function runOpponentTurn(state: GameState): WithEvents<GameState> {
   let s = state
+  const events: OutcomeEvent[] = []
   // 兜底防御：单位数有限、每个被处理后置 acted，循环必终止；上限按单位数 ×2 守护。
   const guard = Object.keys(s.activeBattle?.units ?? {}).length * 2 + 1
   for (let i = 0; i < guard; i++) {
@@ -185,19 +187,21 @@ function runOpponentTurn(state: GameState): GameState {
     if (!battle || battle.outcome) break
     const decided = nextOpponentAction(s)
     if (!decided) break
-    s = applyActResolved(decided.state, decided.state.activeBattle!, decided.action)
+    const r = applyActResolved(decided.state, decided.state.activeBattle!, decided.action)
+    s = r.state
+    events.push(...r.events)
   }
-  return s
+  return withEvents(s, events)
 }
 
 /**
  * endDay：对手方（AI）行动 → 双方扣当日粮草 → 进入下一天 → 交给 startDay
- * （刷新天气/状态判定/重置行动/日界与即时胜负）。
+ * （刷新天气/状态判定/重置行动/日界与即时胜负）。AI 逐次攻击事件随结果带出。
  */
-function advanceDay(state: GameState, battle: BattleState): GameState {
-  const afterAi = runOpponentTurn({ ...state, activeBattle: battle })
-  const b = afterAi.activeBattle!
-  if (b.outcome) return afterAi // AI 行动已分胜负，交 resumeMonth 收尾
+function advanceDay(state: GameState, battle: BattleState): WithEvents<GameState> {
+  const ai = runOpponentTurn({ ...state, activeBattle: battle })
+  const b = ai.state.activeBattle!
+  if (b.outcome) return ai // AI 行动已分胜负，交 resumeMonth 收尾
   const playerProvisions = Math.max(0, b.playerProvisions - dailyFoodCost(sideTroops(b, 'player')))
   const opponentProvisions = Math.max(
     0,
@@ -209,21 +213,34 @@ function advanceDay(state: GameState, battle: BattleState): GameState {
     playerProvisions,
     opponentProvisions,
   }
-  return startDay({ ...afterAi, activeBattle: advanced })
+  return withEvents(startDay({ ...ai.state, activeBattle: advanced }), ai.events)
 }
 
-/** 战斗 reducer（纯）：非法 no-op；活动战斗已结束亦 no-op。 */
-export function reduceBattle(state: GameState, action: BattleAction): GameState {
+/**
+ * 战斗 reducer（带事件）：非法 no-op；活动战斗已结束亦 no-op。act 普攻产逐次反馈事件。
+ * `reduceBattle` 是其退化包装（丢弃事件），供既有调用与测试零改动（同 apply/applyWithEvents 范式）。
+ */
+export function reduceBattleWithEvents(
+  state: GameState,
+  action: BattleAction
+): WithEvents<GameState> {
   const battle = state.activeBattle
-  if (!battle || battle.outcome) return state
+  if (!battle || battle.outcome) return withEvents(state)
   switch (action.type) {
     case 'retreat':
-      return setOutcome(state, battle, 'playerLose')
+      return withEvents(setOutcome(state, battle, 'playerLose'))
     case 'endDay':
       return advanceDay(state, battle)
     case 'act':
-      return canBattle(state, action).ok ? applyActResolved(state, battle, action) : state
+      return canBattle(state, action).ok
+        ? applyActResolved(state, battle, action)
+        : withEvents(state)
   }
+}
+
+/** 战斗 reducer（纯，退化包装）：丢弃事件，行为与既往逐字节一致。 */
+export function reduceBattle(state: GameState, action: BattleAction): GameState {
+  return reduceBattleWithEvents(state, action).state
 }
 
 /**
