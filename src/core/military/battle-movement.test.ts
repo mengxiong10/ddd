@@ -36,6 +36,7 @@ function makeBattle(units: BattleUnit[]): BattleState {
     defenderCommanderId: 6,
     outcome: null,
     targetCityId: 3,
+    intelRevealDay: null,
   }
 }
 const has = (ps: Position[], p: Position) => ps.some((q) => samePos(q, p))

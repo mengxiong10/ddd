@@ -72,6 +72,7 @@ function makeBattle(units: BattleUnit[], over: Partial<BattleState> = {}): Battl
     defenderCommanderId: 100,
     outcome: null,
     targetCityId: 3,
+    intelRevealDay: null,
     ...over,
   }
 }

@@ -541,7 +541,7 @@ export function skillGatesPass(
 }
 
 /**
- * 成功率（§6.4.3，消耗 rng）：施法能力=施法者有效智力+等级+5；目标抗性=目标有效智力+等级+5（self→0）。
+ * 成功率（§6.4.3，消耗 rng）：施法能力=施法者有效智力+等级+5；目标抗性=目标有效智力+等级+5（self→施法者自身抗性）。
  * R=randInt(0, 目标抗性+19)；R ≤ floor(施法能力/2) 成功，否则失败。失败也推进 rng（外部仍扣 MP）。
  */
 export function rollSkillSuccess(

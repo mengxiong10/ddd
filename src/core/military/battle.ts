@@ -113,6 +113,7 @@ export function initBattle(
     defenderCommanderId: defenderIds[0] ?? 0,
     outcome: null,
     targetCityId,
+    intelRevealDay: null,
   }
 }
 

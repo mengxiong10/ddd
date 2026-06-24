@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs'
 
 /**
  * 战况概览（`21-main-flow-ui`）：左右分栏。左=顶部 [玩家方|对手方] tab 切换 + 该方全员（名/兵力/状态/主将）
- * + 该方粮草（玩家=数值、对手='???'）。右=双方相对位置简化图（始终两方都画）。本切片不实现谍报揭示。
+ * + 该方粮草（玩家=数值；对手=谍报当日揭示则数值、否则 '???'）。右=双方相对位置简化图（始终两方都画）。
  */
 export function BattleOverviewDialog({ onClose }: { readonly onClose: () => void }) {
   const game = useCurrentGame()
@@ -31,7 +31,12 @@ export function BattleOverviewDialog({ onClose }: { readonly onClose: () => void
           </div>
         ))}
       <div className="mt-1 border-t pt-1 text-sm font-medium">
-        本方粮草 {side === 'player' ? battle.playerProvisions : '???'}
+        本方粮草{' '}
+        {side === 'player'
+          ? battle.playerProvisions
+          : battle.intelRevealDay === battle.day
+            ? battle.opponentProvisions
+            : '???'}
       </div>
     </div>
   )

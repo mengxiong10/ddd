@@ -56,6 +56,7 @@ function makeBattle(units: BattleUnit[], over: Partial<BattleState> = {}): Battl
     defenderCommanderId: 6,
     outcome: null,
     targetCityId: 3,
+    intelRevealDay: null,
     ...over,
   }
 }
@@ -309,6 +310,21 @@ describe('reduceBattle cast 施法（诸葛亮 intel100 → seed1 必中、seed2
     })
     expect(WEATHER_ORDER).toContain(next.activeBattle!.weather)
     expect(next.activeBattle!.units[2]!.mp).toBe(90) // 100-10
+  })
+  it('谍报（self）成功：揭示敌粮仅当日可见、次日自动隐藏', () => {
+    const s = withPersonal(createInitialState(5), 2, [30])
+    const b = makeBattle([unit(2, 'player', { x: 5, y: 5 }), unit(6, 'opponent', { x: 20, y: 20 })])
+    const next = reduceBattle(withBattle(s, b), {
+      type: 'act',
+      officerId: 2,
+      terminal: { kind: 'cast', skillId: 30 },
+    })
+    const nb = next.activeBattle!
+    expect(nb.units[2]!.mp).toBe(90) // 100-10
+    expect(nb.intelRevealDay).toBe(nb.day) // 当日揭示
+    // 推进到下一天：intelRevealDay 不再等于 day → 敌粮重新隐藏
+    const day2 = startDay({ ...next, activeBattle: { ...nb, day: nb.day + 1 } }).activeBattle!
+    expect(day2.intelRevealDay).not.toBe(day2.day)
   })
   it('石阵：施加状态、不扣兵', () => {
     const s = createInitialState(1)

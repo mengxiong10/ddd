@@ -97,8 +97,8 @@ export function BattleScreen() {
     <div className="relative flex h-full flex-col">
       <header className="flex items-center gap-2 border-b bg-card px-3 py-1.5 text-sm">
         <span>
-          第 {battle.day} 天 · {WEATHER_LABEL[battle.weather]} · 我粮 {battle.playerProvisions} 敌粮
-          ???
+          第 {battle.day} 天 · {WEATHER_LABEL[battle.weather]} · 我粮 {battle.playerProvisions} 敌粮{' '}
+          {battle.intelRevealDay === battle.day ? battle.opponentProvisions : '???'}
         </span>
         {selectedOfficerId !== null && (
           <button

@@ -96,6 +96,11 @@ export interface BattleState {
   /** 战斗结果；null=进行中。 */
   readonly outcome: BattleOutcome | null
   readonly targetCityId: CityId
+  /**
+   * 谍报揭示日：玩家成功施谍报的那一天；等于当前 day 时敌方战场粮草对玩家可见。
+   * day 每天 +1 → 次日该等式天然为假、自动隐藏；null=从未揭示。
+   */
+  readonly intelRevealDay: number | null
 }
 
 /**
@@ -308,19 +313,29 @@ function applyCastEffect(
   def: SkillDef,
   target: BattleUnit | undefined,
   rng: Rng
-): { weather: Weather; rng: Rng; playerProvisions: number; opponentProvisions: number } {
+): {
+  weather: Weather
+  rng: Rng
+  playerProvisions: number
+  opponentProvisions: number
+  intelRevealDay: number | null
+} {
   const base = {
     weather: battle.weather,
     rng,
     playerProvisions: battle.playerProvisions,
     opponentProvisions: battle.opponentProvisions,
+    intelRevealDay: battle.intelRevealDay,
   }
-  // 天变：刷新天气；谍报：core 无效果（UI 读对手粮草）
+  // 天变：刷新天气
   if (def.special === 'weather') {
     const [w, r] = refreshWeather(rng)
     return { ...base, weather: w, rng: r }
   }
-  if (def.special === 'intel') return base
+  // 谍报：core 数据全可见，落地为「玩家本日揭示对手战场粮草」（UI 据 intelRevealDay 门控）
+  if (def.special === 'intel') {
+    return caster.side === 'player' ? { ...base, intelRevealDay: battle.day } : base
+  }
   if (!target) return base
 
   // 围攻：目标四邻友军逐个普攻目标（上/下/左/右），可致击溃
@@ -408,6 +423,7 @@ export function applyActResolved(
   let weather = battle.weather
   let playerProvisions = battle.playerProvisions
   let opponentProvisions = battle.opponentProvisions
+  let intelRevealDay = battle.intelRevealDay
   const units = { ...battle.units }
   const actor = units[action.officerId]!
   const pos = action.moveTo ?? actor.pos
@@ -425,9 +441,10 @@ export function applyActResolved(
     units[action.officerId] = charged
     const target = def.target === 'self' || !term.target ? undefined : unitAt(battle, term.target)
     const castAbility = effectiveOfficer(state, action.officerId).intelligence + acting.level + 5
+    // self 技能（天变/谍报）无目标 → 抗性取施法者自身（与 castAbility 同源、约半成）
     const targetResist = target
       ? effectiveOfficer(state, target.officerId).intelligence + target.level + 5
-      : 0
+      : castAbility
     const [ok, rng2] = rollSkillSuccess(castAbility, targetResist, rng)
     rng = rng2
     if (ok) {
@@ -436,10 +453,18 @@ export function applyActResolved(
       rng = res.rng
       playerProvisions = res.playerProvisions
       opponentProvisions = res.opponentProvisions
+      intelRevealDay = res.intelRevealDay
     }
   }
 
-  const next: BattleState = { ...battle, weather, units, playerProvisions, opponentProvisions }
+  const next: BattleState = {
+    ...battle,
+    weather,
+    units,
+    playerProvisions,
+    opponentProvisions,
+    intelRevealDay,
+  }
   const outcome = checkImmediateVictory(next, map)
   return { ...state, rng, activeBattle: outcome ? { ...next, outcome } : next }
 }
