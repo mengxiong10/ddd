@@ -14,7 +14,6 @@ import {
 import { PauseDialogs } from '../pause-dialogs'
 import { Button } from '../components/ui/button'
 import { reasonText } from '../feedback/messages'
-import { cn } from '@/lib/utils'
 
 /**
  * 经营大地图屏（`21-main-flow-ui`）：顶栏（纪年/君主/月末/新游戏）+ 大地图 + 右侧选中城面板 +
@@ -82,20 +81,6 @@ export function WorldScreen({ onNewGame }: { readonly onNewGame: () => void }) {
 
       <div className="flex min-h-0 flex-1">
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex gap-1 overflow-x-auto border-b bg-secondary/40 px-2 py-1">
-            {cities.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => selectCityForView(c.id)}
-                className={cn(
-                  'whitespace-nowrap rounded px-2 py-1 text-xs',
-                  c.id === selectedCityId ? 'bg-primary text-primary-foreground' : 'bg-card'
-                )}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
           <div className="min-h-0 flex-1 p-2">
             <WorldMap
               game={game}

@@ -11,17 +11,6 @@ import { Button } from '../components/ui/button'
 import { cn } from '@/lib/utils'
 import { ScenarioPreviewMap } from './scenario-preview-map'
 
-/** 步骤指示条。 */
-function Steps({ step }: { readonly step: 'scenario' | 'lord' }) {
-  return (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <span className={cn(step === 'scenario' && 'font-semibold text-foreground')}>① 选剧本</span>
-      <span className="opacity-40">─────</span>
-      <span className={cn(step === 'lord' && 'font-semibold text-foreground')}>② 选君主</span>
-    </div>
-  )
-}
-
 /**
  * 开局两步向导（`21-main-flow-ui`）：①剧本卡片 →②左君主列表 + 右预览地图 → newGame。
  */
@@ -59,7 +48,6 @@ export function NewGameScreen({
           </Button>
         )}
       </header>
-      <Steps step={step} />
 
       {step === 'scenario' && (
         <>
@@ -97,8 +85,8 @@ export function NewGameScreen({
           <div className="text-sm text-muted-foreground">
             {scenario?.name} · {scenario?.startYear} 年
           </div>
-          <div className="grid flex-1 grid-cols-[14rem_1fr] gap-4 overflow-hidden">
-            <div className="flex flex-col gap-1.5 overflow-y-auto pr-1">
+          <div className="grid min-h-0 flex-1 grid-cols-[14rem_1fr] grid-rows-1 gap-4 overflow-hidden">
+            <div className="flex min-h-0 flex-col gap-1.5 overflow-y-auto pr-1">
               {lords.map((l) => {
                 const active = l.id === lordId
                 return (
@@ -116,7 +104,7 @@ export function NewGameScreen({
                 )
               })}
             </div>
-            <div className="rounded-lg border bg-card p-2">
+            <div className="min-h-0 overflow-hidden rounded-lg border bg-card p-2">
               <ScenarioPreviewMap preview={preview} selectedLordId={lordId} />
             </div>
           </div>
